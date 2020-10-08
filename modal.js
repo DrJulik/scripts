@@ -1,4 +1,8 @@
 const toggleBtn = document.querySelector(".toggle");
+const url = window.location.href;
+const shop = url.split("https://").pop().split("/")[0];
+
+console.log(shop);
 
 if (
 	window.location.href ===
@@ -23,6 +27,7 @@ if (
 
 	// Modal wrapper
 	Object.assign(modal.style, {
+		zIndex: "10000",
 		pointerEvents: "all",
 		opacity: 1,
 		display: "flex",
