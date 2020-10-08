@@ -1,4 +1,3 @@
-c;
 const toggleBtn = document.querySelector(".toggle");
 const url = window.location.href;
 const shop = url.split("https://").pop().split("/")[0];
