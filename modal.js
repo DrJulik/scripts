@@ -1,8 +1,23 @@
+c;
 const toggleBtn = document.querySelector(".toggle");
 const url = window.location.href;
 const shop = url.split("https://").pop().split("/")[0];
 
-console.log(shop);
+const fetchCampaignInfo = async (shop) => {
+	const res = await fetch(
+		`https://easypop.herokuapp.com/api/campaigns/${shop}`,
+		{
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		}
+	);
+	const responseJson = await res.json();
+	console.log(responseJson);
+};
+
+fetchCampaignInfo(shop);
 
 if (
 	window.location.href ===
