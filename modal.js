@@ -55,145 +55,207 @@ const campaignInfo = async () => {
 					urlTrigger = window.location.href === settings.matchInput;
 				}
 
-				const cartSize = "";
-				const cartValue = "";
-				const tagInCart = "";
-				const collectionInCart = "";
-				const timeOnPage = "";
-				const exitIntent = "";
-				// const scrollDepth = "";
-
 				// DOM hooks
 				const toggleBtn = document.querySelector(".toggle");
 				const body = document.body;
 				const modal = document.createElement("div");
 				const popup_content = document.createElement("div");
-				const heading = document.createElement("h3");
+				const container = document.createElement("div");
+				const img = document.createElement("img");
+				const heading = document.createElement("h2");
 				const bodyText = document.createElement("p");
 				const closeBtn = document.createElement("i");
 				const buttons = document.createElement("div");
 				const primaryBtn = document.createElement("button");
-				const secondaryBtn = document.createElement("button");
+				// const secondaryBtn = document.createElement("button");
 				const btnLink = document.createElement("a");
 				const freeIcon = document.createElement("i");
+				// Input for newsletter
+				const input = document.createElement("input");
+				// Product feed elements (everything else is created in the forEach below)
+				const productContainer = document.createElement("div");
+
+				// Loading fontAwesome
+				let link = document.createElement("link");
+				link.rel = "stylesheet";
+				link.href =
+					"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css";
+				document.head.appendChild(link);
+
+				// STYLES
+				const oCValues = hsv_to_hsl(
+					style.overlayColor.hue,
+					style.overlayColor.saturation,
+					style.overlayColor.brightness
+				);
+				const bCValues = hsv_to_hsl(
+					style.backgroundColor.hue,
+					style.backgroundColor.saturation,
+					style.backgroundColor.brightness
+				);
+				const borCValues = hsv_to_hsl(
+					style.borderColor.hue,
+					style.borderColor.saturation,
+					style.borderColor.brightness
+				);
+				const primColor = hsv_to_hsl(
+					style.primaryButtonColor.hue,
+					style.primaryButtonColor.saturation,
+					style.primaryButtonColor.brightness
+				);
+
+				const overlayColor = `hsla(${Math.round(oCValues[0] * 100) / 100}, ${
+					Math.round(oCValues[1] * 100) + "%"
+				}, ${Math.round(oCValues[2] * 100) + "%"}, ${
+					style.overlayColor.alpha
+				})`;
+
+				const backgroundColor = `hsla(${Math.round(bCValues[0] * 100) / 100}, ${
+					Math.round(bCValues[1] * 100) + "%"
+				}, ${Math.round(bCValues[2] * 100) + "%"}, ${
+					style.backgroundColor.alpha
+				})`;
+				const borderColor = `hsla(${Math.round(borCValues[0] * 100) / 100}, ${
+					Math.round(borCValues[1] * 100) + "%"
+				}, ${Math.round(borCValues[2] * 100) + "%"}, ${
+					style.borderColor.alpha
+				})`;
+				const primButtonColor = `hsla(${
+					Math.round(primColor[0] * 100) / 100
+				}, ${Math.round(primColor[1] * 100) + "%"}, ${
+					Math.round(primColor[2] * 100) + "%"
+				}, ${style.primaryButtonColor.alpha})`;
+
+				const borderRadius = style.borderRadius + "%";
+				const borderWidth = style.borderWidth + "px";
+
+				// CREATING CSS STYLESHEET
+
+				let stylesheet = document.createElement("style");
+				stylesheet.type = "text/css";
+				stylesheet.innerHTML = `.modal { z-index: 10000;
+					pointer-events: none;
+					opacity: 0;
+					display: flex;
+					position: fixed;
+					top: 0;
+					left: 0;
+					height: 100%;
+					width: 100%;
+					background-color: ${overlayColor};
+					flex-direction: column;
+					justify-content: center;
+					align-items: center;
+					transition: 0.4s opacity ease; }
+
+					.modal.open {
+						pointer-events: all;
+					opacity: 1;
+					}
+
+					.container {
+						display: flex;
+						flex-direction: column;
+						justify-content: center;
+						align-items: flex-start;
+					}
+					
+					.primaryBtn {
+						padding: 0.7rem; 
+						background: ${primButtonColor}; 
+						box-shadow: #0000002e 1px 1px 3px;
+						border:none;  
+						border-radius: 3%;  
+						color: white; 
+						font-family:inherit; 
+						font-size: 0.75rem; 
+						margin-top: 0.5rem;
+						margin-right: 0.6rem;
+						transition: opacity 0.3s ease;
+					}
+
+					.primaryBtn:hover {
+						opacity:0.8;
+						cursor:pointer;
+					}
+
+					.closeBtn {
+						position: absolute;
+						right: 0;
+						top: 0;
+    					margin-top: -2.1rem;
+    					font-size: 1.6rem;
+					}
+
+					.productContainer {
+						display: flex;
+					}
+
+					.product {
+						margin: 1rem;
+					}
+
+					.prodImg {
+						width: 200px;
+						height:  200px;
+						object-fit: cover;
+						box-shadow: 1px 1px 3px #00000033;
+					}
+
+					.free-icon {
+						position: absolute;
+						bottom: 3%;
+						color: ${primButtonColor};
+						margin-top: 0.7rem;
+						font-size: 0.9em;
+					}
+
+					.free-icon::after {
+						opacity: 0;
+						content: "Popup powered by Easypop";
+						font-weight: 300;
+						padding: 0 0 3px 3px;
+						transition: 0.25s opacity ease;
+					}
+
+					.free-icon:hover:after {
+						opacity: 1;
+					}
+					`;
+				document.getElementsByTagName("head")[0].appendChild(stylesheet);
+
+				// Modal content
+				popup_content.style.cssText = `position: relative; background: ${backgroundColor}; border-radius: ${borderRadius}; border: ${borderWidth} solid ${borderColor}; box-shadow:#00000038 5px 5px 10px 0px; padding: 2.5rem; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; transition: 1s all ease;`;
+				// Secondary button
+				// secondaryBtn.style.cssText =
+				// 	"padding: 0.4rem 0.7rem; background: #ffffff; box-shadow: 0px 0px 0px transparent; border: 1px solid #422dffcc; border-radius: 5%; text-shadow: 0px 0px 0px transparent; color: #422dff; font-size: 0.6rem; margin-right: 0.6rem;";
+				// Heading
+				heading.style.cssText = "margin-bottom: 0.6rem";
+				// Body text
+				bodyText.style.cssText = "margin-bottom: 0.7rem;";
+				// Buttons div
+				buttons.style.cssText = "margin-bottom: 0.7rem; display: flex;";
+				// image
+				img.style.cssText =
+					" height: 150px; object-fit: cover; margin-bottom: 1rem;";
+				// input
+				input.style.cssText =
+					"border: 1px solid #CDD9ED; line-height: 25px; font-size: 14px; font-weight: 500; height: 100%; font-family: inherit; border-radius: 6px 0 0 6px;";
 
 				if (urlTrigger) {
 					const createModal = () => {
 						// STYLING VARS
 						// STYLE
 						// Converted color values
-						const oCValues = hsv_to_hsl(
-							style.overlayColor.hue,
-							style.overlayColor.saturation,
-							style.overlayColor.brightness
-						);
-						const bCValues = hsv_to_hsl(
-							style.backgroundColor.hue,
-							style.backgroundColor.saturation,
-							style.backgroundColor.brightness
-						);
-						const borCValues = hsv_to_hsl(
-							style.borderColor.hue,
-							style.borderColor.saturation,
-							style.borderColor.brightness
-						);
-						const primColor = hsv_to_hsl(
-							style.primaryButtonColor.hue,
-							style.primaryButtonColor.saturation,
-							style.primaryButtonColor.brightness
-						);
 
-						const overlayColor = `hsla(${
-							Math.round(oCValues[0] * 100) / 100
-						}, ${Math.round(oCValues[1] * 100) + "%"}, ${
-							Math.round(oCValues[2] * 100) + "%"
-						}, ${style.overlayColor.alpha})`;
-
-						const backgroundColor = `hsla(${
-							Math.round(bCValues[0] * 100) / 100
-						}, ${Math.round(bCValues[1] * 100) + "%"}, ${
-							Math.round(bCValues[2] * 100) + "%"
-						}, ${style.backgroundColor.alpha})`;
-						const borderColor = `hsla(${
-							Math.round(borCValues[0] * 100) / 100
-						}, ${Math.round(borCValues[1] * 100) + "%"}, ${
-							Math.round(borCValues[2] * 100) + "%"
-						}, ${style.borderColor.alpha})`;
-						const primButtonColor = `hsla(${
-							Math.round(primColor[0] * 100) / 100
-						}, ${Math.round(primColor[1] * 100) + "%"}, ${
-							Math.round(primColor[2] * 100) + "%"
-						}, ${style.primaryButtonColor.alpha})`;
-
-						const borderRadius = style.borderRadius + "%";
-						const borderWidth = style.borderWidth + "px";
-
-						// Loading fontAwesome
-						let link = document.createElement("link");
-						link.rel = "stylesheet";
-						link.href =
-							"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css";
-						// link.integrity =
-						// 	"sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==";
-						// link.crossorigin = "anonymous";
-						document.head.appendChild(link);
-						// CREATING CSS STYLESHEET
-
-						let stylesheet = document.createElement("style");
-						stylesheet.type = "text/css";
-						stylesheet.innerHTML = `.modal { z-index: 10000;
-						pointer-events: none;
-						opacity: 0;
-						display: flex;
-						position: absolute;
-						top: 0;
-						left: 0;
-						height: 100%;
-						width: 100%;
-						background-color: ${overlayColor};
-						flex-direction: column;
-						justify-content: center;
-						align-items: center;
-						transition: 0.4s opacity ease; }
-	
-						.modal.open {
-							pointer-events: all;
-						opacity: 1;
-						}
-						
-						.free-icon {
-							position: absolute;
-								bottom: 5%;
-							left: 5%;
-							font-size: 0.9em;
-						}
-	
-						.free-icon::after {
-							opacity: 0;
-							content: "Popup powered by Easypop";
-							font-weight: 300;
-							padding: 0 0 3px 3px;
-							transition: 0.25s opacity ease;
-						}
-	
-						.free-icon:hover:after {
-							opacity: 1;
-						}
-						`;
-						document.getElementsByTagName("head")[0].appendChild(stylesheet);
 						if (settings.delay) {
 							modal.classList.add("modal");
 						} else {
-							modal.classList.add("modal", "open");
+							modal.classList.add("modal");
+							setTimeout(() => {
+								modal.classList.add("open");
+							}, 1);
 						}
-
-						// CONTENT
-						heading.textContent = content.headline;
-						bodyText.textContent = content.body;
-						primaryBtn.textContent = content.buttonText;
-						btnLink.href = content.buttonUrl;
-						secondaryBtn.textContent = "Cancel";
-
 						// AUTO CLOSE
 						const handleAutoClose = () => {
 							if (settings.autoClose) {
@@ -205,7 +267,6 @@ const campaignInfo = async () => {
 								return;
 							}
 						};
-
 						// DELAY
 						if (settings.delay) {
 							setTimeout(() => {
@@ -233,28 +294,106 @@ const campaignInfo = async () => {
 						};
 						handleFrequency();
 
-						// Modal content
-						popup_content.style.cssText = `position: relative; background: ${backgroundColor}; border-radius: ${borderRadius}; border: ${borderWidth} solid ${borderColor}; box-shadow:#00000038 5px 5px 10px 0px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 1s all ease;`;
-						// Primary button
-						primaryBtn.style.cssText = `padding: 0.4rem 0.7rem; background: ${primButtonColor}; box-shadow: 0px 0px 0px transparent;  border-radius: 7%; text-shadow: 0px 0px 0px transparent; color: white; font-size: 0.6rem; margin-right: 0.6rem;`;
-						// Secondary button
-						secondaryBtn.style.cssText =
-							"padding: 0.4rem 0.7rem; background: #ffffff; box-shadow: 0px 0px 0px transparent; border: 1px solid #422dffcc; border-radius: 5%; text-shadow: 0px 0px 0px transparent; color: #422dff; font-size: 0.6rem; margin-right: 0.6rem;";
-						// Heading
-						heading.style.cssText = "margin-bottom: 0.6rem";
-						// Body text
-						bodyText.style.cssText =
-							"text-align: center; margin-bottom: 0.7rem;";
+						// CONTENT TYPES
+						if (content.contentType === "text-image") {
+							// CONTENT
+							img.src = content.imgUrl;
+							heading.textContent = content.headline;
+							bodyText.textContent = content.body;
+							primaryBtn.textContent = content.buttonText;
+							btnLink.href = content.buttonUrl;
+							// secondaryBtn.textContent = "Cancel";
 
-						modal.appendChild(popup_content);
-						popup_content.appendChild(heading);
-						popup_content.appendChild(bodyText);
-						popup_content.appendChild(closeBtn);
-						popup_content.appendChild(buttons);
-						buttons.appendChild(btnLink);
-						btnLink.appendChild(primaryBtn);
-						buttons.appendChild(secondaryBtn);
-						body.appendChild(modal);
+							modal.appendChild(popup_content);
+							modal.appendChild(closeBtn);
+							popup_content.appendChild(container);
+							container.appendChild(img);
+							container.appendChild(heading);
+							container.appendChild(bodyText);
+							container.appendChild(closeBtn);
+							container.appendChild(buttons);
+							buttons.appendChild(btnLink);
+							btnLink.appendChild(primaryBtn);
+							// buttons.appendChild(secondaryBtn);
+							body.appendChild(modal);
+						} else if (content.contentType === "newsletter") {
+							heading.textContent = content.headline;
+							bodyText.textContent = content.body;
+							primaryBtn.textContent = content.buttonText;
+							btnLink.href = content.buttonUrl;
+							input.type = "text";
+
+							modal.appendChild(popup_content);
+							popup_content.appendChild(container);
+							container.appendChild(heading);
+							container.appendChild(bodyText);
+							container.appendChild(closeBtn);
+							container.appendChild(buttons);
+							buttons.appendChild(input);
+							buttons.appendChild(btnLink);
+							btnLink.appendChild(primaryBtn);
+							// buttons.appendChild(secondaryBtn);
+							body.appendChild(modal);
+						} else if (content.contentType === "product-feed") {
+							heading.textContent = content.headline;
+							bodyText.textContent = content.body;
+							primaryBtn.textContent = content.buttonText;
+							btnLink.href = content.buttonUrl;
+
+							productContainer.classList.add("productContainer");
+
+							modal.appendChild(popup_content);
+							popup_content.appendChild(container);
+							container.appendChild(heading);
+							container.appendChild(bodyText);
+							popup_content.appendChild(productContainer);
+							// Run a forEach loop for how many products we want here?
+							const products = content.selectedProducts[0].selection;
+							console.log(products);
+							products.forEach((prod) => {
+								const product = document.createElement("div");
+								const prodImg = document.createElement("img");
+								const prodTitle = document.createElement("h3");
+								const prodPrice = document.createElement("p");
+								const primaryBtn = document.createElement("p");
+
+								product.classList.add("product");
+								prodImg.classList.add("prodImg");
+								prodTitle.classList.add("prodTitle");
+								prodPrice.classList.add("prodPrice");
+								primaryBtn.classList.add("primaryBtn");
+
+								productContainer.appendChild(product);
+								product.appendChild(prodImg);
+								product.appendChild(prodTitle);
+								product.appendChild(prodPrice);
+								product.appendChild(primaryBtn);
+
+								const image =
+									prod.images.length === 0
+										? "https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png?format=jpg&quality=90&v=1530129081"
+										: prod.images[0].originalSrc;
+
+								prodTitle.textContent = prod.title;
+								prodPrice.textContent = prod.variants[0].price;
+								prodImg.src = image;
+								primaryBtn.textContent = "Add to Cart";
+							});
+
+							body.appendChild(modal);
+						} else if (content.contentType === "custom-html") {
+							const customHtml = content.customHtml;
+
+							popup_content.innerHTML = customHtml;
+
+							modal.appendChild(popup_content);
+							body.appendChild(modal);
+						}
+						// classes
+						primaryBtn.classList.add("primaryBtn");
+						container.classList.add("container");
+						closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
+
 						if (freePlan) {
 							freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
 							popup_content.appendChild(freeIcon);
@@ -266,7 +405,7 @@ const campaignInfo = async () => {
 							isOpen = true;
 							handleAutoClose();
 						});
-						secondaryBtn.addEventListener("click", (e) => {
+						closeBtn.addEventListener("click", (e) => {
 							modal.classList.remove("open");
 							isOpen = false;
 						});
@@ -277,105 +416,6 @@ const campaignInfo = async () => {
 						// STYLING VARS
 						// STYLE
 						// Converted color values
-						const oCValues = hsv_to_hsl(
-							style.overlayColor.hue,
-							style.overlayColor.saturation,
-							style.overlayColor.brightness
-						);
-						const bCValues = hsv_to_hsl(
-							style.backgroundColor.hue,
-							style.backgroundColor.saturation,
-							style.backgroundColor.brightness
-						);
-						const borCValues = hsv_to_hsl(
-							style.borderColor.hue,
-							style.borderColor.saturation,
-							style.borderColor.brightness
-						);
-						const primColor = hsv_to_hsl(
-							style.primaryButtonColor.hue,
-							style.primaryButtonColor.saturation,
-							style.primaryButtonColor.brightness
-						);
-
-						const overlayColor = `hsla(${
-							Math.round(oCValues[0] * 100) / 100
-						}, ${Math.round(oCValues[1] * 100) + "%"}, ${
-							Math.round(oCValues[2] * 100) + "%"
-						}, ${style.overlayColor.alpha})`;
-
-						const backgroundColor = `hsla(${
-							Math.round(bCValues[0] * 100) / 100
-						}, ${Math.round(bCValues[1] * 100) + "%"}, ${
-							Math.round(bCValues[2] * 100) + "%"
-						}, ${style.backgroundColor.alpha})`;
-						const borderColor = `hsla(${
-							Math.round(borCValues[0] * 100) / 100
-						}, ${Math.round(borCValues[1] * 100) + "%"}, ${
-							Math.round(borCValues[2] * 100) + "%"
-						}, ${style.borderColor.alpha})`;
-						const primButtonColor = `hsla(${
-							Math.round(primColor[0] * 100) / 100
-						}, ${Math.round(primColor[1] * 100) + "%"}, ${
-							Math.round(primColor[2] * 100) + "%"
-						}, ${style.primaryButtonColor.alpha})`;
-
-						const borderRadius = style.borderRadius + "%";
-						const borderWidth = style.borderWidth + "px";
-
-						// Loading fontAwesome
-						let link = document.createElement("link");
-						link.rel = "stylesheet";
-						link.href =
-							"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css";
-						// link.integrity =
-						// 	"sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==";
-						// link.crossorigin = "anonymous";
-						document.head.appendChild(link);
-						// CREATING CSS STYLESHEET
-
-						let stylesheet = document.createElement("style");
-						stylesheet.type = "text/css";
-						stylesheet.innerHTML = `.modal { z-index: 10000;
-						pointer-events: none;
-						opacity: 0;
-						display: flex;
-						position: absolute;
-						top: 0;
-						left: 0;
-						height: 100%;
-						width: 100%;
-						background-color: ${overlayColor};
-						flex-direction: column;
-						justify-content: center;
-						align-items: center;
-						transition: 0.4s opacity ease; }
-	
-						.modal.open {
-							pointer-events: all;
-						opacity: 1;
-						}
-						
-						.free-icon {
-							position: absolute;
-								bottom: 5%;
-							left: 5%;
-							font-size: 0.9em;
-						}
-	
-						.free-icon::after {
-							opacity: 0;
-							content: "Popup powered by Easypop";
-							font-weight: 300;
-							padding: 0 0 3px 3px;
-							transition: 0.25s opacity ease;
-						}
-	
-						.free-icon:hover:after {
-							opacity: 1;
-						}
-						`;
-						document.getElementsByTagName("head")[0].appendChild(stylesheet);
 
 						let scrollpos = window.scrollY;
 
@@ -443,19 +483,6 @@ const campaignInfo = async () => {
 						};
 						handleFrequency();
 
-						// Modal content
-						popup_content.style.cssText = `position: relative; background: ${backgroundColor}; border-radius: ${borderRadius}; border: ${borderWidth} solid ${borderColor}; box-shadow:#00000038 5px 5px 10px 0px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 1s all ease;`;
-						// Primary button
-						primaryBtn.style.cssText = `padding: 0.4rem 0.7rem; background: ${primButtonColor}; box-shadow: 0px 0px 0px transparent; border: none; border-radius: 7%; text-shadow: 0px 0px 0px transparent; color: white; font-size: 0.6rem; margin-right: 0.6rem;`;
-						// Secondary button
-						secondaryBtn.style.cssText =
-							"padding: 0.4rem 0.7rem; background: #ffffff; box-shadow: 0px 0px 0px transparent; border: none; border-radius: 5%; text-shadow: 0px 0px 0px transparent; color: #422dff; font-size: 0.6rem; margin-right: 0.6rem;";
-						// Heading
-						heading.style.cssText = "margin-bottom: 0.6rem";
-						// Body text
-						bodyText.style.cssText =
-							"text-align: center; margin-bottom: 0.7rem;";
-
 						modal.appendChild(popup_content);
 						popup_content.appendChild(heading);
 						popup_content.appendChild(bodyText);
@@ -486,106 +513,6 @@ const campaignInfo = async () => {
 					const createModal = () => {
 						// STYLING VARS
 						// STYLE
-						// Converted color values
-						const oCValues = hsv_to_hsl(
-							style.overlayColor.hue,
-							style.overlayColor.saturation,
-							style.overlayColor.brightness
-						);
-						const bCValues = hsv_to_hsl(
-							style.backgroundColor.hue,
-							style.backgroundColor.saturation,
-							style.backgroundColor.brightness
-						);
-						const borCValues = hsv_to_hsl(
-							style.borderColor.hue,
-							style.borderColor.saturation,
-							style.borderColor.brightness
-						);
-						const primColor = hsv_to_hsl(
-							style.primaryButtonColor.hue,
-							style.primaryButtonColor.saturation,
-							style.primaryButtonColor.brightness
-						);
-
-						const overlayColor = `hsla(${
-							Math.round(oCValues[0] * 100) / 100
-						}, ${Math.round(oCValues[1] * 100) + "%"}, ${
-							Math.round(oCValues[2] * 100) + "%"
-						}, ${style.overlayColor.alpha})`;
-
-						const backgroundColor = `hsla(${
-							Math.round(bCValues[0] * 100) / 100
-						}, ${Math.round(bCValues[1] * 100) + "%"}, ${
-							Math.round(bCValues[2] * 100) + "%"
-						}, ${style.backgroundColor.alpha})`;
-						const borderColor = `hsla(${
-							Math.round(borCValues[0] * 100) / 100
-						}, ${Math.round(borCValues[1] * 100) + "%"}, ${
-							Math.round(borCValues[2] * 100) + "%"
-						}, ${style.borderColor.alpha})`;
-						const primButtonColor = `hsla(${
-							Math.round(primColor[0] * 100) / 100
-						}, ${Math.round(primColor[1] * 100) + "%"}, ${
-							Math.round(primColor[2] * 100) + "%"
-						}, ${style.primaryButtonColor.alpha})`;
-
-						const borderRadius = style.borderRadius + "%";
-						const borderWidth = style.borderWidth + "px";
-
-						// Loading fontAwesome
-						let link = document.createElement("link");
-						link.rel = "stylesheet";
-						link.href =
-							"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css";
-						// link.integrity =
-						// 	"sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==";
-						// link.crossorigin = "anonymous";
-						document.head.appendChild(link);
-						// CREATING CSS STYLESHEET
-
-						let stylesheet = document.createElement("style");
-						stylesheet.type = "text/css";
-						stylesheet.innerHTML = `.modal { z-index: 10000;
-						pointer-events: none;
-						opacity: 0;
-						display: flex;
-						position: absolute;
-						top: 0;
-						left: 0;
-						height: 100%;
-						width: 100%;
-						background-color: ${overlayColor};
-						flex-direction: column;
-						justify-content: center;
-						align-items: center;
-						transition: 0.4s opacity ease; }
-	
-						.modal.open {
-							pointer-events: all;
-						opacity: 1;
-						}
-						
-						.free-icon {
-							position: absolute;
-								bottom: 5%;
-							left: 5%;
-							font-size: 0.9em;
-						}
-	
-						.free-icon::after {
-							opacity: 0;
-							content: "Popup powered by Easypop";
-							font-weight: 300;
-							padding: 0 0 3px 3px;
-							transition: 0.25s opacity ease;
-						}
-	
-						.free-icon:hover:after {
-							opacity: 1;
-						}
-						`;
-						document.getElementsByTagName("head")[0].appendChild(stylesheet);
 
 						const mouseEvent = (e) => {
 							const shouldShowExitIntent =
@@ -646,24 +573,12 @@ const campaignInfo = async () => {
 						};
 						handleFrequency();
 
-						// Modal content
-						popup_content.style.cssText = `position: relative; background: ${backgroundColor}; border-radius: ${borderRadius}; border: ${borderWidth} solid ${borderColor}; box-shadow:#00000038 5px 5px 10px 0px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 1s all ease;`;
-						// Primary button
-						primaryBtn.style.cssText = `padding: 0.4rem 0.7rem; background: ${primButtonColor}; box-shadow: 0px 0px 0px transparent; border: none; border-radius: 7%; text-shadow: 0px 0px 0px transparent; color: white; font-size: 0.6rem; margin-right: 0.6rem;`;
-						// Secondary button
-						secondaryBtn.style.cssText =
-							"padding: 0.4rem 0.7rem; background: #ffffff; box-shadow: 0px 0px 0px transparent; border: none; border-radius: 5%; text-shadow: 0px 0px 0px transparent; color: #422dff; font-size: 0.6rem; margin-right: 0.6rem;";
-						// Heading
-						heading.style.cssText = "margin-bottom: 0.6rem";
-						// Body text
-						bodyText.style.cssText =
-							"text-align: center; margin-bottom: 0.7rem;";
-
 						modal.appendChild(popup_content);
 						popup_content.appendChild(heading);
 						popup_content.appendChild(bodyText);
 						popup_content.appendChild(closeBtn);
 						popup_content.appendChild(buttons);
+						buttons.appendChild(input);
 						buttons.appendChild(btnLink);
 						btnLink.appendChild(primaryBtn);
 						buttons.appendChild(secondaryBtn);
@@ -689,106 +604,6 @@ const campaignInfo = async () => {
 					const createModal = () => {
 						// STYLING VARS
 						// STYLE
-						// Converted color values
-						const oCValues = hsv_to_hsl(
-							style.overlayColor.hue,
-							style.overlayColor.saturation,
-							style.overlayColor.brightness
-						);
-						const bCValues = hsv_to_hsl(
-							style.backgroundColor.hue,
-							style.backgroundColor.saturation,
-							style.backgroundColor.brightness
-						);
-						const borCValues = hsv_to_hsl(
-							style.borderColor.hue,
-							style.borderColor.saturation,
-							style.borderColor.brightness
-						);
-						const primColor = hsv_to_hsl(
-							style.primaryButtonColor.hue,
-							style.primaryButtonColor.saturation,
-							style.primaryButtonColor.brightness
-						);
-
-						const overlayColor = `hsla(${
-							Math.round(oCValues[0] * 100) / 100
-						}, ${Math.round(oCValues[1] * 100) + "%"}, ${
-							Math.round(oCValues[2] * 100) + "%"
-						}, ${style.overlayColor.alpha})`;
-
-						const backgroundColor = `hsla(${
-							Math.round(bCValues[0] * 100) / 100
-						}, ${Math.round(bCValues[1] * 100) + "%"}, ${
-							Math.round(bCValues[2] * 100) + "%"
-						}, ${style.backgroundColor.alpha})`;
-						const borderColor = `hsla(${
-							Math.round(borCValues[0] * 100) / 100
-						}, ${Math.round(borCValues[1] * 100) + "%"}, ${
-							Math.round(borCValues[2] * 100) + "%"
-						}, ${style.borderColor.alpha})`;
-						const primButtonColor = `hsla(${
-							Math.round(primColor[0] * 100) / 100
-						}, ${Math.round(primColor[1] * 100) + "%"}, ${
-							Math.round(primColor[2] * 100) + "%"
-						}, ${style.primaryButtonColor.alpha})`;
-
-						const borderRadius = style.borderRadius + "%";
-						const borderWidth = style.borderWidth + "px";
-
-						// Loading fontAwesome
-						let link = document.createElement("link");
-						link.rel = "stylesheet";
-						link.href =
-							"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css";
-						// link.integrity =
-						// 	"sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==";
-						// link.crossorigin = "anonymous";
-						document.head.appendChild(link);
-						// CREATING CSS STYLESHEET
-
-						let stylesheet = document.createElement("style");
-						stylesheet.type = "text/css";
-						stylesheet.innerHTML = `.modal { z-index: 10000;
-						pointer-events: none;
-						opacity: 0;
-						display: flex;
-						position: absolute;
-						top: 0;
-						left: 0;
-						height: 100%;
-						width: 100%;
-						background-color: ${overlayColor};
-						flex-direction: column;
-						justify-content: center;
-						align-items: center;
-						transition: 0.4s opacity ease; }
-	
-						.modal.open {
-							pointer-events: all;
-						opacity: 1;
-						}
-						
-						.free-icon {
-							position: absolute;
-								bottom: 5%;
-							left: 5%;
-							font-size: 0.9em;
-						}
-	
-						.free-icon::after {
-							opacity: 0;
-							content: "Popup powered by Easypop";
-							font-weight: 300;
-							padding: 0 0 3px 3px;
-							transition: 0.25s opacity ease;
-						}
-	
-						.free-icon:hover:after {
-							opacity: 1;
-						}
-						`;
-						document.getElementsByTagName("head")[0].appendChild(stylesheet);
 
 						setTimeout(() => {
 							modal.classList.add("open");
@@ -840,19 +655,6 @@ const campaignInfo = async () => {
 							}
 						};
 						handleFrequency();
-
-						// Modal content
-						popup_content.style.cssText = `position: relative; background: ${backgroundColor}; border-radius: ${borderRadius}; border: ${borderWidth} solid ${borderColor}; box-shadow:#00000038 5px 5px 10px 0px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 1s all ease;`;
-						// Primary button
-						primaryBtn.style.cssText = `padding: 0.4rem 0.7rem; background: ${primButtonColor}; box-shadow: 0px 0px 0px transparent; border: none; border-radius: 7%; text-shadow: 0px 0px 0px transparent; color: white; font-size: 0.6rem; margin-right: 0.6rem;`;
-						// Secondary button
-						secondaryBtn.style.cssText =
-							"padding: 0.4rem 0.7rem; background: #ffffff; box-shadow: 0px 0px 0px transparent; border: none; border-radius: 5%; text-shadow: 0px 0px 0px transparent; color: #422dff; font-size: 0.6rem; margin-right: 0.6rem;";
-						// Heading
-						heading.style.cssText = "margin-bottom: 0.6rem";
-						// Body text
-						bodyText.style.cssText =
-							"text-align: center; margin-bottom: 0.7rem;";
 
 						modal.appendChild(popup_content);
 						popup_content.appendChild(heading);
