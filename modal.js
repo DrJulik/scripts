@@ -1,6 +1,8 @@
+const shop = window.location.href.split("https://").pop().split("/")[0];
+
 const fetchCampaignInfo = async () => {
 	const res = await fetch(
-		`https://easypop.herokuapp.com/api/campaigns/easypop-development.myshopify.com`,
+		`https://easypop.herokuapp.com/api/campaigns/${shop}`,
 		{
 			method: "GET",
 			headers: {
@@ -255,15 +257,20 @@ const campaignInfo = async () => {
 					"border: 1px solid #CDD9ED; line-height: 25px; font-size: 14px; font-weight: 500; height: 100%; font-family: inherit; border-radius: 6px 0 0 6px;";
 				if (settings.trigger === "cart-size") {
 					const createModal = () => {
-						// STYLING VARS
-						// STYLE
-						// Converted color values
-
-						if (cartData.item_count >= settings.matchInput) {
-							modal.classList.add("modal");
-							setTimeout(() => {
-								modal.classList.add("open");
-							}, 1);
+						if (settings.matchingFormat === "greater") {
+							if (cartData.item_count > settings.matchInput) {
+								modal.classList.add("modal");
+								setTimeout(() => {
+									modal.classList.add("open");
+								}, 1);
+							}
+						} else if (settings.matchingFormat === "less") {
+							if (cartData.item_count < settings.matchInput) {
+								modal.classList.add("modal");
+								setTimeout(() => {
+									modal.classList.add("open");
+								}, 1);
+							}
 						}
 
 						// AUTO CLOSE
