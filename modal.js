@@ -12,13 +12,16 @@ const fetchCampaignInfo = async () => {
 	return responseJson.data;
 };
 
-var cartContents = fetch("/cart.js")
-	.then((response) => response.json())
-	.then((data) => {
-		return data;
+const fetchCartInfo = async () => {
+	const res = await fetch(`/cart.js`, {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+		},
 	});
-
-console.log(cartContents);
+	const responseJson = await res.json();
+	return responseJson.data;
+};
 
 // HELPER
 function hsv_to_hsl(h, s, v) {
@@ -41,6 +44,7 @@ function hsv_to_hsl(h, s, v) {
 const campaignInfo = async () => {
 	try {
 		const campData = await fetchCampaignInfo();
+		const cartData = await fetchCartInfo();
 
 		campData.forEach((campaign) => {
 			console.log(campaign);
@@ -249,8 +253,175 @@ const campaignInfo = async () => {
 				// input
 				input.style.cssText =
 					"border: 1px solid #CDD9ED; line-height: 25px; font-size: 14px; font-weight: 500; height: 100%; font-family: inherit; border-radius: 6px 0 0 6px;";
+				if (settings.trigger === "cart-size") {
+					const createModal = () => {
+						// STYLING VARS
+						// STYLE
+						// Converted color values
 
-				if (urlTrigger) {
+						if (cartData.item_count >= settings.matchInput) {
+							modal.classList.add("modal");
+							setTimeout(() => {
+								modal.classList.add("open");
+							}, 1);
+						}
+
+						// AUTO CLOSE
+						const handleAutoClose = () => {
+							if (settings.autoClose) {
+								setTimeout(() => {
+									modal.classList.remove("open");
+									isOpen = false;
+								}, settings.autoCloseTime * 1000);
+							} else {
+								return;
+							}
+						};
+						// DELAY
+						if (settings.delay) {
+							setTimeout(() => {
+								modal.classList.add("open");
+								isOpen = true;
+								handleAutoClose();
+							}, settings.delayTime * 1000);
+						}
+
+						const handleFrequency = () => {
+							if (settings.frequency) {
+								// wait for delay if there is one
+								if (settings.delay) {
+									setTimeout(() => {
+										return;
+									}, settings.delayTime * 1000);
+								}
+								// run the open close every X amount of time
+								setInterval(() => {
+									modal.classList.add("open");
+									isOpen = true;
+									handleAutoClose();
+								}, settings.frequencyTime * 1000);
+							}
+						};
+						handleFrequency();
+
+						// CONTENT TYPES
+						if (content.contentType === "text-image") {
+							// CONTENT
+							img.src = content.imgUrl;
+							heading.textContent = content.headline;
+							bodyText.textContent = content.body;
+							primaryBtn.textContent = content.buttonText;
+							btnLink.href = content.buttonUrl;
+							// secondaryBtn.textContent = "Cancel";
+
+							modal.appendChild(popup_content);
+							modal.appendChild(closeBtn);
+							popup_content.appendChild(container);
+							container.appendChild(img);
+							container.appendChild(heading);
+							container.appendChild(bodyText);
+							container.appendChild(closeBtn);
+							container.appendChild(buttons);
+							buttons.appendChild(btnLink);
+							btnLink.appendChild(primaryBtn);
+							// buttons.appendChild(secondaryBtn);
+							body.appendChild(modal);
+						} else if (content.contentType === "newsletter") {
+							heading.textContent = content.headline;
+							bodyText.textContent = content.body;
+							primaryBtn.textContent = content.buttonText;
+							btnLink.href = content.buttonUrl;
+							input.type = "text";
+
+							modal.appendChild(popup_content);
+							popup_content.appendChild(container);
+							container.appendChild(heading);
+							container.appendChild(bodyText);
+							container.appendChild(closeBtn);
+							container.appendChild(buttons);
+							buttons.appendChild(input);
+							buttons.appendChild(btnLink);
+							btnLink.appendChild(primaryBtn);
+							// buttons.appendChild(secondaryBtn);
+							body.appendChild(modal);
+						} else if (content.contentType === "product-feed") {
+							heading.textContent = content.headline;
+							bodyText.textContent = content.body;
+							primaryBtn.textContent = content.buttonText;
+							btnLink.href = content.buttonUrl;
+
+							productContainer.classList.add("productContainer");
+
+							modal.appendChild(popup_content);
+							popup_content.appendChild(container);
+							container.appendChild(heading);
+							container.appendChild(bodyText);
+							popup_content.appendChild(productContainer);
+							// Run a forEach loop for how many products we want here?
+							const products = content.selectedProducts[0].selection;
+							console.log(products);
+							products.forEach((prod) => {
+								const product = document.createElement("div");
+								const prodImg = document.createElement("img");
+								const prodTitle = document.createElement("h3");
+								const prodPrice = document.createElement("p");
+								const primaryBtn = document.createElement("p");
+
+								product.classList.add("product");
+								prodImg.classList.add("prodImg");
+								prodTitle.classList.add("prodTitle");
+								prodPrice.classList.add("prodPrice");
+								primaryBtn.classList.add("primaryBtn");
+
+								productContainer.appendChild(product);
+								product.appendChild(prodImg);
+								product.appendChild(prodTitle);
+								product.appendChild(prodPrice);
+								product.appendChild(primaryBtn);
+
+								const image =
+									prod.images.length === 0
+										? "https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png?format=jpg&quality=90&v=1530129081"
+										: prod.images[0].originalSrc;
+
+								prodTitle.textContent = prod.title;
+								prodPrice.textContent = prod.variants[0].price;
+								prodImg.src = image;
+								primaryBtn.textContent = "Add to Cart";
+							});
+
+							body.appendChild(modal);
+						} else if (content.contentType === "custom-html") {
+							const customHtml = content.customHtml;
+
+							popup_content.innerHTML = customHtml;
+
+							modal.appendChild(popup_content);
+							body.appendChild(modal);
+						}
+						// classes
+						primaryBtn.classList.add("primaryBtn");
+						container.classList.add("container");
+						closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
+
+						if (freePlan) {
+							freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
+							popup_content.appendChild(freeIcon);
+						}
+
+						// Open and close bar
+						toggleBtn.addEventListener("click", (e) => {
+							modal.classList.add("open");
+							isOpen = true;
+							handleAutoClose();
+						});
+						closeBtn.addEventListener("click", (e) => {
+							modal.classList.remove("open");
+							isOpen = false;
+						});
+					};
+					createModal();
+				} else if (urlTrigger) {
 					const createModal = () => {
 						// STYLING VARS
 						// STYLE
