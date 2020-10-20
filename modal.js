@@ -45,7 +45,7 @@ const campaignInfo = async () => {
 	try {
 		const campData = await fetchCampaignInfo();
 		const cartData = await fetchCartInfo();
-
+		console.log(cartData);
 		campData.forEach((campaign) => {
 			console.log(campaign);
 			const { freePlan, style, content, settings } = campaign;
