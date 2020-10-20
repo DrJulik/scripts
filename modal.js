@@ -12,6 +12,14 @@ const fetchCampaignInfo = async () => {
 	return responseJson.data;
 };
 
+var cartContents = fetch("/cart.js")
+	.then((response) => response.json())
+	.then((data) => {
+		return data;
+	});
+
+console.log(cartContents);
+
 // HELPER
 function hsv_to_hsl(h, s, v) {
 	// both hsv and hsl values are in [0, 1]
