@@ -20,7 +20,7 @@ const fetchCartInfo = async () => {
 		},
 	});
 	const responseJson = await res.json();
-	return responseJson.data;
+	return responseJson;
 };
 
 // HELPER
