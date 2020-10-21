@@ -70,7 +70,7 @@ const campaignInfo = async () => {
 				}
 
 				// DOM hooks
-				const toggleBtn = document.querySelector(".toggle");
+				// const toggleBtn = document.querySelector(".toggle");
 				const body = document.body;
 				const modal = document.createElement("div");
 				const popup_content = document.createElement("div");
@@ -418,12 +418,12 @@ const campaignInfo = async () => {
 							popup_content.appendChild(freeIcon);
 						}
 
-						// Open and close bar
-						toggleBtn.addEventListener("click", (e) => {
-							modal.classList.add("open");
-							isOpen = true;
-							handleAutoClose();
-						});
+						// // Open and close bar
+						// toggleBtn.addEventListener("click", (e) => {
+						// 	modal.classList.add("open");
+						// 	isOpen = true;
+						// 	handleAutoClose();
+						// });
 						closeBtn.addEventListener("click", (e) => {
 							modal.classList.remove("open");
 							isOpen = false;
@@ -591,12 +591,12 @@ const campaignInfo = async () => {
 							popup_content.appendChild(freeIcon);
 						}
 
-						// Open and close bar
-						toggleBtn.addEventListener("click", (e) => {
-							modal.classList.add("open");
-							isOpen = true;
-							handleAutoClose();
-						});
+						// // Open and close bar
+						// toggleBtn.addEventListener("click", (e) => {
+						// 	modal.classList.add("open");
+						// 	isOpen = true;
+						// 	handleAutoClose();
+						// });
 						closeBtn.addEventListener("click", (e) => {
 							modal.classList.remove("open");
 							isOpen = false;
@@ -764,12 +764,12 @@ const campaignInfo = async () => {
 							popup_content.appendChild(freeIcon);
 						}
 
-						// Open and close bar
-						toggleBtn.addEventListener("click", (e) => {
-							modal.classList.add("open");
-							isOpen = true;
-							handleAutoClose();
-						});
+						// // Open and close bar
+						// toggleBtn.addEventListener("click", (e) => {
+						// 	modal.classList.add("open");
+						// 	isOpen = true;
+						// 	handleAutoClose();
+						// });
 						closeBtn.addEventListener("click", (e) => {
 							modal.classList.remove("open");
 							isOpen = false;
@@ -933,12 +933,12 @@ const campaignInfo = async () => {
 							popup_content.appendChild(freeIcon);
 						}
 
-						// Open and close bar
-						toggleBtn.addEventListener("click", (e) => {
-							modal.classList.add("open");
-							isOpen = true;
-							handleAutoClose();
-						});
+						// // Open and close bar
+						// toggleBtn.addEventListener("click", (e) => {
+						// 	modal.classList.add("open");
+						// 	isOpen = true;
+						// 	handleAutoClose();
+						// });
 						closeBtn.addEventListener("click", (e) => {
 							modal.classList.remove("open");
 							isOpen = false;
@@ -1031,12 +1031,12 @@ const campaignInfo = async () => {
 							popup_content.appendChild(freeIcon);
 						}
 
-						// Open and close bar
-						toggleBtn.addEventListener("click", (e) => {
-							modal.classList.add("open");
-							isOpen = true;
-							handleAutoClose();
-						});
+						// // Open and close bar
+						// toggleBtn.addEventListener("click", (e) => {
+						// 	modal.classList.add("open");
+						// 	isOpen = true;
+						// 	handleAutoClose();
+						// });
 						secondaryBtn.addEventListener("click", (e) => {
 							modal.classList.remove("open");
 							isOpen = false;
@@ -1122,12 +1122,12 @@ const campaignInfo = async () => {
 							popup_content.appendChild(freeIcon);
 						}
 
-						// Open and close bar
-						toggleBtn.addEventListener("click", (e) => {
-							modal.classList.add("open");
-							isOpen = true;
-							handleAutoClose();
-						});
+						// // Open and close bar
+						// toggleBtn.addEventListener("click", (e) => {
+						// 	modal.classList.add("open");
+						// 	isOpen = true;
+						// 	handleAutoClose();
+						// });
 						secondaryBtn.addEventListener("click", (e) => {
 							modal.classList.remove("open");
 							isOpen = false;
@@ -1204,12 +1204,12 @@ const campaignInfo = async () => {
 							popup_content.appendChild(freeIcon);
 						}
 
-						// Open and close bar
-						toggleBtn.addEventListener("click", (e) => {
-							modal.classList.add("open");
-							isOpen = true;
-							handleAutoClose();
-						});
+						// // Open and close bar
+						// toggleBtn.addEventListener("click", (e) => {
+						// 	modal.classList.add("open");
+						// 	isOpen = true;
+						// 	handleAutoClose();
+						// });
 						secondaryBtn.addEventListener("click", (e) => {
 							modal.classList.remove("open");
 							isOpen = false;
