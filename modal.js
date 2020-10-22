@@ -2,7 +2,7 @@ const shop = window.location.href.split("https://").pop().split("/")[0];
 
 const fetchCampaignInfo = async () => {
 	const res = await fetch(
-		`https://easypop.herokuapp.com/api/campaigns/${shop}`,
+		`https://easypop.herokuapp.com/api/campaigns/freebiesdebug.myshopify.com`,
 		{
 			method: "GET",
 			headers: {
@@ -41,6 +41,59 @@ function hsv_to_hsl(h, s, v) {
 	}
 
 	return [h, s, l];
+}
+
+// MUTATION OBSERVER TO WATCH FOR CLASS CHANGES
+class ClassWatcher {
+	constructor(
+		targetNode,
+		classToWatch,
+		classAddedCallback,
+		classRemovedCallback
+	) {
+		this.targetNode = targetNode;
+		this.classToWatch = classToWatch;
+		this.classAddedCallback = classAddedCallback;
+		this.classRemovedCallback = classRemovedCallback;
+		this.observer = null;
+		this.lastClassState = targetNode.classList.contains(this.classToWatch);
+
+		this.init();
+	}
+
+	init() {
+		this.observer = new MutationObserver(this.mutationCallback);
+		this.observe();
+	}
+
+	observe() {
+		this.observer.observe(this.targetNode, { attributes: true });
+	}
+
+	disconnect() {
+		this.observer.disconnect();
+	}
+
+	mutationCallback = (mutationsList) => {
+		for (let mutation of mutationsList) {
+			if (
+				mutation.type === "attributes" &&
+				mutation.attributeName === "class"
+			) {
+				let currentClassState = mutation.target.classList.contains(
+					this.classToWatch
+				);
+				if (this.lastClassState !== currentClassState) {
+					this.lastClassState = currentClassState;
+					if (currentClassState) {
+						this.classAddedCallback();
+					} else {
+						this.classRemovedCallback();
+					}
+				}
+			}
+		}
+	};
 }
 
 const campaignInfo = async () => {
@@ -198,7 +251,13 @@ const campaignInfo = async () => {
 						right: 0;
 						top: 0;
     					margin-top: -2.1rem;
-    					font-size: 1.6rem;
+						font-size: 1.6rem;
+						transition: 0.25s opacity ease;
+					}
+
+					.closeBtn:hover {
+						opacity: 0.85;
+						cursor:pointer;
 					}
 
 					.productContainer {
@@ -356,62 +415,63 @@ const campaignInfo = async () => {
 					}
 				};
 
+				// SETTINGS
+				// AUTO CLOSE
+				const handleAutoClose = () => {
+					if (settings.autoClose) {
+						setTimeout(() => {
+							modal.classList.remove("open");
+							isOpen = false;
+						}, settings.autoCloseTime * 1000);
+					} else {
+						return;
+					}
+				};
+
+				function workOnClassAdd() {
+					handleAutoClose();
+				}
+
+				function workOnClassRemoval() {}
+
+				// watch for a specific class change
+				let classWatcher = new ClassWatcher(
+					modal,
+					"open",
+					workOnClassAdd,
+					workOnClassRemoval
+				);
+
 				// TRIGGERS START
 				if (settings.trigger === "cart-value") {
 					const createModal = () => {
 						if (settings.matchingFormat === "greater") {
 							if (cartData.item_count > settings.matchInput / 100) {
 								modal.classList.add("modal");
-								setTimeout(() => {
-									modal.classList.add("open");
-								}, 1);
+								if (settings.delay) {
+									setTimeout(() => {
+										modal.classList.add("open");
+									}, settings.delayTime);
+								} else {
+									setTimeout(() => {
+										modal.classList.add("open");
+									}, 1);
+								}
 							}
 						} else if (settings.matchingFormat === "less") {
 							if (cartData.item_count < settings.matchInput / 100) {
 								modal.classList.add("modal");
-								setTimeout(() => {
-									modal.classList.add("open");
-								}, 1);
-							}
-						}
-
-						// AUTO CLOSE
-						const handleAutoClose = () => {
-							if (settings.autoClose) {
-								setTimeout(() => {
-									modal.classList.remove("open");
-									isOpen = false;
-								}, settings.autoCloseTime * 1000);
-							} else {
-								return;
-							}
-						};
-						// DELAY
-						if (settings.delay) {
-							setTimeout(() => {
-								modal.classList.add("open");
-								isOpen = true;
-								handleAutoClose();
-							}, settings.delayTime * 1000);
-						}
-
-						const handleFrequency = () => {
-							if (settings.frequency) {
-								// wait for delay if there is one
 								if (settings.delay) {
 									setTimeout(() => {
-										return;
-									}, settings.delayTime * 1000);
+										modal.classList.add("open");
+									}, settings.delayTime);
+								} else {
+									setTimeout(() => {
+										modal.classList.add("open");
+									}, 1);
 								}
-								// run the open close every X amount of time
-								setInterval(() => {
-									modal.classList.add("open");
-									isOpen = true;
-									handleAutoClose();
-								}, settings.frequencyTime * 1000);
 							}
-						};
-						handleFrequency();
+						}
 
 						// CONTENT TYPES
 						setContentTypes();
@@ -425,12 +485,6 @@ const campaignInfo = async () => {
 							popup_content.appendChild(freeIcon);
 						}
 
-						// Open and close bar
-						// toggleBtn.addEventListener("click", (e) => {
-						// 	modal.classList.add("open");
-						// 	isOpen = true;
-						// 	handleAutoClose();
-						// });
 						closeBtn.addEventListener("click", (e) => {
 							modal.classList.remove("open");
 							isOpen = false;
@@ -442,56 +496,30 @@ const campaignInfo = async () => {
 						if (settings.matchingFormat === "greater") {
 							if (cartData.item_count > settings.matchInput) {
 								modal.classList.add("modal");
-								setTimeout(() => {
-									modal.classList.add("open");
-								}, 1);
+								if (settings.delay) {
+									setTimeout(() => {
+										modal.classList.add("open");
+									}, settings.delayTime);
+								} else {
+									setTimeout(() => {
+										modal.classList.add("open");
+									}, 1);
+								}
 							}
 						} else if (settings.matchingFormat === "less") {
 							if (cartData.item_count < settings.matchInput) {
 								modal.classList.add("modal");
-								setTimeout(() => {
-									modal.classList.add("open");
-								}, 1);
-							}
-						}
-
-						// AUTO CLOSE
-						const handleAutoClose = () => {
-							if (settings.autoClose) {
-								setTimeout(() => {
-									modal.classList.remove("open");
-									isOpen = false;
-								}, settings.autoCloseTime * 1000);
-							} else {
-								return;
-							}
-						};
-						// DELAY
-						if (settings.delay) {
-							setTimeout(() => {
-								modal.classList.add("open");
-								isOpen = true;
-								handleAutoClose();
-							}, settings.delayTime * 1000);
-						}
-
-						const handleFrequency = () => {
-							if (settings.frequency) {
-								// wait for delay if there is one
 								if (settings.delay) {
 									setTimeout(() => {
-										return;
-									}, settings.delayTime * 1000);
+										modal.classList.add("open");
+									}, settings.delayTime);
+								} else {
+									setTimeout(() => {
+										modal.classList.add("open");
+									}, 1);
 								}
-								// run the open close every X amount of time
-								setInterval(() => {
-									modal.classList.add("open");
-									isOpen = true;
-									handleAutoClose();
-								}, settings.frequencyTime * 1000);
 							}
-						};
-						handleFrequency();
+						}
 
 						// CONTENT TYPES
 						setContentTypes();
@@ -505,12 +533,6 @@ const campaignInfo = async () => {
 							popup_content.appendChild(freeIcon);
 						}
 
-						// Open and close bar
-						// toggleBtn.addEventListener("click", (e) => {
-						// 	modal.classList.add("open");
-						// 	isOpen = true;
-						// 	handleAutoClose();
-						// });
 						closeBtn.addEventListener("click", (e) => {
 							modal.classList.remove("open");
 							isOpen = false;
@@ -519,10 +541,6 @@ const campaignInfo = async () => {
 					createModal();
 				} else if (urlTrigger) {
 					const createModal = () => {
-						// STYLING VARS
-						// STYLE
-						// Converted color values
-
 						if (settings.delay) {
 							modal.classList.add("modal");
 						} else {
@@ -531,43 +549,6 @@ const campaignInfo = async () => {
 								modal.classList.add("open");
 							}, 1);
 						}
-						// AUTO CLOSE
-						const handleAutoClose = () => {
-							if (settings.autoClose) {
-								setTimeout(() => {
-									modal.classList.remove("open");
-									isOpen = false;
-								}, settings.autoCloseTime * 1000);
-							} else {
-								return;
-							}
-						};
-						// DELAY
-						if (settings.delay) {
-							setTimeout(() => {
-								modal.classList.add("open");
-								isOpen = true;
-								handleAutoClose();
-							}, settings.delayTime * 1000);
-						}
-
-						const handleFrequency = () => {
-							if (settings.frequency) {
-								// wait for delay if there is one
-								if (settings.delay) {
-									setTimeout(() => {
-										return;
-									}, settings.delayTime * 1000);
-								}
-								// run the open close every X amount of time
-								setInterval(() => {
-									modal.classList.add("open");
-									isOpen = true;
-									handleAutoClose();
-								}, settings.frequencyTime * 1000);
-							}
-						};
-						handleFrequency();
 
 						// CONTENT TYPES
 						setContentTypes();
@@ -581,12 +562,6 @@ const campaignInfo = async () => {
 							popup_content.appendChild(freeIcon);
 						}
 
-						// Open and close bar
-						// toggleBtn.addEventListener("click", (e) => {
-						// 	modal.classList.add("open");
-						// 	isOpen = true;
-						// 	handleAutoClose();
-						// });
 						closeBtn.addEventListener("click", (e) => {
 							modal.classList.remove("open");
 							isOpen = false;
@@ -595,14 +570,17 @@ const campaignInfo = async () => {
 					createModal();
 				} else if (settings.trigger === "scroll-depth") {
 					const createModal = () => {
-						// STYLING VARS
-						// STYLE
-						// Converted color values
-
 						let scrollpos = window.scrollY;
 
-						const add_class_on_scroll = () =>
-							modal.classList.add("modal", "open");
+						const add_class_on_scroll = () => {
+							if (settings.delay) {
+								setTimeout(() => {
+									modal.classList.add("open");
+								}, settings.delayTime * 1000);
+							} else {
+								modal.classList.add("open");
+							}
+						};
 
 						const removeListener = () => {
 							window.removeEventListener("scroll", catchModal);
@@ -621,57 +599,16 @@ const campaignInfo = async () => {
 
 						// CONTENT TYPES
 						setContentTypes();
-
-						// AUTO CLOSE
-						const handleAutoClose = () => {
-							if (settings.autoClose) {
-								setTimeout(() => {
-									modal.classList.remove("open");
-									isOpen = false;
-								}, settings.autoCloseTime * 1000);
-							} else {
-								return;
-							}
-						};
-
-						// DELAY
-						if (settings.delay) {
-							setTimeout(() => {
-								modal.classList.add("open");
-								isOpen = true;
-								handleAutoClose();
-							}, settings.delayTime * 1000);
-						}
-
-						const handleFrequency = () => {
-							if (settings.frequency) {
-								// wait for delay if there is one
-								if (settings.delay) {
-									setTimeout(() => {
-										return;
-									}, settings.delayTime * 1000);
-								}
-								// run the open close every X amount of time
-								setInterval(() => {
-									modal.classList.add("open");
-									isOpen = true;
-									handleAutoClose();
-								}, settings.frequencyTime * 1000);
-							}
-						};
-						handleFrequency();
+						// classes
+						primaryBtn.classList.add("primaryBtn");
+						container.classList.add("container");
+						closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
 
 						if (freePlan) {
 							freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
 							popup_content.appendChild(freeIcon);
 						}
 
-						// Open and close bar
-						// toggleBtn.addEventListener("click", (e) => {
-						// 	modal.classList.add("open");
-						// 	isOpen = true;
-						// 	handleAutoClose();
-						// });
 						closeBtn.addEventListener("click", (e) => {
 							modal.classList.remove("open");
 							isOpen = false;
@@ -689,8 +626,14 @@ const campaignInfo = async () => {
 
 							if (shouldShowExitIntent) {
 								document.removeEventListener("mouseout", mouseEvent);
-
-								modal.classList.add("open");
+								// Handling delay here
+								if (settings.delay) {
+									setTimeout(() => {
+										modal.classList.add("open");
+									}, settings.delayTime * 1000);
+								} else {
+									modal.classList.add("open");
+								}
 							}
 						};
 						document.addEventListener("mouseout", mouseEvent);
@@ -698,57 +641,16 @@ const campaignInfo = async () => {
 
 						// CONTENT TYPES
 						setContentTypes();
-
-						// AUTO CLOSE
-						const handleAutoClose = () => {
-							if (settings.autoClose) {
-								setTimeout(() => {
-									modal.classList.remove("open");
-									isOpen = false;
-								}, settings.autoCloseTime * 1000);
-							} else {
-								return;
-							}
-						};
-
-						// DELAY
-						if (settings.delay) {
-							setTimeout(() => {
-								modal.classList.add("open");
-								isOpen = true;
-								handleAutoClose();
-							}, settings.delayTime * 1000);
-						}
-
-						const handleFrequency = () => {
-							if (settings.frequency) {
-								// wait for delay if there is one
-								if (settings.delay) {
-									setTimeout(() => {
-										return;
-									}, settings.delayTime * 1000);
-								}
-								// run the open close every X amount of time
-								setInterval(() => {
-									modal.classList.add("open");
-									isOpen = true;
-									handleAutoClose();
-								}, settings.frequencyTime * 1000);
-							}
-						};
-						handleFrequency();
+						// classes
+						primaryBtn.classList.add("primaryBtn");
+						container.classList.add("container");
+						closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
 
 						if (freePlan) {
 							freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
 							popup_content.appendChild(freeIcon);
 						}
 
-						// Open and close bar
-						// toggleBtn.addEventListener("click", (e) => {
-						// 	modal.classList.add("open");
-						// 	isOpen = true;
-						// 	handleAutoClose();
-						// });
 						closeBtn.addEventListener("click", (e) => {
 							modal.classList.remove("open");
 							isOpen = false;
@@ -757,67 +659,30 @@ const campaignInfo = async () => {
 					createModal();
 				} else if (settings.trigger === "time-on-page") {
 					const createModal = () => {
-						// STYLING VARS
-						// STYLE
-
-						setTimeout(() => {
-							modal.classList.add("open");
-						}, settings.matchInput * 1000);
-						modal.classList.add("modal");
-
-						// CONTENT TYPES
-						setContentTypes();
-
-						// AUTO CLOSE
-						const handleAutoClose = () => {
-							if (settings.autoClose) {
-								setTimeout(() => {
-									modal.classList.remove("open");
-									isOpen = false;
-								}, settings.autoCloseTime * 1000);
-							} else {
-								return;
-							}
-						};
-
-						// DELAY
 						if (settings.delay) {
 							setTimeout(() => {
 								modal.classList.add("open");
-								isOpen = true;
-								handleAutoClose();
-							}, settings.delayTime * 1000);
+							}, settings.matchInput * 1000 + settings.delayTime * 1000);
+							modal.classList.add("modal");
+						} else {
+							setTimeout(() => {
+								modal.classList.add("open");
+							}, settings.matchInput * 1000);
+							modal.classList.add("modal");
 						}
 
-						const handleFrequency = () => {
-							if (settings.frequency) {
-								// wait for delay if there is one
-								if (settings.delay) {
-									setTimeout(() => {
-										return;
-									}, settings.delayTime * 1000);
-								}
-								// run the open close every X amount of time
-								setInterval(() => {
-									modal.classList.add("open");
-									isOpen = true;
-									handleAutoClose();
-								}, settings.frequencyTime * 1000);
-							}
-						};
-						handleFrequency();
+						// CONTENT TYPES
+						setContentTypes();
+						// classes
+						primaryBtn.classList.add("primaryBtn");
+						container.classList.add("container");
+						closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
 
 						if (freePlan) {
 							freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
 							popup_content.appendChild(freeIcon);
 						}
 
-						// Open and close bar
-						// toggleBtn.addEventListener("click", (e) => {
-						// 	modal.classList.add("open");
-						// 	isOpen = true;
-						// 	handleAutoClose();
-						// });
 						closeBtn.addEventListener("click", (e) => {
 							modal.classList.remove("open");
 							isOpen = false;
