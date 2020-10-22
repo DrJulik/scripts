@@ -2,7 +2,7 @@ const shop = window.location.href.split("https://").pop().split("/")[0];
 
 const fetchCampaignInfo = async () => {
 	const res = await fetch(
-		`https://easypop.herokuapp.com/api/campaigns/freebiesdebug.myshopify.com`,
+		`https://easypop.herokuapp.com/api/campaigns/${shop}`,
 		{
 			method: "GET",
 			headers: {
@@ -448,7 +448,7 @@ const campaignInfo = async () => {
 						if (settings.matchingFormat === "greater") {
 							if (cartData.item_count > settings.matchInput / 100) {
 								modal.classList.add("modal");
-								if (settings.delay) {
+								if (settings.delay * 1000) {
 									setTimeout(() => {
 										modal.classList.add("open");
 									}, settings.delayTime);
@@ -464,7 +464,7 @@ const campaignInfo = async () => {
 								if (settings.delay) {
 									setTimeout(() => {
 										modal.classList.add("open");
-									}, settings.delayTime);
+									}, settings.delayTime * 1000);
 								} else {
 									setTimeout(() => {
 										modal.classList.add("open");
@@ -499,7 +499,7 @@ const campaignInfo = async () => {
 								if (settings.delay) {
 									setTimeout(() => {
 										modal.classList.add("open");
-									}, settings.delayTime);
+									}, settings.delayTime * 1000);
 								} else {
 									setTimeout(() => {
 										modal.classList.add("open");
@@ -512,7 +512,7 @@ const campaignInfo = async () => {
 								if (settings.delay) {
 									setTimeout(() => {
 										modal.classList.add("open");
-									}, settings.delayTime);
+									}, settings.delayTime * 1000);
 								} else {
 									setTimeout(() => {
 										modal.classList.add("open");
