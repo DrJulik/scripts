@@ -103,7 +103,7 @@ const campaignInfo = async () => {
 		console.log(cartData);
 		campData.forEach((campaign) => {
 			console.log(campaign);
-			const { freePlan, style, content, settings } = campaign;
+			const { freePlan, style, content, settings, _id, createdAt } = campaign;
 			// I GUESS THIS IS WHERE WE BUILD THE CAMPAIGNS
 			if (style.campaignType === "modal") {
 				// TRIGGERS
@@ -134,6 +134,7 @@ const campaignInfo = async () => {
 				const closeBtn = document.createElement("i");
 				const buttons = document.createElement("div");
 				const primaryBtn = document.createElement("button");
+				const primaryBtnNewsletter = document.createElement("button");
 				// const secondaryBtn = document.createElement("button");
 				const btnLink = document.createElement("a");
 				const freeIcon = document.createElement("i");
@@ -241,7 +242,24 @@ const campaignInfo = async () => {
 						transition: opacity 0.3s ease;
 					}
 
+					.primaryBtn-newsletter {
+						padding: 0.7rem; 
+						background: ${primButtonColor}; 
+						box-shadow: #0000002e 1px 1px 3px;
+						border:none;  
+						border-radius: 3%;  
+						color: white; 
+						font-family:inherit; 
+						font-size: 0.75rem; 
+						margin-right: 0.6rem;
+						transition: opacity 0.3s ease;
+					}
+
 					.primaryBtn:hover {
+						opacity:0.8;
+						cursor:pointer;
+					}
+					.primaryBtn-newsletter:hover {
 						opacity:0.8;
 						cursor:pointer;
 					}
@@ -313,7 +331,7 @@ const campaignInfo = async () => {
 					" height: 150px; object-fit: cover; margin-bottom: 1rem;";
 				// input
 				input.style.cssText =
-					"border: 1px solid #CDD9ED; line-height: 25px; font-size: 14px; font-weight: 500; height: 100%; font-family: inherit; border-radius: 6px 0 0 6px;";
+					"width: 300px; border: 1px solid #CDD9ED; line-height: 25px; font-size: 14px; font-weight: 500; height: 100%; font-family: inherit; border-radius: 6px 0 0 6px;";
 
 				// SET CONTENT TYPES
 				const setContentTypes = () => {
@@ -341,7 +359,7 @@ const campaignInfo = async () => {
 					} else if (content.contentType === "newsletter") {
 						heading.textContent = content.headline;
 						bodyText.textContent = content.body;
-						primaryBtn.textContent = content.buttonText;
+						primaryBtnNewsletter.textContent = content.buttonText;
 						btnLink.href = content.buttonUrl;
 						input.type = "text";
 
@@ -353,9 +371,11 @@ const campaignInfo = async () => {
 						container.appendChild(buttons);
 						buttons.appendChild(input);
 						buttons.appendChild(btnLink);
-						btnLink.appendChild(primaryBtn);
+						btnLink.appendChild(primaryBtnNewsletter);
 						// buttons.appendChild(secondaryBtn);
 						body.appendChild(modal);
+
+						primaryBtnNewsletter.classList.add("primaryBtn-newsletter");
 					} else if (content.contentType === "product-feed") {
 						heading.textContent = content.headline;
 						bodyText.textContent = content.body;
@@ -385,6 +405,7 @@ const campaignInfo = async () => {
 							prodTitle.classList.add("prodTitle");
 							prodPrice.classList.add("prodPrice");
 							primaryBtn.classList.add("primaryBtn");
+							primaryBtnNewsletter.classList.add("primaryBtn-newsletter");
 
 							productContainer.appendChild(product);
 							product.appendChild(prodImg);
@@ -428,7 +449,81 @@ const campaignInfo = async () => {
 					}
 				};
 
+				// Frequency
+				const handleFrequency = (id) => {
+					// Check if they disabled frequency
+					if (!settings.frequency) {
+						localStorage.removeItem(`campaign_${id}`);
+						localStorage.removeItem(`limit_${id}`);
+					}
+
+					let timesShown = 1;
+
+					Date.prototype.addDays = function (days) {
+						let date = new Date(this.valueOf());
+						date.setDate(date.getDate() + days);
+						return date;
+					};
+
+					let limitPeriod = parseInt(settings.frequencyPeriod);
+					let creationDate = new Date(createdAt);
+					let limitResetDate = creationDate.addDays(limitPeriod);
+					let today = new Date();
+
+					if (limitResetDate <= today) {
+						localStorage.removeItem(`limit_${id}`);
+					}
+
+					if (settings.frequency) {
+						if (!localStorage.getItem(`campaign_${id}`)) {
+							localStorage.setItem(`campaign_${id}`, timesShown);
+							let count = localStorage.getItem(`campaign_${id}`);
+							if (
+								settings.frequency &&
+								parseInt(count) >= parseInt(settings.frequencyTime)
+							) {
+								console.log("Limit is reached");
+								localStorage.setItem(`limit_${id}`, true);
+							} else if (
+								settings.frequency &&
+								parseInt(count) < parseInt(settings.frequencyTime)
+							) {
+								console.log("Limit not reached yet");
+							} else {
+								console.log("Frequency is off");
+							}
+						} else {
+							let count = localStorage.getItem(`campaign_${id}`);
+
+							if (!localStorage.getItem(`limit_${id}`)) {
+								count++;
+								localStorage.setItem(`campaign_${id}`, count);
+							} else {
+								return;
+							}
+
+							if (
+								settings.frequency &&
+								parseInt(count) >= parseInt(settings.frequencyTime)
+							) {
+								console.log("Limit is reached");
+								localStorage.setItem(`limit_${id}`, true);
+							} else if (
+								settings.frequency &&
+								parseInt(count) < parseInt(settings.frequencyTime)
+							) {
+								console.log("Limit not reached yet");
+							} else {
+								console.log("Frequency is off");
+							}
+						}
+					} else {
+						return;
+					}
+				};
+
 				function workOnClassAdd() {
+					handleFrequency(_id);
 					handleAutoClose();
 				}
 
@@ -443,12 +538,18 @@ const campaignInfo = async () => {
 				);
 
 				// TRIGGERS START
-				if (settings.trigger === "cart-value") {
+				if (
+					(settings.trigger === "cart-value" &&
+						!localStorage.getItem(`limit_${_id}`)) ||
+					(settings.trigger === "cart-value" &&
+						localStorage.getItem(`limit_${_id}`) &&
+						!settings.frequency)
+				) {
 					const createModal = () => {
 						if (settings.matchingFormat === "greater") {
 							if (cartData.item_count > settings.matchInput / 100) {
 								modal.classList.add("modal");
-								if (settings.delay * 1000) {
+								if (settings.delay) {
 									setTimeout(() => {
 										modal.classList.add("open");
 									}, settings.delayTime);
@@ -464,7 +565,7 @@ const campaignInfo = async () => {
 								if (settings.delay) {
 									setTimeout(() => {
 										modal.classList.add("open");
-									}, settings.delayTime * 1000);
+									}, settings.delayTime);
 								} else {
 									setTimeout(() => {
 										modal.classList.add("open");
@@ -491,7 +592,13 @@ const campaignInfo = async () => {
 						});
 					};
 					createModal();
-				} else if (settings.trigger === "cart-size") {
+				} else if (
+					(settings.trigger === "cart-size" &&
+						!localStorage.getItem(`limit_${_id}`)) ||
+					(settings.trigger === "cart-size" &&
+						localStorage.getItem(`limit_${_id}`) &&
+						!settings.frequency)
+				) {
 					const createModal = () => {
 						if (settings.matchingFormat === "greater") {
 							if (cartData.item_count > settings.matchInput) {
@@ -499,7 +606,7 @@ const campaignInfo = async () => {
 								if (settings.delay) {
 									setTimeout(() => {
 										modal.classList.add("open");
-									}, settings.delayTime * 1000);
+									}, settings.delayTime);
 								} else {
 									setTimeout(() => {
 										modal.classList.add("open");
@@ -512,7 +619,7 @@ const campaignInfo = async () => {
 								if (settings.delay) {
 									setTimeout(() => {
 										modal.classList.add("open");
-									}, settings.delayTime * 1000);
+									}, settings.delayTime);
 								} else {
 									setTimeout(() => {
 										modal.classList.add("open");
@@ -539,7 +646,12 @@ const campaignInfo = async () => {
 						});
 					};
 					createModal();
-				} else if (urlTrigger) {
+				} else if (
+					(urlTrigger && !localStorage.getItem(`limit_${_id}`)) ||
+					(urlTrigger &&
+						localStorage.getItem(`limit_${_id}`) &&
+						!settings.frequency)
+				) {
 					const createModal = () => {
 						if (settings.delay) {
 							modal.classList.add("modal");
@@ -568,7 +680,13 @@ const campaignInfo = async () => {
 						});
 					};
 					createModal();
-				} else if (settings.trigger === "scroll-depth") {
+				} else if (
+					(settings.trigger === "scroll-depth" &&
+						!localStorage.getItem(`limit_${_id}`)) ||
+					(settings.trigger === "scroll-depth" &&
+						localStorage.getItem(`limit_${_id}`) &&
+						!settings.frequency)
+				) {
 					const createModal = () => {
 						let scrollpos = window.scrollY;
 
@@ -615,7 +733,13 @@ const campaignInfo = async () => {
 						});
 					};
 					createModal();
-				} else if (settings.trigger === "exit-intent") {
+				} else if (
+					(settings.trigger === "exit-intent" &&
+						!localStorage.getItem(`limit_${_id}`)) ||
+					(settings.trigger === "exit-intent" &&
+						localStorage.getItem(`limit_${_id}`) &&
+						!settings.frequency)
+				) {
 					const createModal = () => {
 						// STYLING VARS
 						// STYLE
@@ -657,7 +781,13 @@ const campaignInfo = async () => {
 						});
 					};
 					createModal();
-				} else if (settings.trigger === "time-on-page") {
+				} else if (
+					(settings.trigger === "time-on-page" &&
+						!localStorage.getItem(`limit_${_id}`)) ||
+					(settings.trigger === "time-on-page" &&
+						localStorage.getItem(`limit_${_id}`) &&
+						!settings.frequency)
+				) {
 					const createModal = () => {
 						if (settings.delay) {
 							setTimeout(() => {
