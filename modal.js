@@ -206,8 +206,7 @@ const campaignInfo = async () => {
 					opacity: 0;
 					display: flex;
 					position: fixed;
-					top: 0;
-					left: 0;
+					bottom:0;
 					height: 100%;
 					width: 100%;
 					background-color: ${overlayColor};
