@@ -216,7 +216,7 @@ const campaignInfo = async () => {
 					align-items: center;
 					transition: 0.4s opacity ease; }
 
-					.modal.open {
+					.modal-ep.open {
 						pointer-events: all;
 					opacity: 1;
 					}
