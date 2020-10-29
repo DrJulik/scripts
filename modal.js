@@ -201,12 +201,13 @@ const campaignInfo = async () => {
 
 				let stylesheet = document.createElement("style");
 				stylesheet.type = "text/css";
-				stylesheet.innerHTML = `.modal { z-index: 10000;
+				stylesheet.innerHTML = `.modal-ep { z-index: 10000;
 					pointer-events: none;
 					opacity: 0;
 					display: flex;
 					position: fixed;
-					bottom:0;
+					top: 0;
+					left: 0;
 					height: 100%;
 					width: 100%;
 					background-color: ${overlayColor};
@@ -547,7 +548,7 @@ const campaignInfo = async () => {
 					const createModal = () => {
 						if (settings.matchingFormat === "greater") {
 							if (cartData.item_count > settings.matchInput / 100) {
-								modal.classList.add("modal");
+								modal.classList.add("modal-ep");
 								if (settings.delay) {
 									setTimeout(() => {
 										modal.classList.add("open");
@@ -560,7 +561,7 @@ const campaignInfo = async () => {
 							}
 						} else if (settings.matchingFormat === "less") {
 							if (cartData.item_count < settings.matchInput / 100) {
-								modal.classList.add("modal");
+								modal.classList.add("modal-ep");
 								if (settings.delay) {
 									setTimeout(() => {
 										modal.classList.add("open");
@@ -601,7 +602,7 @@ const campaignInfo = async () => {
 					const createModal = () => {
 						if (settings.matchingFormat === "greater") {
 							if (cartData.item_count > settings.matchInput) {
-								modal.classList.add("modal");
+								modal.classList.add("modal-ep");
 								if (settings.delay) {
 									setTimeout(() => {
 										modal.classList.add("open");
@@ -614,7 +615,7 @@ const campaignInfo = async () => {
 							}
 						} else if (settings.matchingFormat === "less") {
 							if (cartData.item_count < settings.matchInput) {
-								modal.classList.add("modal");
+								modal.classList.add("modal-ep");
 								if (settings.delay) {
 									setTimeout(() => {
 										modal.classList.add("open");
@@ -653,9 +654,9 @@ const campaignInfo = async () => {
 				) {
 					const createModal = () => {
 						if (settings.delay) {
-							modal.classList.add("modal");
+							modal.classList.add("modal-ep");
 						} else {
-							modal.classList.add("modal");
+							modal.classList.add("modal-ep");
 							setTimeout(() => {
 								modal.classList.add("open");
 							}, 1);
@@ -712,7 +713,7 @@ const campaignInfo = async () => {
 						};
 
 						window.addEventListener("scroll", catchModal);
-						modal.classList.add("modal");
+						modal.classList.add("modal-ep");
 
 						// CONTENT TYPES
 						setContentTypes();
@@ -760,7 +761,7 @@ const campaignInfo = async () => {
 							}
 						};
 						document.addEventListener("mouseout", mouseEvent);
-						modal.classList.add("modal");
+						modal.classList.add("modal-ep");
 
 						// CONTENT TYPES
 						setContentTypes();
@@ -792,12 +793,12 @@ const campaignInfo = async () => {
 							setTimeout(() => {
 								modal.classList.add("open");
 							}, settings.matchInput * 1000 + settings.delayTime * 1000);
-							modal.classList.add("modal");
+							modal.classList.add("modal-ep");
 						} else {
 							setTimeout(() => {
 								modal.classList.add("open");
 							}, settings.matchInput * 1000);
-							modal.classList.add("modal");
+							modal.classList.add("modal-ep");
 						}
 
 						// CONTENT TYPES
