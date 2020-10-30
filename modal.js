@@ -26,22 +26,22 @@ const fetchCartInfo = async () => {
 };
 
 // HELPER
-function hsv_to_hsl(h, s, v) {
-	// both hsv and hsl values are in [0, 1]
-	var l = ((2 - s) * v) / 2;
+// function hsv_to_hsl(h, s, v) {
+// 	// both hsv and hsl values are in [0, 1]
+// 	var l = ((2 - s) * v) / 2;
 
-	if (l != 0) {
-		if (l == 1) {
-			s = 0;
-		} else if (l < 0.5) {
-			s = (s * v) / (l * 2);
-		} else {
-			s = (s * v) / (2 - l * 2);
-		}
-	}
+// 	if (l != 0) {
+// 		if (l == 1) {
+// 			s = 0;
+// 		} else if (l < 0.5) {
+// 			s = (s * v) / (l * 2);
+// 		} else {
+// 			s = (s * v) / (2 - l * 2);
+// 		}
+// 	}
 
-	return [h, s, l];
-}
+// 	return [h, s, l];
+// }
 
 // MUTATION OBSERVER TO WATCH FOR CLASS CHANGES
 class ClassWatcher {
@@ -100,10 +100,16 @@ const campaignInfo = async () => {
 	try {
 		const campData = await fetchCampaignInfo();
 		const cartData = await fetchCartInfo();
-		console.log(cartData);
+		// console.log(cartData);
 		campData.forEach((campaign) => {
 			console.log(campaign);
 			const { freePlan, style, content, settings, _id, createdAt } = campaign;
+			const {
+				borderColor,
+				backgroundColor,
+				primaryButtonColor,
+				overlayColor,
+			} = style;
 			// I GUESS THIS IS WHERE WE BUILD THE CAMPAIGNS
 			if (style.campaignType === "modal") {
 				// TRIGGERS
@@ -151,48 +157,49 @@ const campaignInfo = async () => {
 				document.head.appendChild(link);
 
 				// STYLES
-				const oCValues = hsv_to_hsl(
-					style.overlayColor.hue,
-					style.overlayColor.saturation,
-					style.overlayColor.brightness
-				);
-				const bCValues = hsv_to_hsl(
-					style.backgroundColor.hue,
-					style.backgroundColor.saturation,
-					style.backgroundColor.brightness
-				);
-				const borCValues = hsv_to_hsl(
-					style.borderColor.hue,
-					style.borderColor.saturation,
-					style.borderColor.brightness
-				);
-				const primColor = hsv_to_hsl(
-					style.primaryButtonColor.hue,
-					style.primaryButtonColor.saturation,
-					style.primaryButtonColor.brightness
-				);
+				// THIS IS HERE JUST IN CASE WE NEED TO GO BACK TO DEFAULT POLARIS PICKER
+				// const oCValues = hsv_to_hsl(
+				// 	style.overlayColor.hue,
+				// 	style.overlayColor.saturation,
+				// 	style.overlayColor.brightness
+				// );
+				// const bCValues = hsv_to_hsl(
+				// 	style.backgroundColor.hue,
+				// 	style.backgroundColor.saturation,
+				// 	style.backgroundColor.brightness
+				// );
+				// const borCValues = hsv_to_hsl(
+				// 	style.borderColor.hue,
+				// 	style.borderColor.saturation,
+				// 	style.borderColor.brightness
+				// );
+				// const primColor = hsv_to_hsl(
+				// 	style.primaryButtonColor.hue,
+				// 	style.primaryButtonColor.saturation,
+				// 	style.primaryButtonColor.brightness
+				// );
 
-				const overlayColor = `hsla(${Math.round(oCValues[0] * 100) / 100}, ${
-					Math.round(oCValues[1] * 100) + "%"
-				}, ${Math.round(oCValues[2] * 100) + "%"}, ${
-					style.overlayColor.alpha
-				})`;
+				// const overlayColor = `hsla(${Math.round(oCValues[0] * 100) / 100}, ${
+				// 	Math.round(oCValues[1] * 100) + "%"
+				// }, ${Math.round(oCValues[2] * 100) + "%"}, ${
+				// 	style.overlayColor.alpha
+				// })`;
 
-				const backgroundColor = `hsla(${Math.round(bCValues[0] * 100) / 100}, ${
-					Math.round(bCValues[1] * 100) + "%"
-				}, ${Math.round(bCValues[2] * 100) + "%"}, ${
-					style.backgroundColor.alpha
-				})`;
-				const borderColor = `hsla(${Math.round(borCValues[0] * 100) / 100}, ${
-					Math.round(borCValues[1] * 100) + "%"
-				}, ${Math.round(borCValues[2] * 100) + "%"}, ${
-					style.borderColor.alpha
-				})`;
-				const primButtonColor = `hsla(${
-					Math.round(primColor[0] * 100) / 100
-				}, ${Math.round(primColor[1] * 100) + "%"}, ${
-					Math.round(primColor[2] * 100) + "%"
-				}, ${style.primaryButtonColor.alpha})`;
+				// const backgroundColor = `hsla(${Math.round(bCValues[0] * 100) / 100}, ${
+				// 	Math.round(bCValues[1] * 100) + "%"
+				// }, ${Math.round(bCValues[2] * 100) + "%"}, ${
+				// 	style.backgroundColor.alpha
+				// })`;
+				// const borderColor = `hsla(${Math.round(borCValues[0] * 100) / 100}, ${
+				// 	Math.round(borCValues[1] * 100) + "%"
+				// }, ${Math.round(borCValues[2] * 100) + "%"}, ${
+				// 	style.borderColor.alpha
+				// })`;
+				// const primButtonColor = `hsla(${
+				// 	Math.round(primColor[0] * 100) / 100
+				// }, ${Math.round(primColor[1] * 100) + "%"}, ${
+				// 	Math.round(primColor[2] * 100) + "%"
+				// }, ${style.primaryButtonColor.alpha})`;
 
 				const borderRadius = style.borderRadius + "%";
 				const borderWidth = style.borderWidth + "px";
@@ -230,7 +237,7 @@ const campaignInfo = async () => {
 					
 					.primaryBtn {
 						padding: 0.7rem; 
-						background: ${primButtonColor}; 
+						background: ${primaryButtonColor}; 
 						box-shadow: #0000002e 1px 1px 3px;
 						border:none;  
 						border-radius: 3%;  
@@ -244,7 +251,7 @@ const campaignInfo = async () => {
 
 					.primaryBtn-newsletter {
 						padding: 0.7rem; 
-						background: ${primButtonColor}; 
+						background: ${primaryButtonColor}; 
 						box-shadow: #0000002e 1px 1px 3px;
 						border:none;  
 						border-radius: 3%;  
@@ -280,6 +287,9 @@ const campaignInfo = async () => {
 
 					.productContainer {
 						display: flex;
+						width: 90%;
+						margin:auto;
+						overflow-x: auto;
 					}
 
 					.product {
@@ -291,12 +301,13 @@ const campaignInfo = async () => {
 						height:  200px;
 						object-fit: cover;
 						box-shadow: 1px 1px 3px #00000033;
+						border-radius: 5%;
 					}
 
 					.free-icon {
 						position: absolute;
 						bottom: 3%;
-						color: ${primButtonColor};
+						color: ${primaryButtonColor};
 						margin-top: 0.7rem;
 						font-size: 0.9em;
 					}
@@ -328,7 +339,7 @@ const campaignInfo = async () => {
 				buttons.style.cssText = "margin-bottom: 0.7rem; display: flex;";
 				// image
 				img.style.cssText =
-					" height: 150px; object-fit: cover; margin-bottom: 1rem;";
+					"box-shadow: 1px 3px 5px #0000002b; height: 150px; object-fit: cover; margin-bottom: 1rem;";
 				// input
 				input.style.cssText =
 					"width: 300px; border: 1px solid #CDD9ED; line-height: 25px; font-size: 14px; font-weight: 500; height: 100%; font-family: inherit; border-radius: 6px 0 0 6px;";
