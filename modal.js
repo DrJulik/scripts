@@ -1,8 +1,8 @@
-const shop = window.location.href.split("https://").pop().split("/")[0];
+// const shop = window.location.href.split("https://").pop().split("/")[0];
 
 const fetchCampaignInfo = async () => {
 	const res = await fetch(
-		`https://easypop.herokuapp.com/api/campaigns/${shop}`,
+		`https://easypop.herokuapp.com/api/campaigns/freebiesdebug.myshopify.com`,
 		{
 			method: "GET",
 			headers: {
@@ -13,35 +13,6 @@ const fetchCampaignInfo = async () => {
 	const responseJson = await res.json();
 	return responseJson.data;
 };
-
-const fetchCartInfo = async () => {
-	const res = await fetch(`/cart.js`, {
-		method: "GET",
-		headers: {
-			"Content-Type": "application/json",
-		},
-	});
-	const responseJson = await res.json();
-	return responseJson;
-};
-
-// HELPER
-// function hsv_to_hsl(h, s, v) {
-// 	// both hsv and hsl values are in [0, 1]
-// 	var l = ((2 - s) * v) / 2;
-
-// 	if (l != 0) {
-// 		if (l == 1) {
-// 			s = 0;
-// 		} else if (l < 0.5) {
-// 			s = (s * v) / (l * 2);
-// 		} else {
-// 			s = (s * v) / (2 - l * 2);
-// 		}
-// 	}
-
-// 	return [h, s, l];
-// }
 
 // MUTATION OBSERVER TO WATCH FOR CLASS CHANGES
 class ClassWatcher {
@@ -99,7 +70,7 @@ class ClassWatcher {
 const campaignInfo = async () => {
 	try {
 		const campData = await fetchCampaignInfo();
-		const cartData = await fetchCartInfo();
+		// const cartData = await fetchCartInfo();
 		// console.log(cartData);
 		campData.forEach((campaign) => {
 			console.log(campaign);
@@ -110,24 +81,9 @@ const campaignInfo = async () => {
 				primaryButtonColor,
 				overlayColor,
 			} = style;
+			const { triggers, triggerMatch } = settings;
 			// I GUESS THIS IS WHERE WE BUILD THE CAMPAIGNS
 			if (style.campaignType === "modal") {
-				// TRIGGERS
-
-				// URL
-				let urlTrigger;
-				if (
-					settings.trigger === "url" &&
-					settings.matchingFormat === "contains"
-				) {
-					urlTrigger = window.location.href.includes(settings.matchInput);
-				} else if (
-					settings.trigger === "url" &&
-					settings.matchingFormat === "matches"
-				) {
-					urlTrigger = window.location.href === settings.matchInput;
-				}
-
 				// DOM hooks
 				const toggleBtn = document.querySelector(".toggle");
 				const body = document.body;
@@ -155,51 +111,6 @@ const campaignInfo = async () => {
 				link.href =
 					"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css";
 				document.head.appendChild(link);
-
-				// STYLES
-				// THIS IS HERE JUST IN CASE WE NEED TO GO BACK TO DEFAULT POLARIS PICKER
-				// const oCValues = hsv_to_hsl(
-				// 	style.overlayColor.hue,
-				// 	style.overlayColor.saturation,
-				// 	style.overlayColor.brightness
-				// );
-				// const bCValues = hsv_to_hsl(
-				// 	style.backgroundColor.hue,
-				// 	style.backgroundColor.saturation,
-				// 	style.backgroundColor.brightness
-				// );
-				// const borCValues = hsv_to_hsl(
-				// 	style.borderColor.hue,
-				// 	style.borderColor.saturation,
-				// 	style.borderColor.brightness
-				// );
-				// const primColor = hsv_to_hsl(
-				// 	style.primaryButtonColor.hue,
-				// 	style.primaryButtonColor.saturation,
-				// 	style.primaryButtonColor.brightness
-				// );
-
-				// const overlayColor = `hsla(${Math.round(oCValues[0] * 100) / 100}, ${
-				// 	Math.round(oCValues[1] * 100) + "%"
-				// }, ${Math.round(oCValues[2] * 100) + "%"}, ${
-				// 	style.overlayColor.alpha
-				// })`;
-
-				// const backgroundColor = `hsla(${Math.round(bCValues[0] * 100) / 100}, ${
-				// 	Math.round(bCValues[1] * 100) + "%"
-				// }, ${Math.round(bCValues[2] * 100) + "%"}, ${
-				// 	style.backgroundColor.alpha
-				// })`;
-				// const borderColor = `hsla(${Math.round(borCValues[0] * 100) / 100}, ${
-				// 	Math.round(borCValues[1] * 100) + "%"
-				// }, ${Math.round(borCValues[2] * 100) + "%"}, ${
-				// 	style.borderColor.alpha
-				// })`;
-				// const primButtonColor = `hsla(${
-				// 	Math.round(primColor[0] * 100) / 100
-				// }, ${Math.round(primColor[1] * 100) + "%"}, ${
-				// 	Math.round(primColor[2] * 100) + "%"
-				// }, ${style.primaryButtonColor.alpha})`;
 
 				const borderRadius = style.borderRadius + "%";
 				const borderWidth = style.borderWidth + "px";
@@ -548,290 +459,335 @@ const campaignInfo = async () => {
 					workOnClassRemoval
 				);
 
-				// TRIGGERS START
-				if (
-					(settings.trigger === "cart-value" &&
-						!localStorage.getItem(`limit_${_id}`)) ||
-					(settings.trigger === "cart-value" &&
-						localStorage.getItem(`limit_${_id}`) &&
-						!settings.frequency)
-				) {
-					const createModal = () => {
-						if (settings.matchingFormat === "greater") {
-							if (cartData.item_count > settings.matchInput / 100) {
-								modal.classList.add("modal-ep");
-								if (settings.delay) {
-									setTimeout(() => {
-										modal.classList.add("open");
-									}, settings.delayTime);
-								} else {
-									setTimeout(() => {
-										modal.classList.add("open");
-									}, 1);
-								}
-							}
-						} else if (settings.matchingFormat === "less") {
-							if (cartData.item_count < settings.matchInput / 100) {
-								modal.classList.add("modal-ep");
-								if (settings.delay) {
-									setTimeout(() => {
-										modal.classList.add("open");
-									}, settings.delayTime);
-								} else {
-									setTimeout(() => {
-										modal.classList.add("open");
-									}, 1);
-								}
-							}
-						}
+				// MATCH CONDITIONS -------------------------------------------------------------------
+				if (triggerMatch === "all") {
+					console.log("all triggers are matched");
 
-						// CONTENT TYPES
-						setContentTypes();
-						// classes
-						primaryBtn.classList.add("primaryBtn");
-						container.classList.add("container");
-						closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
-
-						if (freePlan) {
-							freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
-							popup_content.appendChild(freeIcon);
-						}
-
-						closeBtn.addEventListener("click", (e) => {
-							modal.classList.remove("open");
-							isOpen = false;
-						});
+					const checkCondition = (trigger) => {
+						trigger.triggerType === "url";
+						console.log(trigger.triggerType);
 					};
-					createModal();
-				} else if (
-					(settings.trigger === "cart-size" &&
-						!localStorage.getItem(`limit_${_id}`)) ||
-					(settings.trigger === "cart-size" &&
-						localStorage.getItem(`limit_${_id}`) &&
-						!settings.frequency)
-				) {
-					const createModal = () => {
-						if (settings.matchingFormat === "greater") {
-							if (cartData.item_count > settings.matchInput) {
-								modal.classList.add("modal-ep");
-								if (settings.delay) {
-									setTimeout(() => {
-										modal.classList.add("open");
-									}, settings.delayTime);
-								} else {
-									setTimeout(() => {
-										modal.classList.add("open");
-									}, 1);
+
+					const conditionsMatched = triggers.every(checkCondition);
+					console.log(conditionsMatched);
+				} else if (triggerMatch === "any") {
+					console.log("any triggers are matched");
+					// TRIGGERS START------------------------------------------------------------------------
+					triggers.some((trigger) => {
+						if (
+							(trigger.triggerType === "cart-value" &&
+								!localStorage.getItem(`limit_${_id}`)) ||
+							(trigger.triggerType === "cart-value" &&
+								localStorage.getItem(`limit_${_id}`) &&
+								!settings.frequency)
+						) {
+							const createModal = () => {
+								if (trigger.matchingFormat === "greater") {
+									if (cartData.item_count > trigger.matchingInput / 100) {
+										modal.classList.add("modal-ep");
+										if (settings.delay) {
+											setTimeout(() => {
+												modal.classList.add("open");
+											}, settings.delayTime);
+										} else {
+											setTimeout(() => {
+												modal.classList.add("open");
+											}, 1);
+										}
+									}
+								} else if (trigger.matchingFormat === "less") {
+									if (cartData.item_count < trigger.matchingInput / 100) {
+										modal.classList.add("modal-ep");
+										if (settings.delay) {
+											setTimeout(() => {
+												modal.classList.add("open");
+											}, settings.delayTime);
+										} else {
+											setTimeout(() => {
+												modal.classList.add("open");
+											}, 1);
+										}
+									}
 								}
-							}
-						} else if (settings.matchingFormat === "less") {
-							if (cartData.item_count < settings.matchInput) {
-								modal.classList.add("modal-ep");
-								if (settings.delay) {
-									setTimeout(() => {
-										modal.classList.add("open");
-									}, settings.delayTime);
-								} else {
-									setTimeout(() => {
-										modal.classList.add("open");
-									}, 1);
+
+								// CONTENT TYPES
+								setContentTypes();
+								// classes
+								primaryBtn.classList.add("primaryBtn");
+								container.classList.add("container");
+								closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
+
+								if (freePlan) {
+									freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
+									popup_content.appendChild(freeIcon);
 								}
-							}
-						}
 
-						// CONTENT TYPES
-						setContentTypes();
-						// classes
-						primaryBtn.classList.add("primaryBtn");
-						container.classList.add("container");
-						closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
+								closeBtn.addEventListener("click", (e) => {
+									modal.classList.remove("open");
+									isOpen = false;
+								});
+							};
+							createModal();
+							return trigger.triggerType === "cart-value";
+						} else if (
+							(trigger.triggerType === "cart-size" &&
+								!localStorage.getItem(`limit_${_id}`)) ||
+							(trigger.triggerType === "cart-size" &&
+								localStorage.getItem(`limit_${_id}`) &&
+								!settings.frequency)
+						) {
+							const createModal = () => {
+								if (trigger.matchingFormat === "greater") {
+									if (cartData.item_count > trigger.matchingInput) {
+										modal.classList.add("modal-ep");
+										if (settings.delay) {
+											setTimeout(() => {
+												modal.classList.add("open");
+											}, settings.delayTime);
+										} else {
+											setTimeout(() => {
+												modal.classList.add("open");
+											}, 1);
+										}
+									}
+								} else if (trigger.matchingFormat === "less") {
+									if (cartData.item_count < trigger.matchingInput) {
+										modal.classList.add("modal-ep");
+										if (settings.delay) {
+											setTimeout(() => {
+												modal.classList.add("open");
+											}, settings.delayTime);
+										} else {
+											setTimeout(() => {
+												modal.classList.add("open");
+											}, 1);
+										}
+									}
+								}
 
-						if (freePlan) {
-							freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
-							popup_content.appendChild(freeIcon);
-						}
+								// CONTENT TYPES
+								setContentTypes();
+								// classes
+								primaryBtn.classList.add("primaryBtn");
+								container.classList.add("container");
+								closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
 
-						closeBtn.addEventListener("click", (e) => {
-							modal.classList.remove("open");
-							isOpen = false;
-						});
-					};
-					createModal();
-				} else if (
-					(urlTrigger && !localStorage.getItem(`limit_${_id}`)) ||
-					(urlTrigger &&
-						localStorage.getItem(`limit_${_id}`) &&
-						!settings.frequency)
-				) {
-					const createModal = () => {
-						if (settings.delay) {
-							modal.classList.add("modal-ep");
-						} else {
-							modal.classList.add("modal-ep");
-							setTimeout(() => {
-								modal.classList.add("open");
-							}, 1);
-						}
+								if (freePlan) {
+									freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
+									popup_content.appendChild(freeIcon);
+								}
 
-						// CONTENT TYPES
-						setContentTypes();
-						// classes
-						primaryBtn.classList.add("primaryBtn");
-						container.classList.add("container");
-						closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
+								closeBtn.addEventListener("click", (e) => {
+									modal.classList.remove("open");
+									isOpen = false;
+								});
+							};
+							createModal();
+							return trigger.triggerType === "cart-size";
+						} else if (
+							(trigger.triggerType === "url" &&
+								!localStorage.getItem(`limit_${_id}`)) ||
+							(trigger.triggerType === "url" &&
+								localStorage.getItem(`limit_${_id}`) &&
+								!settings.frequency)
+						) {
+							const createModal = () => {
+								let urlTrigger;
+								if (trigger.matchingFormat === "contains") {
+									urlTrigger = window.location.href.includes(
+										trigger.matchingInput
+									);
+								} else if (trigger.matchingFormat === "matches") {
+									urlTrigger = window.location.href === trigger.matchingInput;
+								}
 
-						if (freePlan) {
-							freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
-							popup_content.appendChild(freeIcon);
-						}
-
-						closeBtn.addEventListener("click", (e) => {
-							modal.classList.remove("open");
-							isOpen = false;
-						});
-					};
-					createModal();
-				} else if (
-					(settings.trigger === "scroll-depth" &&
-						!localStorage.getItem(`limit_${_id}`)) ||
-					(settings.trigger === "scroll-depth" &&
-						localStorage.getItem(`limit_${_id}`) &&
-						!settings.frequency)
-				) {
-					const createModal = () => {
-						let scrollpos = window.scrollY;
-
-						const add_class_on_scroll = () => {
-							if (settings.delay) {
-								setTimeout(() => {
-									modal.classList.add("open");
-								}, settings.delayTime * 1000);
-							} else {
-								modal.classList.add("open");
-							}
-						};
-
-						const removeListener = () => {
-							window.removeEventListener("scroll", catchModal);
-						};
-						const catchModal = () => {
-							scrollpos = window.scrollY;
-
-							if (scrollpos >= settings.matchInput) {
-								add_class_on_scroll();
-								removeListener();
-							}
-						};
-
-						window.addEventListener("scroll", catchModal);
-						modal.classList.add("modal-ep");
-
-						// CONTENT TYPES
-						setContentTypes();
-						// classes
-						primaryBtn.classList.add("primaryBtn");
-						container.classList.add("container");
-						closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
-
-						if (freePlan) {
-							freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
-							popup_content.appendChild(freeIcon);
-						}
-
-						closeBtn.addEventListener("click", (e) => {
-							modal.classList.remove("open");
-							isOpen = false;
-						});
-					};
-					createModal();
-				} else if (
-					(settings.trigger === "exit-intent" &&
-						!localStorage.getItem(`limit_${_id}`)) ||
-					(settings.trigger === "exit-intent" &&
-						localStorage.getItem(`limit_${_id}`) &&
-						!settings.frequency)
-				) {
-					const createModal = () => {
-						// STYLING VARS
-						// STYLE
-
-						const mouseEvent = (e) => {
-							const shouldShowExitIntent =
-								!e.toElement && !e.relatedTarget && e.clientY < 10;
-
-							if (shouldShowExitIntent) {
-								document.removeEventListener("mouseout", mouseEvent);
-								// Handling delay here
 								if (settings.delay) {
+									modal.classList.add("modal-ep");
 									setTimeout(() => {
 										modal.classList.add("open");
 									}, settings.delayTime * 1000);
 								} else {
-									modal.classList.add("open");
+									if (urlTrigger) {
+										modal.classList.add("modal-ep");
+										setTimeout(() => {
+											modal.classList.add("open");
+										}, 1);
+									}
 								}
-							}
-						};
-						document.addEventListener("mouseout", mouseEvent);
-						modal.classList.add("modal-ep");
 
-						// CONTENT TYPES
-						setContentTypes();
-						// classes
-						primaryBtn.classList.add("primaryBtn");
-						container.classList.add("container");
-						closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
+								// CONTENT TYPES
+								setContentTypes();
+								// classes
+								primaryBtn.classList.add("primaryBtn");
+								container.classList.add("container");
+								closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
 
-						if (freePlan) {
-							freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
-							popup_content.appendChild(freeIcon);
-						}
+								if (freePlan) {
+									freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
+									popup_content.appendChild(freeIcon);
+								}
 
-						closeBtn.addEventListener("click", (e) => {
-							modal.classList.remove("open");
-							isOpen = false;
-						});
-					};
-					createModal();
-				} else if (
-					(settings.trigger === "time-on-page" &&
-						!localStorage.getItem(`limit_${_id}`)) ||
-					(settings.trigger === "time-on-page" &&
-						localStorage.getItem(`limit_${_id}`) &&
-						!settings.frequency)
-				) {
-					const createModal = () => {
-						if (settings.delay) {
-							setTimeout(() => {
-								modal.classList.add("open");
-							}, settings.matchInput * 1000 + settings.delayTime * 1000);
-							modal.classList.add("modal-ep");
+								closeBtn.addEventListener("click", (e) => {
+									modal.classList.remove("open");
+									isOpen = false;
+								});
+							};
+							createModal();
+							// Break out of the loop
+							return trigger.triggerType === "url";
+						} else if (
+							(trigger.triggerType === "scroll-depth" &&
+								!localStorage.getItem(`limit_${_id}`)) ||
+							(trigger.triggerType === "scroll-depth" &&
+								localStorage.getItem(`limit_${_id}`) &&
+								!settings.frequency)
+						) {
+							const createModal = () => {
+								let scrollpos = window.scrollY;
+
+								const add_class_on_scroll = () => {
+									if (settings.delay) {
+										setTimeout(() => {
+											modal.classList.add("open");
+										}, settings.delayTime * 1000);
+									} else {
+										modal.classList.add("open");
+									}
+								};
+
+								const removeListener = () => {
+									window.removeEventListener("scroll", catchModal);
+								};
+								const catchModal = () => {
+									scrollpos = window.scrollY;
+
+									if (scrollpos >= trigger.matchingInput) {
+										add_class_on_scroll();
+										removeListener();
+									}
+								};
+
+								window.addEventListener("scroll", catchModal);
+								modal.classList.add("modal-ep");
+
+								// CONTENT TYPES
+								setContentTypes();
+								// classes
+								primaryBtn.classList.add("primaryBtn");
+								container.classList.add("container");
+								closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
+
+								if (freePlan) {
+									freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
+									popup_content.appendChild(freeIcon);
+								}
+
+								closeBtn.addEventListener("click", (e) => {
+									modal.classList.remove("open");
+									isOpen = false;
+								});
+							};
+							createModal();
+							// Break out of the loop
+							return trigger.triggerType === "scroll-depth";
+						} else if (
+							(triggers.some((trigger) => {
+								return trigger.triggerType === "exit-intent";
+							}) &&
+								!localStorage.getItem(`limit_${_id}`)) ||
+							(triggers.some((trigger) => {
+								return trigger.triggerType === "exit-intent";
+							}) &&
+								localStorage.getItem(`limit_${_id}`) &&
+								!settings.frequency)
+						) {
+							const createModal = () => {
+								// STYLING VARS
+								// STYLE
+
+								const mouseEvent = (e) => {
+									const shouldShowExitIntent =
+										!e.toElement && !e.relatedTarget && e.clientY < 10;
+
+									if (shouldShowExitIntent) {
+										document.removeEventListener("mouseout", mouseEvent);
+										// Handling delay here
+										if (settings.delay) {
+											setTimeout(() => {
+												modal.classList.add("open");
+											}, settings.delayTime * 1000);
+										} else {
+											modal.classList.add("open");
+										}
+									}
+								};
+								document.addEventListener("mouseout", mouseEvent);
+								modal.classList.add("modal-ep");
+
+								// CONTENT TYPES
+								setContentTypes();
+								// classes
+								primaryBtn.classList.add("primaryBtn");
+								container.classList.add("container");
+								closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
+
+								if (freePlan) {
+									freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
+									popup_content.appendChild(freeIcon);
+								}
+
+								closeBtn.addEventListener("click", (e) => {
+									modal.classList.remove("open");
+									isOpen = false;
+								});
+							};
+							createModal();
+							// Break out of the loop
+							return trigger.triggerType === "exit-intent";
+						} else if (
+							(trigger.triggerType === "time-on-page" &&
+								!localStorage.getItem(`limit_${_id}`)) ||
+							(trigger.triggerType === "time-on-page" &&
+								localStorage.getItem(`limit_${_id}`) &&
+								!settings.frequency)
+						) {
+							const createModal = () => {
+								if (settings.delay) {
+									setTimeout(() => {
+										modal.classList.add("open");
+									}, trigger.matchingInput * 1000 + settings.delayTime * 1000);
+									modal.classList.add("modal-ep");
+								} else {
+									setTimeout(() => {
+										modal.classList.add("open");
+									}, trigger.matchingInput * 1000);
+									modal.classList.add("modal-ep");
+								}
+
+								// CONTENT TYPES
+								setContentTypes();
+								// classes
+								primaryBtn.classList.add("primaryBtn");
+								container.classList.add("container");
+								closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
+
+								if (freePlan) {
+									freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
+									popup_content.appendChild(freeIcon);
+								}
+
+								closeBtn.addEventListener("click", (e) => {
+									modal.classList.remove("open");
+									isOpen = false;
+								});
+							};
+							createModal();
+
+							return trigger.triggerType === "time-on-page";
 						} else {
-							setTimeout(() => {
-								modal.classList.add("open");
-							}, settings.matchInput * 1000);
-							modal.classList.add("modal-ep");
+							return;
 						}
-
-						// CONTENT TYPES
-						setContentTypes();
-						// classes
-						primaryBtn.classList.add("primaryBtn");
-						container.classList.add("container");
-						closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
-
-						if (freePlan) {
-							freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
-							popup_content.appendChild(freeIcon);
-						}
-
-						closeBtn.addEventListener("click", (e) => {
-							modal.classList.remove("open");
-							isOpen = false;
-						});
-					};
-					createModal();
-				} else {
-					return;
+					});
 				}
 			}
 		});
