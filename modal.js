@@ -596,9 +596,7 @@ const campaignInfo = async () => {
 							return trigger.triggerType === "exit-intent";
 						})
 					) {
-						setTimeout(() => {
-							document.addEventListener("mouseout", mouseEvent);
-						}, 1000);
+						document.addEventListener("mouseout", mouseEvent);
 					}
 
 					// SCROLL DEPTH CHECK
@@ -612,7 +610,9 @@ const campaignInfo = async () => {
 							return trigger.triggerType === "scroll-depth";
 						})
 					) {
-						window.addEventListener("scroll", catchModal);
+						setTimeout(() => {
+							window.addEventListener("scroll", catchModal);
+						}, 1000);
 					}
 
 					// TIME ON PAGE
