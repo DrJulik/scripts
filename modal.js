@@ -548,7 +548,7 @@ const campaignInfo = async () => {
 							if (settings.delay) {
 								setTimeout(() => {
 									modal.classList.add("open");
-								}, settings.delayTime);
+								}, settings.delayTime * 1000);
 							} else {
 								setTimeout(() => {
 									modal.classList.add("open");
@@ -596,7 +596,9 @@ const campaignInfo = async () => {
 							return trigger.triggerType === "exit-intent";
 						})
 					) {
-						document.addEventListener("mouseout", mouseEvent);
+						setTimeout(() => {
+							document.addEventListener("mouseout", mouseEvent);
+						}, 1000);
 					}
 
 					// SCROLL DEPTH CHECK
