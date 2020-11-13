@@ -495,21 +495,21 @@ const campaignInfo = async () => {
 							}
 						} else if (trigger.triggerType === "cart-size") {
 							if (trigger.matchingFormat === "greater") {
-								if (cartData.item_count > trigger.matchingInput) {
+								if (trigger.matchingInput > cartData.item_count) {
 									return trigger.triggerType === "cart-size";
 								}
 							} else if (trigger.matchingFormat === "less") {
-								if (cartData.item_count < trigger.matchingInput) {
+								if (trigger.matchingInput < cartData.item_count) {
 									return trigger.triggerType === "cart-size";
 								}
 							}
 						} else if (trigger.triggerType === "cart-value") {
 							if (trigger.matchingFormat === "greater") {
-								if (cartData.total_price > trigger.matchingInput / 100) {
+								if (trigger.matchingInput > cartData.total_price / 100) {
 									return trigger.triggerType === "cart-value";
 								}
 							} else if (trigger.matchingFormat === "less") {
-								if (cartData.total_price < trigger.matchingInput / 100) {
+								if (trigger.matchingInput < cartData.total_price / 100) {
 									return trigger.triggerType === "cart-value";
 								}
 							}
