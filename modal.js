@@ -536,6 +536,7 @@ const campaignInfo = async () => {
 						if (!timerElapsed) {
 							setTimeout(() => {
 								timerElapsed = true;
+								check();
 							}, 5000);
 							// FIGURE OUT HOW TO GET THE TIME OF THE FIRST TIME ON PAGE TRIGGER
 						}
