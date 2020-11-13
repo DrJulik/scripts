@@ -1,8 +1,8 @@
-// const shop = window.location.href.split("https://").pop().split("/")[0];
+const shop = window.location.href.split("https://").pop().split("/")[0];
 
 const fetchCampaignInfo = async () => {
 	const res = await fetch(
-		`https://easypop.herokuapp.com/api/campaigns/freebiesdebug.myshopify.com`,
+		`https://easypop.herokuapp.com/api/campaigns/${shop}`,
 		{
 			method: "GET",
 			headers: {
@@ -12,6 +12,17 @@ const fetchCampaignInfo = async () => {
 	);
 	const responseJson = await res.json();
 	return responseJson.data;
+};
+
+const fetchCartInfo = async () => {
+	const res = await fetch(`/cart.js`, {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+		},
+	});
+	const responseJson = await res.json();
+	return responseJson;
 };
 
 // MUTATION OBSERVER TO WATCH FOR CLASS CHANGES
@@ -70,8 +81,8 @@ class ClassWatcher {
 const campaignInfo = async () => {
 	try {
 		const campData = await fetchCampaignInfo();
-		// const cartData = await fetchCartInfo();
-		// console.log(cartData);
+		const cartData = await fetchCartInfo();
+		console.log(cartData);
 		campData.forEach((campaign) => {
 			console.log(campaign);
 			const { freePlan, style, content, settings, _id, createdAt } = campaign;
@@ -463,13 +474,153 @@ const campaignInfo = async () => {
 				if (triggerMatch === "all") {
 					console.log("all triggers are matched");
 
+					// timer for time on page
+					let timerElapsed = false;
+					let exit = false;
+
 					const checkCondition = (trigger) => {
-						trigger.triggerType === "url";
-						console.log(trigger.triggerType);
+						if (trigger.triggerType === "url") {
+							if (trigger.matchingFormat === "contains") {
+								urlTrigger = window.location.href.includes(
+									trigger.matchingInput
+								);
+								if (urlTrigger) {
+									return trigger.triggerType === "url";
+								}
+							} else if (trigger.matchingFormat === "matches") {
+								urlTrigger = window.location.href === trigger.matchingInput;
+								if (urlTrigger) {
+									return trigger.triggerType === "url";
+								}
+							}
+						} else if (trigger.triggerType === "cart-size") {
+							if (trigger.matchingFormat === "greater") {
+								if (cartData.item_count > trigger.matchingInput) {
+									return trigger.triggerType === "cart-size";
+								}
+							} else if (trigger.matchingFormat === "less") {
+								if (cartData.item_count < trigger.matchingInput) {
+									return trigger.triggerType === "cart-size";
+								}
+							}
+						} else if (trigger.triggerType === "cart-value") {
+							if (trigger.matchingFormat === "greater") {
+								if (cartData.total_price > trigger.matchingInput / 100) {
+									return trigger.triggerType === "cart-value";
+								}
+							} else if (trigger.matchingFormat === "less") {
+								if (cartData.total_price < trigger.matchingInput / 100) {
+									return trigger.triggerType === "cart-value";
+								}
+							}
+						} else if (trigger.triggerType === "scroll-depth") {
+							scrollpos = window.scrollY;
+
+							if (scrollpos >= trigger.matchingInput) {
+								return trigger.triggerType === "scroll-depth";
+							}
+						} else if (trigger.triggerType === "time-on-page") {
+							if (timerElapsed) {
+								return trigger.triggerType === "time-on-page";
+							}
+						} else if (trigger.triggerType === "exit-intent") {
+							if (exit) {
+								return trigger.triggerType === "exit-intent";
+							}
+						}
 					};
 
-					const conditionsMatched = triggers.every(checkCondition);
-					console.log(conditionsMatched);
+					const check = () => {
+						const conditionsMatched = triggers.every(checkCondition);
+
+						if (!timerElapsed) {
+							setTimeout(() => {
+								timerElapsed = true;
+							}, 5000);
+							// FIGURE OUT HOW TO GET THE TIME OF THE FIRST TIME ON PAGE TRIGGER
+						}
+
+						if (conditionsMatched) {
+							console.log("conditions matched");
+
+							modal.classList.add("modal-ep");
+							if (settings.delay) {
+								setTimeout(() => {
+									modal.classList.add("open");
+								}, settings.delayTime);
+							} else {
+								setTimeout(() => {
+									modal.classList.add("open");
+								}, 200);
+							}
+							// CONTENT TYPES
+							setContentTypes();
+							// classes
+							primaryBtn.classList.add("primaryBtn");
+							container.classList.add("container");
+							closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
+
+							if (freePlan) {
+								freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
+								popup_content.appendChild(freeIcon);
+							}
+
+							closeBtn.addEventListener("click", (e) => {
+								modal.classList.remove("open");
+								isOpen = false;
+							});
+
+							document.removeEventListener("mouseout", mouseEvent);
+							window.removeEventListener("scroll", catchModal);
+						}
+					};
+					check();
+
+					// EXIT INTENT CHECK
+					const mouseEvent = (e) => {
+						const shouldShowExitIntent =
+							!e.toElement && !e.relatedTarget && e.clientY < 10;
+
+						if (shouldShowExitIntent) {
+							// document.removeEventListener("mouseout", mouseEvent); not removing cuz we wanna check every time
+							// Handling delay here
+							// flip the exit switch
+							exit = true;
+							check();
+						}
+					};
+					if (
+						triggers.some((trigger) => {
+							// exit intent
+							return trigger.triggerType === "exit-intent";
+						})
+					) {
+						document.addEventListener("mouseout", mouseEvent);
+					}
+
+					// SCROLL DEPTH CHECK
+					const catchModal = () => {
+						check();
+					};
+
+					if (
+						triggers.some((trigger) => {
+							// exit intent
+							return trigger.triggerType === "scroll-depth";
+						})
+					) {
+						window.addEventListener("scroll", catchModal);
+					}
+
+					// TIME ON PAGE
+					if (
+						triggers.some((trigger) => {
+							// exit intent
+							return trigger.triggerType === "time-on-page";
+						})
+					) {
+						check();
+					}
 				} else if (triggerMatch === "any") {
 					console.log("any triggers are matched");
 					// TRIGGERS START------------------------------------------------------------------------
