@@ -477,6 +477,8 @@ const campaignInfo = async () => {
 					// timer for time on page
 					let timerElapsed = false;
 					let exit = false;
+					let scrolled = false;
+					let finishedScrolling = false;
 
 					const checkCondition = (trigger) => {
 						if (trigger.triggerType === "url") {
@@ -513,12 +515,8 @@ const campaignInfo = async () => {
 									return trigger.triggerType === "cart-value";
 								}
 							}
-						} else if (trigger.triggerType === "scroll-depth") {
-							scrollpos = window.scrollY;
-
-							if (scrollpos >= trigger.matchingInput) {
-								return trigger.triggerType === "scroll-depth";
-							}
+						} else if (scrolled) {
+							return trigger.triggerType === "scroll-depth";
 						} else if (trigger.triggerType === "time-on-page") {
 							if (timerElapsed) {
 								return trigger.triggerType === "time-on-page";
@@ -541,7 +539,7 @@ const campaignInfo = async () => {
 							// FIGURE OUT HOW TO GET THE TIME OF THE FIRST TIME ON PAGE TRIGGER
 						}
 
-						if (conditionsMatched) {
+						if (conditionsMatched && !finishedScrolling) {
 							console.log("conditions matched");
 
 							modal.classList.add("modal-ep");
@@ -571,8 +569,8 @@ const campaignInfo = async () => {
 								isOpen = false;
 							});
 
+							finishedScrolling = true;
 							document.removeEventListener("mouseout", mouseEvent);
-							window.removeEventListener("scroll", catchModal);
 						}
 					};
 					check();
@@ -601,7 +599,20 @@ const campaignInfo = async () => {
 
 					// SCROLL DEPTH CHECK
 					const catchModal = () => {
-						check();
+						scrollpos = window.scrollY;
+
+						if (!scrolled) {
+							if (scrollpos >= 500) {
+								console.log("found");
+								scrolled = true;
+								check();
+							}
+
+							console.log("catching");
+						} else {
+							console.log("remove listener");
+							document.removeEventListener("scroll", catchModal);
+						}
 					};
 
 					if (
@@ -610,9 +621,7 @@ const campaignInfo = async () => {
 							return trigger.triggerType === "scroll-depth";
 						})
 					) {
-						setTimeout(() => {
-							window.addEventListener("scroll", catchModal);
-						}, 1000);
+						document.addEventListener("scroll", catchModal);
 					}
 
 					// TIME ON PAGE
