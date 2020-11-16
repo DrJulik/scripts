@@ -454,10 +454,14 @@ const campaignInfo = async () => {
 						return;
 					}
 				};
-
+				let triggered = false;
 				function workOnClassAdd() {
 					handleFrequency(_id);
 					handleAutoClose();
+
+					if (!triggered) {
+						triggered = true;
+					}
 				}
 
 				function workOnClassRemoval() {}
@@ -531,11 +535,17 @@ const campaignInfo = async () => {
 					const check = () => {
 						const conditionsMatched = triggers.every(checkCondition);
 
+						let timerObj = triggers.find(
+							(trigger) => trigger.triggerType === "time-on-page"
+						);
 						if (!timerElapsed) {
-							setTimeout(() => {
-								timerElapsed = true;
-								check();
-							}, 5000);
+							setTimeout(
+								() => {
+									timerElapsed = true;
+									check();
+								},
+								timerObj ? timerObj.matchingInput * 1000 : null
+							);
 							// FIGURE OUT HOW TO GET THE TIME OF THE FIRST TIME ON PAGE TRIGGER
 						}
 
@@ -569,7 +579,14 @@ const campaignInfo = async () => {
 								isOpen = false;
 							});
 
-							finishedScrolling = true;
+							if (
+								triggers.some((trigger) => {
+									// exit intent
+									return trigger.triggerType === "scroll-depth";
+								})
+							) {
+								finishedScrolling = true;
+							}
 							document.removeEventListener("mouseout", mouseEvent);
 						}
 					};
@@ -600,9 +617,11 @@ const campaignInfo = async () => {
 					// SCROLL DEPTH CHECK
 					const catchModal = () => {
 						scrollpos = window.scrollY;
-
+						let scrollObj = triggers.find(
+							(trigger) => trigger.triggerType === "scroll-depth"
+						);
 						if (!scrolled) {
-							if (scrollpos >= 500) {
+							if (scrollpos >= scrollObj.matchingInput) {
 								console.log("found");
 								scrolled = true;
 								check();
@@ -635,322 +654,182 @@ const campaignInfo = async () => {
 					}
 				} else if (triggerMatch === "any") {
 					console.log("any triggers are matched");
-					// TRIGGERS START------------------------------------------------------------------------
-					triggers.some((trigger) => {
-						if (
-							(trigger.triggerType === "cart-value" &&
-								!localStorage.getItem(`limit_${_id}`)) ||
-							(trigger.triggerType === "cart-value" &&
-								localStorage.getItem(`limit_${_id}`) &&
-								!settings.frequency)
-						) {
-							const createModal = () => {
-								if (trigger.matchingFormat === "greater") {
-									if (cartData.item_count > trigger.matchingInput / 100) {
-										modal.classList.add("modal-ep");
-										if (settings.delay) {
-											setTimeout(() => {
-												modal.classList.add("open");
-											}, settings.delayTime);
-										} else {
-											setTimeout(() => {
-												modal.classList.add("open");
-											}, 1);
-										}
-									}
-								} else if (trigger.matchingFormat === "less") {
-									if (cartData.item_count < trigger.matchingInput / 100) {
-										modal.classList.add("modal-ep");
-										if (settings.delay) {
-											setTimeout(() => {
-												modal.classList.add("open");
-											}, settings.delayTime);
-										} else {
-											setTimeout(() => {
-												modal.classList.add("open");
-											}, 1);
-										}
-									}
+					// TRIGGERS START-----------------------------------------------------------------------------------------------------------------------------------------------
+
+					// timer for time on page
+					let timerElapsed = false;
+					let exit = false;
+					let scrolled = false;
+					let finishedScrolling = false;
+
+					const checkCondition = (trigger) => {
+						if (trigger.triggerType === "url") {
+							if (trigger.matchingFormat === "contains") {
+								urlTrigger = window.location.href.includes(
+									trigger.matchingInput
+								);
+								if (urlTrigger) {
+									return trigger.triggerType === "url";
 								}
-
-								// CONTENT TYPES
-								setContentTypes();
-								// classes
-								primaryBtn.classList.add("primaryBtn");
-								container.classList.add("container");
-								closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
-
-								if (freePlan) {
-									freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
-									popup_content.appendChild(freeIcon);
+							} else if (trigger.matchingFormat === "matches") {
+								urlTrigger = window.location.href === trigger.matchingInput;
+								if (urlTrigger) {
+									return trigger.triggerType === "url";
 								}
-
-								closeBtn.addEventListener("click", (e) => {
-									modal.classList.remove("open");
-									isOpen = false;
-								});
-							};
-							createModal();
-							return trigger.triggerType === "cart-value";
-						} else if (
-							(trigger.triggerType === "cart-size" &&
-								!localStorage.getItem(`limit_${_id}`)) ||
-							(trigger.triggerType === "cart-size" &&
-								localStorage.getItem(`limit_${_id}`) &&
-								!settings.frequency)
-						) {
-							const createModal = () => {
-								if (trigger.matchingFormat === "greater") {
-									if (cartData.item_count > trigger.matchingInput) {
-										modal.classList.add("modal-ep");
-										if (settings.delay) {
-											setTimeout(() => {
-												modal.classList.add("open");
-											}, settings.delayTime);
-										} else {
-											setTimeout(() => {
-												modal.classList.add("open");
-											}, 1);
-										}
-									}
-								} else if (trigger.matchingFormat === "less") {
-									if (cartData.item_count < trigger.matchingInput) {
-										modal.classList.add("modal-ep");
-										if (settings.delay) {
-											setTimeout(() => {
-												modal.classList.add("open");
-											}, settings.delayTime);
-										} else {
-											setTimeout(() => {
-												modal.classList.add("open");
-											}, 1);
-										}
-									}
+							}
+						} else if (trigger.triggerType === "cart-size") {
+							if (trigger.matchingFormat === "greater") {
+								if (trigger.matchingInput > cartData.item_count) {
+									return trigger.triggerType === "cart-size";
 								}
-
-								// CONTENT TYPES
-								setContentTypes();
-								// classes
-								primaryBtn.classList.add("primaryBtn");
-								container.classList.add("container");
-								closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
-
-								if (freePlan) {
-									freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
-									popup_content.appendChild(freeIcon);
+							} else if (trigger.matchingFormat === "less") {
+								if (trigger.matchingInput < cartData.item_count) {
+									return trigger.triggerType === "cart-size";
 								}
-
-								closeBtn.addEventListener("click", (e) => {
-									modal.classList.remove("open");
-									isOpen = false;
-								});
-							};
-							createModal();
-							return trigger.triggerType === "cart-size";
-						} else if (
-							(trigger.triggerType === "url" &&
-								!localStorage.getItem(`limit_${_id}`)) ||
-							(trigger.triggerType === "url" &&
-								localStorage.getItem(`limit_${_id}`) &&
-								!settings.frequency)
-						) {
-							const createModal = () => {
-								let urlTrigger;
-								if (trigger.matchingFormat === "contains") {
-									urlTrigger = window.location.href.includes(
-										trigger.matchingInput
-									);
-								} else if (trigger.matchingFormat === "matches") {
-									urlTrigger = window.location.href === trigger.matchingInput;
+							}
+						} else if (trigger.triggerType === "cart-value") {
+							if (trigger.matchingFormat === "greater") {
+								if (trigger.matchingInput > cartData.total_price / 100) {
+									return trigger.triggerType === "cart-value";
 								}
-
-								if (settings.delay) {
-									modal.classList.add("modal-ep");
-									setTimeout(() => {
-										modal.classList.add("open");
-									}, settings.delayTime * 1000);
-								} else {
-									if (urlTrigger) {
-										modal.classList.add("modal-ep");
-										setTimeout(() => {
-											modal.classList.add("open");
-										}, 1);
-									}
+							} else if (trigger.matchingFormat === "less") {
+								if (trigger.matchingInput < cartData.total_price / 100) {
+									return trigger.triggerType === "cart-value";
 								}
-
-								// CONTENT TYPES
-								setContentTypes();
-								// classes
-								primaryBtn.classList.add("primaryBtn");
-								container.classList.add("container");
-								closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
-
-								if (freePlan) {
-									freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
-									popup_content.appendChild(freeIcon);
-								}
-
-								closeBtn.addEventListener("click", (e) => {
-									modal.classList.remove("open");
-									isOpen = false;
-								});
-							};
-							createModal();
-							// Break out of the loop
-							return trigger.triggerType === "url";
-						} else if (
-							(trigger.triggerType === "scroll-depth" &&
-								!localStorage.getItem(`limit_${_id}`)) ||
-							(trigger.triggerType === "scroll-depth" &&
-								localStorage.getItem(`limit_${_id}`) &&
-								!settings.frequency)
-						) {
-							const createModal = () => {
-								let scrollpos = window.scrollY;
-
-								const add_class_on_scroll = () => {
-									if (settings.delay) {
-										setTimeout(() => {
-											modal.classList.add("open");
-										}, settings.delayTime * 1000);
-									} else {
-										modal.classList.add("open");
-									}
-								};
-
-								const removeListener = () => {
-									window.removeEventListener("scroll", catchModal);
-								};
-								const catchModal = () => {
-									scrollpos = window.scrollY;
-
-									if (scrollpos >= trigger.matchingInput) {
-										add_class_on_scroll();
-										removeListener();
-									}
-								};
-
-								window.addEventListener("scroll", catchModal);
-								modal.classList.add("modal-ep");
-
-								// CONTENT TYPES
-								setContentTypes();
-								// classes
-								primaryBtn.classList.add("primaryBtn");
-								container.classList.add("container");
-								closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
-
-								if (freePlan) {
-									freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
-									popup_content.appendChild(freeIcon);
-								}
-
-								closeBtn.addEventListener("click", (e) => {
-									modal.classList.remove("open");
-									isOpen = false;
-								});
-							};
-							createModal();
-							// Break out of the loop
+							}
+						} else if (scrolled) {
 							return trigger.triggerType === "scroll-depth";
-						} else if (
-							(triggers.some((trigger) => {
+						} else if (trigger.triggerType === "time-on-page") {
+							if (timerElapsed) {
+								return trigger.triggerType === "time-on-page";
+							}
+						} else if (trigger.triggerType === "exit-intent") {
+							if (exit) {
 								return trigger.triggerType === "exit-intent";
-							}) &&
-								!localStorage.getItem(`limit_${_id}`)) ||
-							(triggers.some((trigger) => {
-								return trigger.triggerType === "exit-intent";
-							}) &&
-								localStorage.getItem(`limit_${_id}`) &&
-								!settings.frequency)
-						) {
-							const createModal = () => {
-								// STYLING VARS
-								// STYLE
-
-								const mouseEvent = (e) => {
-									const shouldShowExitIntent =
-										!e.toElement && !e.relatedTarget && e.clientY < 10;
-
-									if (shouldShowExitIntent) {
-										document.removeEventListener("mouseout", mouseEvent);
-										// Handling delay here
-										if (settings.delay) {
-											setTimeout(() => {
-												modal.classList.add("open");
-											}, settings.delayTime * 1000);
-										} else {
-											modal.classList.add("open");
-										}
-									}
-								};
-								document.addEventListener("mouseout", mouseEvent);
-								modal.classList.add("modal-ep");
-
-								// CONTENT TYPES
-								setContentTypes();
-								// classes
-								primaryBtn.classList.add("primaryBtn");
-								container.classList.add("container");
-								closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
-
-								if (freePlan) {
-									freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
-									popup_content.appendChild(freeIcon);
-								}
-
-								closeBtn.addEventListener("click", (e) => {
-									modal.classList.remove("open");
-									isOpen = false;
-								});
-							};
-							createModal();
-							// Break out of the loop
-							return trigger.triggerType === "exit-intent";
-						} else if (
-							(trigger.triggerType === "time-on-page" &&
-								!localStorage.getItem(`limit_${_id}`)) ||
-							(trigger.triggerType === "time-on-page" &&
-								localStorage.getItem(`limit_${_id}`) &&
-								!settings.frequency)
-						) {
-							const createModal = () => {
-								if (settings.delay) {
-									setTimeout(() => {
-										modal.classList.add("open");
-									}, trigger.matchingInput * 1000 + settings.delayTime * 1000);
-									modal.classList.add("modal-ep");
-								} else {
-									setTimeout(() => {
-										modal.classList.add("open");
-									}, trigger.matchingInput * 1000);
-									modal.classList.add("modal-ep");
-								}
-
-								// CONTENT TYPES
-								setContentTypes();
-								// classes
-								primaryBtn.classList.add("primaryBtn");
-								container.classList.add("container");
-								closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
-
-								if (freePlan) {
-									freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
-									popup_content.appendChild(freeIcon);
-								}
-
-								closeBtn.addEventListener("click", (e) => {
-									modal.classList.remove("open");
-									isOpen = false;
-								});
-							};
-							createModal();
-
-							return trigger.triggerType === "time-on-page";
-						} else {
-							return;
+							}
 						}
-					});
+					};
+
+					const check = () => {
+						const conditionsMatched = triggers.some(checkCondition);
+
+						let timerObj = triggers.find(
+							(trigger) => trigger.triggerType === "time-on-page"
+						);
+						if (!timerElapsed) {
+							setTimeout(
+								() => {
+									timerElapsed = true;
+									check();
+								},
+								timerObj ? timerObj.matchingInput * 1000 : null
+							);
+							// FIGURE OUT HOW TO GET THE TIME OF THE FIRST TIME ON PAGE TRIGGER
+						}
+
+						if (conditionsMatched && !finishedScrolling) {
+							console.log("conditions matched");
+
+							modal.classList.add("modal-ep");
+							if (settings.delay) {
+								setTimeout(() => {
+									modal.classList.add("open");
+								}, settings.delayTime * 1000);
+							} else {
+								setTimeout(() => {
+									modal.classList.add("open");
+								}, 200);
+							}
+							// CONTENT TYPES
+							setContentTypes();
+							// classes
+							primaryBtn.classList.add("primaryBtn");
+							container.classList.add("container");
+							closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
+
+							if (freePlan) {
+								freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
+								popup_content.appendChild(freeIcon);
+							}
+
+							closeBtn.addEventListener("click", (e) => {
+								modal.classList.remove("open");
+								isOpen = false;
+							});
+
+							if (
+								triggers.some((trigger) => {
+									// exit intent
+									return trigger.triggerType === "scroll-depth";
+								})
+							) {
+								finishedScrolling = true;
+							}
+							document.removeEventListener("mouseout", mouseEvent);
+						}
+					};
+					check();
+
+					// EXIT INTENT CHECK
+					const mouseEvent = (e) => {
+						const shouldShowExitIntent =
+							!e.toElement && !e.relatedTarget && e.clientY < 10;
+
+						if (shouldShowExitIntent) {
+							// document.removeEventListener("mouseout", mouseEvent); not removing cuz we wanna check every time
+							// Handling delay here
+							// flip the exit switch
+							exit = true;
+							check();
+						}
+					};
+					if (
+						triggers.some((trigger) => {
+							// exit intent
+							return trigger.triggerType === "exit-intent";
+						})
+					) {
+						document.addEventListener("mouseout", mouseEvent);
+					}
+
+					// SCROLL DEPTH CHECK
+					const catchModal = () => {
+						scrollpos = window.scrollY;
+						let scrollObj = triggers.find(
+							(trigger) => trigger.triggerType === "scroll-depth"
+						);
+						if (!scrolled) {
+							if (scrollpos >= scrollObj.matchingInput) {
+								console.log("found");
+								scrolled = true;
+								check();
+							}
+
+							console.log("catching");
+						} else {
+							console.log("remove listener");
+							document.removeEventListener("scroll", catchModal);
+						}
+					};
+
+					if (
+						triggers.some((trigger) => {
+							// exit intent
+							return trigger.triggerType === "scroll-depth";
+						})
+					) {
+						document.addEventListener("scroll", catchModal);
+					}
+
+					// TIME ON PAGE
+					if (
+						triggers.some((trigger) => {
+							// exit intent
+							return trigger.triggerType === "time-on-page";
+						})
+					) {
+						check();
+					}
 				}
 			}
 		});
