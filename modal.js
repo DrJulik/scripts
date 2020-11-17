@@ -501,21 +501,21 @@ const campaignInfo = async () => {
 							}
 						} else if (trigger.triggerType === "cart-size") {
 							if (trigger.matchingFormat === "greater") {
-								if (trigger.matchingInput > cartData.item_count) {
+								if (cartData.item_count > trigger.matchingInput) {
 									return trigger.triggerType === "cart-size";
 								}
 							} else if (trigger.matchingFormat === "less") {
-								if (trigger.matchingInput < cartData.item_count) {
+								if (cartData.item_count < trigger.matchingInput) {
 									return trigger.triggerType === "cart-size";
 								}
 							}
 						} else if (trigger.triggerType === "cart-value") {
 							if (trigger.matchingFormat === "greater") {
-								if (trigger.matchingInput > cartData.total_price / 100) {
+								if (cartData.total_price / 100 > trigger.matchingInput) {
 									return trigger.triggerType === "cart-value";
 								}
 							} else if (trigger.matchingFormat === "less") {
-								if (trigger.matchingInput < cartData.total_price / 100) {
+								if (cartData.total_price / 100 < trigger.matchingInput) {
 									return trigger.triggerType === "cart-value";
 								}
 							}
@@ -679,21 +679,21 @@ const campaignInfo = async () => {
 							}
 						} else if (trigger.triggerType === "cart-size") {
 							if (trigger.matchingFormat === "greater") {
-								if (trigger.matchingInput > cartData.item_count) {
+								if (cartData.item_count > trigger.matchingInput) {
 									return trigger.triggerType === "cart-size";
 								}
 							} else if (trigger.matchingFormat === "less") {
-								if (trigger.matchingInput < cartData.item_count) {
+								if (cartData.item_count < trigger.matchingInput) {
 									return trigger.triggerType === "cart-size";
 								}
 							}
 						} else if (trigger.triggerType === "cart-value") {
 							if (trigger.matchingFormat === "greater") {
-								if (trigger.matchingInput > cartData.total_price / 100) {
+								if (cartData.total_price / 100 > trigger.matchingInput) {
 									return trigger.triggerType === "cart-value";
 								}
 							} else if (trigger.matchingFormat === "less") {
-								if (trigger.matchingInput < cartData.total_price / 100) {
+								if (cartData.total_price / 100 < trigger.matchingInput) {
 									return trigger.triggerType === "cart-value";
 								}
 							}
