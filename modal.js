@@ -96,61 +96,8 @@ const campaignInfo = async () => {
       // I GUESS THIS IS WHERE WE BUILD THE CAMPAIGNS
       if (style.campaignType === "modal") {
         // DOM hooks
-        const toggleBtn = document.querySelector(".toggle");
-        const body = document.body;
+        const body = document.querySelector("body");
         const modal = document.createElement("div");
-        const popup_content = document.createElement("div");
-
-        let img;
-        if (content.imgUrl !== "") {
-          img = document.createElement("img");
-          img.classList.add("image");
-          img.src = content.imgUrl;
-        }
-
-        let heading;
-        if (content.headline !== "") {
-          heading = document.createElement("h2");
-          heading.textContent = content.headline;
-          heading.classList.add("heading");
-        }
-
-        let bodyText;
-        if (content.body !== "") {
-          bodyText = document.createElement("p");
-          bodyText.textContent = content.body;
-          bodyText.classList.add("bodyText");
-        }
-
-        const closeBtn = document.createElement("i");
-        closeBtn.classList.add("far", "fa-times-circle", "closeBtn");
-        closeBtn.tabIndex = 1;
-
-        let buttons;
-        if (content.buttonText !== "") {
-          buttons = document.createElement("div");
-          buttons.classList.add("buttons");
-        }
-
-        let textContainer;
-        if (!heading && !bodyText && !buttons) {
-          textContainer = undefined;
-        } else {
-          textContainer = document.createElement("div");
-          textContainer.classList.add("text-container");
-        }
-
-        const container = document.createElement("div");
-
-        const primaryBtn = document.createElement("button");
-        const primaryBtnNewsletter = document.createElement("button");
-        // const secondaryBtn = document.createElement("button");
-        const btnLink = document.createElement("a");
-        const freeIcon = document.createElement("i");
-        // Input for newsletter
-        const input = document.createElement("input");
-        // Product feed elements (everything else is created in the forEach below)
-        const productContainer = document.createElement("div");
 
         // Loading fontAwesome
         let link = document.createElement("link");
@@ -159,363 +106,100 @@ const campaignInfo = async () => {
           "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css";
         document.head.appendChild(link);
 
+        let link1 = document.createElement("link");
+        link1.rel = "stylesheet";
+        link1.href = "https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css";
+        document.head.appendChild(link1);
+
         const borderRadius = style.borderRadius + "%";
         const borderWidth = style.borderWidth + "px";
-
-        // CREATING CSS STYLESHEET
-
-        let stylesheet = document.createElement("style");
-        stylesheet.type = "text/css";
-        stylesheet.innerHTML = `.modal-ep { z-index: 10000;
-					  pointer-events: none;
-					  opacity: 0;
-					  display: flex;
-					  position: fixed;
-					  top: 0;
-					  left: 0;
-					  height: 100%;
-					  width: 100%;
-					  background-color: ${overlayColor};
-					  flex-direction: column;
-					  justify-content: center;
-					  align-items: center;
-					  transition: 0.4s opacity ease; }
-  
-					  .modal-ep.open {
-						  pointer-events: all;
-					  opacity: 1;
-					  }
-  
-					  .container {
-						  display: grid;
-						  grid-template-columns: 1fr 1fr;
-						  grid-template-rows: 1fr;
-						  height: 100%;
-					  }
-  
-					  .container-product-feed {
-						  width: 90%;
-						  margin: 1rem auto;
-					  }
-  
-					  .container-newsletter {
-						  width: 90%;
-						  margin: 1rem auto;
-					  }
-  
-					  .container-one-half{
-						  display: grid;
-						  grid-template-columns: 1fr;
-						  grid-template-rows: 1fr;
-						  height: 100%;
-					  }
-  
-					  .image {
-						  height: 100%;
-						   width: 100%;
-						  min-width: 200px;
-						   box-shadow: 1px 3px 5px #0000002b; 
-						   object-fit: cover; 
-						   margin-right: 1rem
-					  }
-  
-					  .text-container {
-						  min-width: 200px;
-						  height: 100%;
-						  display: flex;
-						  flex-direction: column;
-						  justify-content: center;
-						  align-items: center;
-						  margin: 0 3rem 0 2rem;
-					  }
-  
-					  .input-container {
-						  display: grid;
-						  grid-template-columns: 60% 40%;
-					  }
-  
-					  .input-container input {
-						  padding-left: 0.6rem;  
-						  width: 400px; 
-						  border: 1px solid #CDD9ED; 
-						  line-height: 25px; 
-						  font-size: 14px; 
-						  font-weight: 500; 
-						  font-family: inherit; 
-						  border-radius: 6px 0 0 6px;
-					  }
-  
-					  .heading {
-						  margin: 1rem 0;
-					  }
-  
-					  .bodyText {
-						  margin-bottom: 0.7rem;
-					  }
-  
-					  .buttons {
-						  width: 100%; 
-						  margin-bottom: 0.7rem; 
-						  display: flex;
-					  }
-					  .btnLink {
-						  justify-self:end;
-					  }
-					  
-					  .primaryBtn {
-						  width: 100%;
-						  padding: 0.7rem; 
-						  background: ${primaryButtonColor}; 
-						  box-shadow: #0000002e 1px 1px 3px;
-						  border:none;  
-						  border-radius: 0.25rem;  
-						  color: white; 
-						  font-family:inherit; 
-						  font-size: 0.93rem; 
-						  margin-top: 1.5rem;
-						  margin-right: 0.6rem;
-						  margin-bottom: 1rem;
-						  transition: opacity 0.3s ease;
-						  
-					  }
-  
-					  .primaryBtn-newsletter {
-						  
-						  padding: 0.7rem; 
-						  background: ${primaryButtonColor}; 
-						  box-shadow: #0000002e 1px 1px 3px;
-						  border:none;  
-						  border-radius: 3%;  
-						  color: white; 
-						  font-family:inherit; 
-						  font-size: 0.75rem; 
-						  margin-right: 0.6rem;
-						  transition: opacity 0.3s ease;
-					  }
-  
-					  .primaryBtn:hover {
-						  opacity:0.8;
-						  cursor:pointer;
-					  }
-					  .primaryBtn-newsletter:hover {
-						  opacity:0.8;
-						  cursor:pointer;
-					  }
-  
-					  .closeBtn {
-						  position: absolute;
-						  right: 0;
-						  top: 0;
-						  margin-top: -2.1rem;
-						  font-size: 1.6rem;
-						  transition: 0.25s opacity ease;
-					  }
-  
-					  .closeBtn:hover {
-						  opacity: 0.85;
-						  cursor:pointer;
-					  }
-  
-					  .productContainer {
-						  display: flex;
-						  width: 90%;
-						  margin:auto;
-						  overflow-x: auto;
-					  }
-  
-					  .product {
-						  margin-right: 1rem;
-					  }
-  
-					  .prodImg {
-						  width: 200px;
-						  height:  200px;
-						  object-fit: cover;
-						  box-shadow: 1px 1px 3px #00000033;
-						  border-radius: 5%;
-					  }
-  
-					  .free-icon {
-						  position: absolute;
-						  left: 2%;
-						  bottom: 5%;
-						  color:#494949 ;
-						  margin-top: 0.7rem;
-						  font-size: 1em;
-					  }
-  
-					  .free-icon::after {
-						  opacity: 0;
-							  content: "Popup powered by Easypop";
-						  font-weight: 300;
-						  padding: 8px;
-						  transition: 0.25s opacity ease;
-						  background: #efefef;
-						  border-radius: 30px;
-					  }
-  
-					  .free-icon:hover:after {
-						  opacity: 1;
-						  background: #efefef;
-					  }
-  
-					  @media only screen and (max-width: 768px) {
-						  .container {
-							  grid-template-columns: 1fr;
-							  grid-template-rows: 1fr 1fr;
-							  height: 100%;
-						  }
-  
-						  .text-container {
-							  margin: 0 3rem 1rem 2rem;
-						  }
-  
-						  .free-icon {
-							  left: 3%;
-							  top: 1%;
-						  }
-  
-  
-						  .input-container {
-							  grid-template-rows: 1fr 1fr;
-							  grid-template-columns: 1fr;
-						  }
-  
-						  .input-container input {
-							  width: auto;
-							  margin-bottom: 1rem;
-						  }
-  
-						  .btnLink {
-							  justify-self: start;
-						  }
-						}
-					  `;
-        document.getElementsByTagName("head")[0].appendChild(stylesheet);
-
-        // Modal content
-        popup_content.style.cssText = ` min-height: 300px; max-width: 60%; position: relative; background: ${backgroundColor}; border-radius: ${borderRadius}; border: ${borderWidth} solid ${borderColor}; box-shadow:#00000038 5px 5px 10px 0px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; transition: 1s all ease;`;
 
         // SET CONTENT TYPES
         const setContentTypes = () => {
           if (content.contentType === "text-image") {
-            // CONTENT
-
-            primaryBtn.textContent = content.buttonText;
-            btnLink.href = content.buttonUrl;
-            // secondaryBtn.textContent = "Cancel";
-            if (!textContainer || !img) {
-              container.classList.add("container-one-half");
-            } else {
-              container.classList.add("container");
-            }
-
-            modal.appendChild(popup_content);
-            modal.appendChild(closeBtn);
-            popup_content.appendChild(container);
-            if (img) {
-              container.appendChild(img);
-            }
-
-            if (textContainer) {
-              container.appendChild(textContainer);
-            }
-            if (heading) {
-              textContainer.appendChild(heading);
-            }
-            if (bodyText) {
-              textContainer.appendChild(bodyText);
-            }
-
-            container.appendChild(closeBtn);
-
-            if (buttons) {
-              textContainer.appendChild(buttons);
-              buttons.appendChild(btnLink);
-              btnLink.appendChild(primaryBtn);
-            }
+            modal.innerHTML = `
+            <section class="ezy-style-modal">
+            <section class="ezy-style-modal__window">
+              <section class="ezy-style-modal__close">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </section>
+              <section class="ezy-style-modal__content">
+                <div class="flex flex-row flex-wrap justify-center">
+                  <div class="w-full sm:w-1/2 relative">
+                    <img class="image--portrait" src="https://images.unsplash.com/photo-1602607203559-d38903b80507?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3898&q=80"/>
+          
+                    <span class="ezy-tooltip ezy-test__body--smaller absolute bottom-1 left-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                      Powered by Easypop
+                    </span>
+          
+                  </div>
+                  <div class="w-full sm:w-1/2 flex justify-center items-center p-4 md:p-8">
+                    <div>
+                    ${
+                      content.headline !== ""
+                        ? `<h3 class="ezy-test__headline--bold-1 mb-2">${content.headline}</h3>`
+                        : ""
+                    }
+                      
+                      <p class="mb-4">
+                      ${content.body !== "" ? `${content.body}` : ""}
+                      </p>
+                      ${
+                        content.buttonText !== ""
+                          ? `<a class="ezy-btn w-full" href="${content.buttonUrl}">${content.buttonText}</a>`
+                          : ""
+                      }
+                      
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </section>
+          </section>
+            `;
 
             body.appendChild(modal);
           } else if (content.contentType === "newsletter") {
-            const inputContainer = document.createElement("div");
-            inputContainer.classList.add("input-container");
-            container.classList.add("container-newsletter");
-            primaryBtnNewsletter.textContent = content.buttonText;
-            btnLink.href = content.buttonUrl;
-            input.type = "text";
-
-            modal.appendChild(popup_content);
-            popup_content.appendChild(container);
-            container.appendChild(heading);
-            if (bodyText) {
-              container.appendChild(bodyText);
-            }
-            container.appendChild(closeBtn);
-            container.appendChild(inputContainer);
-            inputContainer.appendChild(input);
-            inputContainer.appendChild(btnLink);
-            btnLink.appendChild(primaryBtnNewsletter);
-
             body.appendChild(modal);
-
-            primaryBtnNewsletter.classList.add("primaryBtn-newsletter");
           } else if (content.contentType === "product-feed") {
-            productContainer.classList.add("productContainer");
-            container.classList.add("container-product-feed");
-            modal.appendChild(popup_content);
-            popup_content.appendChild(container);
-            if (heading) {
-              container.appendChild(heading);
-            }
-
-            if (bodyText) {
-              container.appendChild(bodyText);
-            }
-            container.appendChild(closeBtn);
-            popup_content.appendChild(productContainer);
-            // Run a forEach loop for how many products we want here?
             const products = content.selectedProducts[0].selection;
-            console.log(products);
-            products.forEach((prod) => {
-              const product = document.createElement("div");
-              const prodImg = document.createElement("img");
-              const prodTitle = document.createElement("h3");
-              const prodPrice = document.createElement("p");
-              const primaryBtn = document.createElement("p");
-
-              product.classList.add("product");
-              prodImg.classList.add("prodImg");
-              prodTitle.classList.add("prodTitle");
-              prodPrice.classList.add("prodPrice");
-              primaryBtn.classList.add("primaryBtn");
-              primaryBtnNewsletter.classList.add("primaryBtn-newsletter");
-
-              productContainer.appendChild(product);
-              product.appendChild(prodImg);
-              product.appendChild(prodTitle);
-              product.appendChild(prodPrice);
-              product.appendChild(primaryBtn);
-
-              const image =
-                prod.images.length === 0
-                  ? "https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png?format=jpg&quality=90&v=1530129081"
-                  : prod.images[0].originalSrc;
-
-              prodTitle.textContent = prod.title;
-              prodPrice.textContent = prod.variants[0].price;
-              prodImg.src = image;
-              primaryBtn.textContent = "Add to Cart";
-            });
+            modal.innerHTML = `
+            <section class="ezy-style-modal">
+  <section class="ezy-style-modal__window">
+    <section class="ezy-style-modal__close">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </section>
+    <section class="ezy-style-modal__content">
+      <div class="flex flex-row flex-wrap">
+        <div class="w-full sm:w-full flex justify-center items-center p-4 md:p-8">
+          <div class="overflow-hidden">
+            <div class="">
+              <h3 class="ezy-test__headline--bold-1 mb-2">Campaign headline for a standard modal</h3>
+              <p class="mb-4">
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              </p>
+            </div>
+            <div class="ezy-product-feed">
+            ${products.map((product) => {
+              return `<div class="ezy-product-feed__item">
+              <img class="image--square" src="https://images.unsplash.com/photo-1602607203559-d38903b80507?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3898&q=80"/>
+              <p>Product title</p>
+              <p class="pb-2">$8.00</p>
+              <a class="ezy-btn w-full" href="">Add to cart</a>
+            </div>`;
+            })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+</section>`;
 
             body.appendChild(modal);
           } else if (content.contentType === "custom-html") {
-            const customHtml = content.customHtml;
-
-            popup_content.innerHTML = customHtml;
-
-            modal.appendChild(popup_content);
             body.appendChild(modal);
-            popup_content.appendChild(closeBtn);
           }
         };
 
@@ -612,48 +296,48 @@ const campaignInfo = async () => {
           if (!triggered) {
             triggered = true;
           }
+          // // add all the elements inside modal which you want to make focusable
+          // const focusableElements = "input, button, i";
+          // const modalEP = document.querySelector(".modal-ep"); // select the modal by its class
 
-          // add all the elements inside modal which you want to make focusable
-          const focusableElements = "input, button, i";
-          const modal = document.querySelector(".modal-ep"); // select the modal by its class
+          // const firstFocusableElement = modalEP.querySelectorAll(
+          //   focusableElements
+          // )[0]; // get first element to be focused inside modal
+          // const focusableContent = modalEP.querySelectorAll(focusableElements);
+          // const lastFocusableElement =
+          //   focusableContent[focusableContent.length - 1]; // get last element to be focused inside modal
 
-          const firstFocusableElement = modal.querySelectorAll(
-            focusableElements
-          )[0]; // get first element to be focused inside modal
-          const focusableContent = modal.querySelectorAll(focusableElements);
-          const lastFocusableElement =
-            focusableContent[focusableContent.length - 1]; // get last element to be focused inside modal
+          // document.addEventListener("keydown", function (e) {
+          //   let isTabPressed = e.key === "Tab" || e.keyCode === 9;
 
-          document.addEventListener("keydown", function (e) {
-            let isTabPressed = e.key === "Tab" || e.keyCode === 9;
+          //   if (!isTabPressed) {
+          //     return;
+          //   }
 
-            if (!isTabPressed) {
-              return;
-            }
+          //   if (e.shiftKey) {
+          //     // if shift key pressed for shift + tab combination
+          //     if (document.activeElement === firstFocusableElement) {
+          //       lastFocusableElement.focus(); // add focus for the last focusable element
+          //       e.preventDefault();
+          //     }
+          //   } else {
+          //     // if tab key is pressed
+          //     if (document.activeElement === lastFocusableElement) {
+          //       // if focused has reached to last focusable element then focus first focusable element after pressing tab
+          //       firstFocusableElement.focus(); // add focus for the first focusable element
+          //       e.preventDefault();
+          //     }
+          //   }
+          // });
 
-            if (e.shiftKey) {
-              // if shift key pressed for shift + tab combination
-              if (document.activeElement === firstFocusableElement) {
-                lastFocusableElement.focus(); // add focus for the last focusable element
-                e.preventDefault();
-              }
-            } else {
-              // if tab key is pressed
-              if (document.activeElement === lastFocusableElement) {
-                // if focused has reached to last focusable element then focus first focusable element after pressing tab
-                firstFocusableElement.focus(); // add focus for the first focusable element
-                e.preventDefault();
-              }
-            }
-          });
-
-          firstFocusableElement.focus();
+          // firstFocusableElement.focus();
         }
 
         function workOnClassRemoval() {
-          // const focusableElements = "input, button, i";
-          const modal = document.querySelector(".modal-ep");
-          modal.tabIndex = -1;
+          primaryBtn.tabIndex = -1;
+          btnLink.tabIndex = -1;
+
+          document.querySelector("body").focus();
         }
 
         // watch for a specific class change
@@ -867,6 +551,31 @@ const campaignInfo = async () => {
           let exit = false;
           let scrolled = false;
           let finishedScrolling = false;
+
+          const open = window.XMLHttpRequest.prototype.open;
+
+          function openReplacement() {
+            this.addEventListener("load", function () {
+              if (
+                [
+                  "/cart/add.js",
+                  "/cart/update.js",
+                  "/cart/change.js",
+                  "/cart/clear.js",
+                ].includes(this._url)
+              ) {
+                calculateShipping(this.response);
+              }
+            });
+            return open.apply(this, arguments);
+          }
+
+          window.XMLHttpRequest.prototype.open = openReplacement;
+
+          function calculateShipping(cartJson) {
+            console.log("calculate new shipping");
+            console.log(JSON.parse(cartJson));
+          }
 
           const checkCondition = (trigger) => {
             if (trigger.triggerType === "url") {
