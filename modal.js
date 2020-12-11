@@ -703,10 +703,9 @@ const campaignInfo = async () => {
                     .clone()
                     .json()
                     .then((data) => {
-                      console.log(data);
                       cartData = data;
-                      check();
-                    });
+                    })
+                    .then(() => check());
                 }
               });
 
