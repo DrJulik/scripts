@@ -552,30 +552,31 @@ const campaignInfo = async () => {
           let scrolled = false;
           let finishedScrolling = false;
 
-          const open = window.XMLHttpRequest.prototype.open;
+          (function (ns, fetch) {
+            if (typeof fetch !== "function") return;
 
-          function openReplacement() {
-            this.addEventListener("load", function () {
-              if (
-                [
-                  "/cart/add.js",
-                  "/cart/update.js",
-                  "/cart/change.js",
-                  "/cart/clear.js",
-                ].includes(this._url)
-              ) {
-                calculateShipping(this.response);
-              }
-            });
-            return open.apply(this, arguments);
-          }
+            ns.fetch = function () {
+              const response = fetch.apply(this, arguments);
 
-          window.XMLHttpRequest.prototype.open = openReplacement;
+              response.then((res) => {
+                if (
+                  [
+                    `${window.location.origin}/cart/add.js`,
+                    `${window.location.origin}/cart/update.js`,
+                    `${window.location.origin}/cart/change.js`,
+                    `${window.location.origin}/cart/clear.js`,
+                  ].includes(res.url)
+                ) {
+                  res
+                    .clone()
+                    .json()
+                    .then((data) => console.log(data));
+                }
+              });
 
-          function calculateShipping(cartJson) {
-            console.log("calculate new shipping");
-            console.log(JSON.parse(cartJson));
-          }
+              return response;
+            };
+          })(window, window.fetch);
 
           const checkCondition = (trigger) => {
             if (trigger.triggerType === "url") {
