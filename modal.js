@@ -617,6 +617,7 @@ const campaignInfo = async () => {
           };
 
           const check = () => {
+            console.log("checked");
             const conditionsMatched = triggers.some(checkCondition);
 
             let timerObj = triggers.find(
@@ -704,8 +705,9 @@ const campaignInfo = async () => {
                     .json()
                     .then((data) => {
                       cartData = data;
-                    })
-                    .then(() => check());
+                      console.log(cartData);
+                      check();
+                    });
                 }
               });
 
