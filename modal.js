@@ -449,27 +449,18 @@ const campaignInfo = async () => {
               }
               // CONTENT TYPES
               setContentTypes();
-              // classes
-              primaryBtn.classList.add("primaryBtn");
 
-              btnLink.classList.add("btnLink");
-
-              if (freePlan) {
-                freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
-                popup_content.appendChild(freeIcon);
-              }
-
-              closeBtn.addEventListener("click", (e) => {
-                modal.classList.remove("open");
-                isOpen = false;
-              });
-              closeBtn.addEventListener("keyup", (e) => {
-                if (e.keyCode === 13) {
-                  e.preventDefault();
-                  modal.classList.remove("open");
-                  isOpen = false;
-                }
-              });
+              // closeBtn.addEventListener("click", (e) => {
+              //   modal.classList.remove("open");
+              //   isOpen = false;
+              // });
+              // closeBtn.addEventListener("keyup", (e) => {
+              //   if (e.keyCode === 13) {
+              //     e.preventDefault();
+              //     modal.classList.remove("open");
+              //     isOpen = false;
+              //   }
+              // });
 
               if (
                 triggers.some((trigger) => {
