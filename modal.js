@@ -83,6 +83,8 @@ const campaignInfo = async () => {
     const campData = await fetchCampaignInfo();
     const cartData = await fetchCartInfo();
     console.log(cartData);
+    let cart_size = cartData.item_count;
+    let cart_value = cartData.total_price;
     campData.forEach((campaign) => {
       console.log(campaign);
       const { freePlan, style, content, settings, _id, createdAt } = campaign;
@@ -570,7 +572,7 @@ const campaignInfo = async () => {
                   res
                     .clone()
                     .json()
-                    .then((data) => console.log(data));
+                    .then((data) => check());
                 }
               });
 
