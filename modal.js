@@ -81,7 +81,7 @@ class ClassWatcher {
 const campaignInfo = async () => {
   try {
     const campData = await fetchCampaignInfo();
-    const cartData = await fetchCartInfo();
+    let cartData = await fetchCartInfo();
     console.log(cartData);
     let cart_size = cartData.item_count;
     let cart_value = cartData.total_price;
@@ -115,6 +115,29 @@ const campaignInfo = async () => {
 
         const borderRadius = style.borderRadius + "%";
         const borderWidth = style.borderWidth + "px";
+
+        let stylesheet = document.createElement("style");
+        stylesheet.type = "text/css";
+        stylesheet.innerHTML = `.modal-ep { z-index: 10000;
+                        pointer-events: none;
+                        opacity: 0;
+                        display: flex;
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        height: 100%;
+                        width: 100%;
+                        background-color: ${overlayColor};
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        transition: 0.4s opacity ease; }
+    
+                        .modal-ep.open {
+                            pointer-events: all;
+                        opacity: 1;
+                        }`;
+        document.getElementsByTagName("head")[0].appendChild(stylesheet);
 
         // SET CONTENT TYPES
         const setContentTypes = () => {
@@ -545,32 +568,6 @@ const campaignInfo = async () => {
           let scrolled = false;
           let finishedScrolling = false;
 
-          (function (ns, fetch) {
-            if (typeof fetch !== "function") return;
-
-            ns.fetch = function () {
-              const response = fetch.apply(this, arguments);
-
-              response.then((res) => {
-                if (
-                  [
-                    `${window.location.origin}/cart/add.js`,
-                    `${window.location.origin}/cart/update.js`,
-                    `${window.location.origin}/cart/change.js`,
-                    `${window.location.origin}/cart/clear.js`,
-                  ].includes(res.url)
-                ) {
-                  res
-                    .clone()
-                    .json()
-                    .then((data) => check());
-                }
-              });
-
-              return response;
-            };
-          })(window, window.fetch);
-
           const checkCondition = (trigger) => {
             if (trigger.triggerType === "url") {
               if (trigger.matchingFormat === "contains") {
@@ -651,18 +648,6 @@ const campaignInfo = async () => {
               }
               // CONTENT TYPES
               setContentTypes();
-              // classes
-              primaryBtn.classList.add("primaryBtn");
-
-              if (freePlan) {
-                freeIcon.classList.add("fas", "fa-info-circle", "free-icon");
-                popup_content.appendChild(freeIcon);
-              }
-
-              closeBtn.addEventListener("click", (e) => {
-                modal.classList.remove("open");
-                isOpen = false;
-              });
 
               if (
                 triggers.some((trigger) => {
@@ -698,6 +683,36 @@ const campaignInfo = async () => {
           ) {
             document.addEventListener("mouseout", mouseEvent);
           }
+
+          (function (ns, fetch) {
+            if (typeof fetch !== "function") return;
+
+            ns.fetch = function () {
+              const response = fetch.apply(this, arguments);
+
+              response.then((res) => {
+                if (
+                  [
+                    `${window.location.origin}/cart/add.js`,
+                    `${window.location.origin}/cart/update.js`,
+                    `${window.location.origin}/cart/change.js`,
+                    `${window.location.origin}/cart/clear.js`,
+                  ].includes(res.url)
+                ) {
+                  res
+                    .clone()
+                    .json()
+                    .then((data) => {
+                      console.log(data);
+                      cartData = data;
+                      check();
+                    });
+                }
+              });
+
+              return response;
+            };
+          })(window, window.fetch);
 
           // SCROLL DEPTH CHECK
           const catchModal = () => {
