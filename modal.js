@@ -584,6 +584,7 @@ const campaignInfo = async () => {
                 }
               }
             } else if (trigger.triggerType === "cart-size") {
+              console.log(cartData.item_count);
               if (trigger.matchingFormat === "greater") {
                 if (cartData.item_count > trigger.matchingInput) {
                   return trigger.triggerType === "cart-size";
