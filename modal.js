@@ -708,9 +708,8 @@ const campaignInfo = async () => {
                       cartDataFetch = fetchCartInfo();
                       cartDataFetch.then((cart) => {
                         cartData = cart;
-                        console.log(cart);
+                        check();
                       });
-                      check();
                     });
                 }
               });
