@@ -117,10 +117,11 @@ const campaignInfo = async () => {
           "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css";
         document.head.appendChild(link);
 
-        // let link1 = document.createElement("link");
-        // link1.rel = "stylesheet";
-        // link1.href = "https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css";
-        // document.head.appendChild(link1);
+        let link1 = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href =
+          "https://cdn.jsdelivr.net/gh/DrJulik/scripts@1.0.931/styles.min.css";
+        document.head.appendChild(link1);
 
         const borderRadius = style.borderRadius + "%";
         const borderWidth = style.borderWidth + "px";
