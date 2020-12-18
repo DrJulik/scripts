@@ -83,11 +83,19 @@ const campaignInfo = async () => {
     const campData = await fetchCampaignInfo();
     let cartData = await fetchCartInfo();
     console.log(cartData);
-    let cart_size = cartData.item_count;
-    let cart_value = cartData.total_price;
+    // let cart_size = cartData.item_count;
+    // let cart_value = cartData.total_price;
     campData.forEach((campaign) => {
       console.log(campaign);
-      const { freePlan, style, content, settings, _id, createdAt } = campaign;
+      const {
+        freePlan,
+        style,
+        content,
+        settings,
+        _id,
+        createdAt,
+        name,
+      } = campaign;
       const {
         borderColor,
         backgroundColor,
@@ -99,7 +107,8 @@ const campaignInfo = async () => {
       if (style.campaignType === "modal") {
         // DOM hooks
         const body = document.querySelector("body");
-        const modal = document.createElement("div");
+        const modal = document.createElement("section");
+        modal.classList.add("ezy-style-modal");
 
         // Loading fontAwesome
         let link = document.createElement("link");
@@ -108,80 +117,104 @@ const campaignInfo = async () => {
           "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css";
         document.head.appendChild(link);
 
-        let link1 = document.createElement("link");
-        link1.rel = "stylesheet";
-        link1.href = "https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css";
-        document.head.appendChild(link1);
+        // let link1 = document.createElement("link");
+        // link1.rel = "stylesheet";
+        // link1.href = "https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css";
+        // document.head.appendChild(link1);
 
         const borderRadius = style.borderRadius + "%";
         const borderWidth = style.borderWidth + "px";
 
-        let stylesheet = document.createElement("style");
-        stylesheet.type = "text/css";
-        stylesheet.innerHTML = `.modal-ep { z-index: 10000;
-                        pointer-events: none;
-                        opacity: 0;
-                        display: flex;
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        height: 100%;
-                        width: 100%;
-                        background-color: ${overlayColor};
-                        flex-direction: column;
-                        justify-content: center;
-                        align-items: center;
-                        transition: 0.4s opacity ease; }
-    
-                        .modal-ep.open {
-                            pointer-events: all;
-                        opacity: 1;
-                        }`;
-        document.getElementsByTagName("head")[0].appendChild(stylesheet);
+        // let stylesheet = document.createElement("style");
+        // stylesheet.type = "text/css";
+        // stylesheet.innerHTML = `.modal-ep { z-index: 10000;
+        //                 pointer-events: none;
+        //                 opacity: 0;
+        //                 display: flex;
+        //                 position: fixed;
+        //                 top: 0;
+        //                 left: 0;
+        //                 height: 100%;
+        //                 width: 100%;
+        //                 background-color: ${overlayColor};
+        //                 flex-direction: column;
+        //                 justify-content: center;
+        //                 align-items: center;
+        //                 transition: 0.4s opacity ease; }
+
+        //                 .modal-ep.open {
+        //                     pointer-events: all;
+        //                 opacity: 1;
+        //                 }`;
+        // document.getElementsByTagName("head")[0].appendChild(stylesheet);
 
         // SET CONTENT TYPES
         const setContentTypes = () => {
+          // tw-hidden inside section
           if (content.contentType === "text-image") {
             modal.innerHTML = `
-            <section class="ezy-style-modal">
-            <section class="ezy-style-modal__window">
-              <section class="ezy-style-modal__close">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-              </section>
-              <section class="ezy-style-modal__content">
-                <div class="flex flex-row flex-wrap justify-center">
-                  <div class="w-full sm:w-1/2 relative">
-                    <img class="image--portrait" src="https://images.unsplash.com/photo-1602607203559-d38903b80507?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3898&q=80"/>
-          
-                    <span class="ezy-tooltip ezy-test__body--smaller absolute bottom-1 left-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                      Powered by Easypop
-                    </span>
-          
-                  </div>
-                  <div class="w-full sm:w-1/2 flex justify-center items-center p-4 md:p-8">
-                    <div>
-                    ${
-                      content.headline !== ""
-                        ? `<h3 class="ezy-test__headline--bold-1 mb-2">${content.headline}</h3>`
-                        : ""
-                    }
-                      
-                      <p class="mb-4">
-                      ${content.body !== "" ? `${content.body}` : ""}
-                      </p>
-                      ${
-                        content.buttonText !== ""
-                          ? `<a class="ezy-btn w-full" href="${content.buttonUrl}">${content.buttonText}</a>`
-                          : ""
-                      }
-                      
-                    </div>
-                  </div>
-                </div>
-              </section>
-            </section>
-          </section>
+            <!-- TEMPLATE STARTS -->
+
+  <section class="ezy-style-modal__window">
+    <section class="ezy-style-modal__close">
+      <a href="#" class="closeBtn" title="Close popup modal"">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x ezy-btn--round--clear"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </a>
+    </section>
+    <section class="ezy-style-modal__content"
+      style="
+        background-color:${style.backgroundColor};
+        border-radius:${style.borderRadius}px">
+
+      <section>
+        
+<!-- CONTENT -->
+<section>
+  <div class="tw-flex tw-flex-row tw-flex-wrap tw-justify-center">
+    <!-- ##IF IMAGE## -->
+    ${
+      content.imgUrl !== ""
+        ? `<div class="tw-w-full sm:tw-w-1/2"> m
+      <div>
+        <img class="ezy-style-modal__content__image" src="${content.imgUrl}"/>
+      </div>
+    </div>`
+        : ""
+    }
+   
+    <!-- ##ENDIF## -->
+    <div class="tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center tw-p-4 tw-md:p-8">
+      <div>
+        <h3 class="ezy-type__headline--bold-1 tw-mb-2">${content.headline}</h3>
+        <p class="tw-mb-4">
+        ${content.body}
+        </p>
+        <a class="ezy-btn tw-w-full" href="${content.buttonUrl}"
+          style="
+            background-color:${style.primaryButtonColor};
+            border-radius:${style.borderRadius}px">${content.buttonText}</a>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- END CONTENT -->
+
+
+      </section>
+
+    </section>
+  </section>
+  <a href="https://brickspacelab.com/" target="_blank" class="ezy-tooltip ezy-tooltip--inverted tw-absolute tw-bottom-2 tw-left-2
+    ##IF PAID_PLAN##tw-hidden##ENDIF##">
+    ${
+      freePlan
+        ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+    <span>Powered by Easypop</span>`
+        : ""
+    }
+    
+  </a>
+
             `;
 
             body.appendChild(modal);
@@ -313,6 +346,7 @@ const campaignInfo = async () => {
             return;
           }
         };
+
         let triggered = false;
         function workOnClassAdd() {
           handleFrequency(_id);
@@ -321,49 +355,9 @@ const campaignInfo = async () => {
           if (!triggered) {
             triggered = true;
           }
-          // // add all the elements inside modal which you want to make focusable
-          // const focusableElements = "input, button, i";
-          // const modalEP = document.querySelector(".modal-ep"); // select the modal by its class
-
-          // const firstFocusableElement = modalEP.querySelectorAll(
-          //   focusableElements
-          // )[0]; // get first element to be focused inside modal
-          // const focusableContent = modalEP.querySelectorAll(focusableElements);
-          // const lastFocusableElement =
-          //   focusableContent[focusableContent.length - 1]; // get last element to be focused inside modal
-
-          // document.addEventListener("keydown", function (e) {
-          //   let isTabPressed = e.key === "Tab" || e.keyCode === 9;
-
-          //   if (!isTabPressed) {
-          //     return;
-          //   }
-
-          //   if (e.shiftKey) {
-          //     // if shift key pressed for shift + tab combination
-          //     if (document.activeElement === firstFocusableElement) {
-          //       lastFocusableElement.focus(); // add focus for the last focusable element
-          //       e.preventDefault();
-          //     }
-          //   } else {
-          //     // if tab key is pressed
-          //     if (document.activeElement === lastFocusableElement) {
-          //       // if focused has reached to last focusable element then focus first focusable element after pressing tab
-          //       firstFocusableElement.focus(); // add focus for the first focusable element
-          //       e.preventDefault();
-          //     }
-          //   }
-          // });
-
-          // firstFocusableElement.focus();
         }
 
-        function workOnClassRemoval() {
-          primaryBtn.tabIndex = -1;
-          btnLink.tabIndex = -1;
-
-          document.querySelector("body").focus();
-        }
+        function workOnClassRemoval() {}
 
         // watch for a specific class change
         let classWatcher = new ClassWatcher(
@@ -373,197 +367,19 @@ const campaignInfo = async () => {
           workOnClassRemoval
         );
 
-        // MATCH CONDITIONS -------------------------------------------------------------------
-        if (triggerMatch === "all") {
-          console.log("all triggers are matched");
-
-          // timer for time on page
-          let timerElapsed;
-          if (
-            settings.triggers.some((trigger) => {
-              trigger.triggerType === "time-on-page";
-            })
-          ) {
-            timerElapsed = false;
-          } else {
-            timerElapsed = true;
-          }
-
-          let exit = false;
-          let scrolled = false;
-          let finishedScrolling = false;
-
-          const checkCondition = (trigger) => {
-            if (trigger.triggerType === "url") {
-              if (trigger.matchingFormat === "contains") {
-                urlTrigger = window.location.href.includes(
-                  trigger.matchingInput
-                );
-                if (urlTrigger) {
-                  return trigger.triggerType === "url";
-                }
-              } else if (trigger.matchingFormat === "matches") {
-                urlTrigger = window.location.href === trigger.matchingInput;
-                if (urlTrigger) {
-                  return trigger.triggerType === "url";
-                }
-              }
-            } else if (trigger.triggerType === "cart-size") {
-              if (trigger.matchingFormat === "greater") {
-                if (cartData.item_count > trigger.matchingInput) {
-                  return trigger.triggerType === "cart-size";
-                }
-              } else if (trigger.matchingFormat === "less") {
-                if (cartData.item_count < trigger.matchingInput) {
-                  return trigger.triggerType === "cart-size";
-                }
-              }
-            } else if (trigger.triggerType === "cart-value") {
-              if (trigger.matchingFormat === "greater") {
-                if (cartData.total_price / 100 > trigger.matchingInput) {
-                  return trigger.triggerType === "cart-value";
-                }
-              } else if (trigger.matchingFormat === "less") {
-                if (cartData.total_price / 100 < trigger.matchingInput) {
-                  return trigger.triggerType === "cart-value";
-                }
-              }
-            } else if (scrolled) {
-              return trigger.triggerType === "scroll-depth";
-            } else if (trigger.triggerType === "time-on-page") {
-              if (timerElapsed) {
-                return trigger.triggerType === "time-on-page";
-              }
-            } else if (trigger.triggerType === "exit-intent") {
-              if (exit) {
-                return trigger.triggerType === "exit-intent";
-              }
-            }
-          };
-
-          const check = () => {
-            console.log("checked");
-            const conditionsMatched = triggers.every(checkCondition);
-
-            let timerObj = triggers.find(
-              (trigger) => trigger.triggerType === "time-on-page"
-            );
-            if (!timerElapsed) {
-              setTimeout(
-                () => {
-                  timerElapsed = true;
-                  check();
-                },
-                timerObj ? timerObj.matchingInput * 1000 : null
-              );
-            }
-
-            if (conditionsMatched && !finishedScrolling) {
-              console.log("conditions matched");
-              modal.classList.add("modal-ep");
-              if (settings.delay) {
-                setTimeout(() => {
-                  modal.classList.add("open");
-                }, settings.delayTime * 1000);
-              } else {
-                setTimeout(() => {
-                  modal.classList.add("open");
-                }, 200);
-              }
-              // CONTENT TYPES
-              setContentTypes();
-
-              // closeBtn.addEventListener("click", (e) => {
-              //   modal.classList.remove("open");
-              //   isOpen = false;
-              // });
-              // closeBtn.addEventListener("keyup", (e) => {
-              //   if (e.keyCode === 13) {
-              //     e.preventDefault();
-              //     modal.classList.remove("open");
-              //     isOpen = false;
-              //   }
-              // });
-
-              if (
-                triggers.some((trigger) => {
-                  // exit intent
-                  return trigger.triggerType === "scroll-depth";
-                })
-              ) {
-                finishedScrolling = true;
-              }
-              document.removeEventListener("mouseout", mouseEvent);
-            }
-          };
-          check();
-
-          // EXIT INTENT CHECK
-          const mouseEvent = (e) => {
-            const shouldShowExitIntent =
-              !e.toElement && !e.relatedTarget && e.clientY < 10;
-
-            if (shouldShowExitIntent) {
-              // document.removeEventListener("mouseout", mouseEvent); not removing cuz we wanna check every time
-              // Handling delay here
-              // flip the exit switch
-              exit = true;
-              check();
-            }
-          };
-          if (
-            triggers.some((trigger) => {
-              // exit intent
-              return trigger.triggerType === "exit-intent";
-            })
-          ) {
-            document.addEventListener("mouseout", mouseEvent);
-          }
-
-          // SCROLL DEPTH CHECK
-          const catchModal = () => {
-            scrollpos = window.scrollY;
-            let scrollObj = triggers.find(
-              (trigger) => trigger.triggerType === "scroll-depth"
-            );
-            if (!scrolled) {
-              if (scrollpos >= scrollObj.matchingInput) {
-                console.log("found");
-                scrolled = true;
-                check();
-              }
-
-              console.log("catching");
-            } else {
-              console.log("remove listener");
-              document.removeEventListener("scroll", catchModal);
-            }
-          };
-
-          if (
-            triggers.some((trigger) => {
-              // exit intent
-              return trigger.triggerType === "scroll-depth";
-            })
-          ) {
-            document.addEventListener("scroll", catchModal);
-          }
-
-          // TIME ON PAGE
-          if (
-            triggers.some((trigger) => {
-              // exit intent
-              return trigger.triggerType === "time-on-page";
-            })
-          ) {
-            check();
-          }
-        } else if (triggerMatch === "any") {
-          console.log("any triggers are matched");
-          // TRIGGERS START-----------------------------------------------------------------------------------------------------------------------------------------------
-
+        const createModal = (condition) => {
           // timer for time on page
           let timerElapsed = false;
+          // if (
+          //   settings.triggers.some((trigger) => {
+          //     trigger.triggerType === "time-on-page";
+          //   })
+          // ) {
+          //   timerElapsed = false;
+          // } else {
+          //   timerElapsed = true;
+          // }
+
           let exit = false;
           let scrolled = false;
           let finishedScrolling = false;
@@ -584,7 +400,6 @@ const campaignInfo = async () => {
                 }
               }
             } else if (trigger.triggerType === "cart-size") {
-              console.log(cartData.item_count);
               if (trigger.matchingFormat === "greater") {
                 if (cartData.item_count > trigger.matchingInput) {
                   return trigger.triggerType === "cart-size";
@@ -617,9 +432,50 @@ const campaignInfo = async () => {
             }
           };
 
+          const trapFocus = (element) => {
+            const modal = element;
+            const focusableElements =
+              'a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])';
+            const firstFocusableElement = modal.querySelectorAll(
+              focusableElements
+            )[0];
+            const focusableContent = modal.querySelectorAll(focusableElements);
+            const lastFocusableElement =
+              focusableContent[focusableContent.length - 1];
+
+            document.addEventListener("keydown", function (e) {
+              let isTabPressed = e.key === "Tab" || e.keyCode === 9;
+
+              if (!isTabPressed) {
+                return;
+              }
+
+              // if shift key pressed for shift + tab combination
+              if (e.shiftKey) {
+                if (document.activeElement === firstFocusableElement) {
+                  lastFocusableElement.focus();
+                  e.preventDefault();
+                }
+              }
+
+              // if tab key is pressed
+              else {
+                if (document.activeElement === lastFocusableElement) {
+                  firstFocusableElement.focus();
+                  e.preventDefault();
+                }
+              }
+            });
+          };
+
           const check = () => {
             console.log("checked");
-            const conditionsMatched = triggers.some(checkCondition);
+            let conditionsMatched;
+            if (condition === "all") {
+              conditionsMatched = triggers.every(checkCondition);
+            } else if (condition === "any") {
+              conditionsMatched = triggers.some(checkCondition);
+            }
 
             let timerObj = triggers.find(
               (trigger) => trigger.triggerType === "time-on-page"
@@ -632,24 +488,56 @@ const campaignInfo = async () => {
                 },
                 timerObj ? timerObj.matchingInput * 1000 : null
               );
-              // FIGURE OUT HOW TO GET THE TIME OF THE FIRST TIME ON PAGE TRIGGER
             }
 
-            if (conditionsMatched && !finishedScrolling) {
+            if (
+              conditionsMatched &&
+              !finishedScrolling &&
+              !triggered &&
+              !localStorage.getItem(`limit_${_id}`)
+            ) {
               console.log("conditions matched");
-
-              modal.classList.add("modal-ep");
-              if (settings.delay) {
-                setTimeout(() => {
-                  modal.classList.add("open");
-                }, settings.delayTime * 1000);
-              } else {
-                setTimeout(() => {
-                  modal.classList.add("open");
-                }, 200);
-              }
+              // modal.classList.add("modal-ep");
+              // if (settings.delay) {
+              //   setTimeout(() => {
+              //     modal.classList.add("open");
+              //   }, settings.delayTime * 1000);
+              // } else {
+              //   setTimeout(() => {
+              //     modal.classList.add("open");
+              //   }, 200);
+              // }
               // CONTENT TYPES
               setContentTypes();
+
+              let closeBtn = document.querySelector(".closeBtn");
+              closeBtn.addEventListener("click", (e) => {
+                modal.classList.add("ezy-style-modal--closed");
+                setTimeout(function () {
+                  modal.classList.add("tw-hidden");
+                }, 1000);
+                isOpen = false;
+              });
+              closeBtn.addEventListener("keyup", (e) => {
+                if (e.keyCode === 13) {
+                  e.preventDefault();
+                  modal.classList.add("ezy-style-modal--closed");
+                  setTimeout(function () {
+                    modal.classList.add("tw-hidden");
+                  }, 1000);
+                  isOpen = false;
+                }
+              });
+              modal.addEventListener("click", function (e) {
+                if (e.target == this) {
+                  modal.classList.add("ezy-style-modal--closed");
+                  setTimeout(function () {
+                    modal.classList.add("tw-hidden");
+                  }, 1000);
+                }
+              });
+
+              trapFocus(modal);
 
               if (
                 triggers.some((trigger) => {
@@ -686,6 +574,7 @@ const campaignInfo = async () => {
             document.addEventListener("mouseout", mouseEvent);
           }
 
+          // Cart catch
           (function (ns, fetch) {
             if (typeof fetch !== "function") return;
 
@@ -748,15 +637,92 @@ const campaignInfo = async () => {
           }
 
           // TIME ON PAGE
-          if (
-            triggers.some((trigger) => {
-              // exit intent
-              return trigger.triggerType === "time-on-page";
-            })
-          ) {
-            check();
-          }
+          // if (
+          //   triggers.some((trigger) => {
+          //     // exit intent
+          //     return trigger.triggerType === "time-on-page";
+          //   })
+          // ) {
+          //   check();
+          // }
+        };
+
+        // MATCH CONDITIONS -------------------------------------------------------------------
+        if (triggerMatch === "all") {
+          console.log("all triggers are matched");
+          createModal("all");
+        } else if (triggerMatch === "any") {
+          console.log("any triggers are matched");
+          createModal("any");
         }
+
+        // let ezy = {};
+        // ezy.modals = {
+        //   // close all modals
+        //   closeAll: function () {
+        //     var modals = document.getElementsByClassName("ezy-style-modal");
+        //     for (var i = 0; i < modals.length; i++) {
+        //       let modal = modals[i];
+        //       modal.classList.add("ezy-style-modal--closed");
+        //       setTimeout(function () {
+        //         modal.classList.add("tw-hidden");
+        //       }, 1000);
+        //     }
+        //   },
+
+        //   // Credit - uxdesign.cc/how-to-trap-focus-inside-modal-to-make-it-ada-compliant-6a50f9a70700
+        //   trapFocus: function (element) {
+        //     const modal = element;
+        //     const focusableElements =
+        //       'a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])';
+        //     const firstFocusableElement = modal.querySelectorAll(
+        //       focusableElements
+        //     )[0];
+        //     const focusableContent = modal.querySelectorAll(focusableElements);
+        //     const lastFocusableElement =
+        //       focusableContent[focusableContent.length - 1];
+
+        //     document.addEventListener("keydown", function (e) {
+        //       let isTabPressed = e.key === "Tab" || e.keyCode === 9;
+
+        //       if (!isTabPressed) {
+        //         return;
+        //       }
+
+        //       // if shift key pressed for shift + tab combination
+        //       if (e.shiftKey) {
+        //         if (document.activeElement === firstFocusableElement) {
+        //           lastFocusableElement.focus();
+        //           e.preventDefault();
+        //         }
+        //       }
+
+        //       // if tab key is pressed
+        //       else {
+        //         if (document.activeElement === lastFocusableElement) {
+        //           firstFocusableElement.focus();
+        //           e.preventDefault();
+        //         }
+        //       }
+        //     });
+        //   },
+
+        //   // initilize modals
+        //   init: function () {
+        //     // close all modals when clicking background
+        //     var modals = document.getElementsByClassName("ezy-style-modal");
+        //     Array.from(modals).forEach(function (modal) {
+        //       modal.addEventListener("click", function (e) {
+        //         if (e.target == this) {
+        //           ezy.modals.closeAll();
+        //         }
+        //       });
+        //     });
+        //   },
+        // };
+
+        // ezy.modals.init();
+        // ezy.modals.trapFocus(document.getElementById("My"));
       }
     });
   } catch (err) {
