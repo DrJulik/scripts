@@ -110,44 +110,12 @@ const campaignInfo = async () => {
         const modal = document.createElement("section");
         modal.classList.add("ezy-style-modal");
 
-        // Loading fontAwesome
-        let link = document.createElement("link");
-        link.rel = "stylesheet";
-        link.href =
-          "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css";
-        document.head.appendChild(link);
-
         let link1 = document.createElement("link");
         link.rel = "stylesheet";
         link.href =
           "https://cdn.jsdelivr.net/gh/DrJulik/scripts@1.0.931/styles.min.css";
         document.head.appendChild(link1);
 
-        const borderRadius = style.borderRadius + "%";
-        const borderWidth = style.borderWidth + "px";
-
-        // let stylesheet = document.createElement("style");
-        // stylesheet.type = "text/css";
-        // stylesheet.innerHTML = `.modal-ep { z-index: 10000;
-        //                 pointer-events: none;
-        //                 opacity: 0;
-        //                 display: flex;
-        //                 position: fixed;
-        //                 top: 0;
-        //                 left: 0;
-        //                 height: 100%;
-        //                 width: 100%;
-        //                 background-color: ${overlayColor};
-        //                 flex-direction: column;
-        //                 justify-content: center;
-        //                 align-items: center;
-        //                 transition: 0.4s opacity ease; }
-
-        //                 .modal-ep.open {
-        //                     pointer-events: all;
-        //                 opacity: 1;
-        //                 }`;
-        // document.getElementsByTagName("head")[0].appendChild(stylesheet);
 
         // SET CONTENT TYPES
         const setContentTypes = () => {
@@ -175,7 +143,7 @@ const campaignInfo = async () => {
     <!-- ##IF IMAGE## -->
     ${
       content.imgUrl !== ""
-        ? `<div class="tw-w-full sm:tw-w-1/2"> m
+        ? `<div class="tw-w-full sm:tw-w-1/2"> 
       <div>
         <img class="ezy-style-modal__content__image" src="${content.imgUrl}"/>
       </div>
@@ -498,16 +466,6 @@ const campaignInfo = async () => {
               !localStorage.getItem(`limit_${_id}`)
             ) {
               console.log("conditions matched");
-              // modal.classList.add("modal-ep");
-              // if (settings.delay) {
-              //   setTimeout(() => {
-              //     modal.classList.add("open");
-              //   }, settings.delayTime * 1000);
-              // } else {
-              //   setTimeout(() => {
-              //     modal.classList.add("open");
-              //   }, 200);
-              // }
               // CONTENT TYPES
               setContentTypes();
 
@@ -636,16 +594,6 @@ const campaignInfo = async () => {
           ) {
             document.addEventListener("scroll", catchModal);
           }
-
-          // TIME ON PAGE
-          // if (
-          //   triggers.some((trigger) => {
-          //     // exit intent
-          //     return trigger.triggerType === "time-on-page";
-          //   })
-          // ) {
-          //   check();
-          // }
         };
 
         // MATCH CONDITIONS -------------------------------------------------------------------
@@ -656,74 +604,6 @@ const campaignInfo = async () => {
           console.log("any triggers are matched");
           createModal("any");
         }
-
-        // let ezy = {};
-        // ezy.modals = {
-        //   // close all modals
-        //   closeAll: function () {
-        //     var modals = document.getElementsByClassName("ezy-style-modal");
-        //     for (var i = 0; i < modals.length; i++) {
-        //       let modal = modals[i];
-        //       modal.classList.add("ezy-style-modal--closed");
-        //       setTimeout(function () {
-        //         modal.classList.add("tw-hidden");
-        //       }, 1000);
-        //     }
-        //   },
-
-        //   // Credit - uxdesign.cc/how-to-trap-focus-inside-modal-to-make-it-ada-compliant-6a50f9a70700
-        //   trapFocus: function (element) {
-        //     const modal = element;
-        //     const focusableElements =
-        //       'a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])';
-        //     const firstFocusableElement = modal.querySelectorAll(
-        //       focusableElements
-        //     )[0];
-        //     const focusableContent = modal.querySelectorAll(focusableElements);
-        //     const lastFocusableElement =
-        //       focusableContent[focusableContent.length - 1];
-
-        //     document.addEventListener("keydown", function (e) {
-        //       let isTabPressed = e.key === "Tab" || e.keyCode === 9;
-
-        //       if (!isTabPressed) {
-        //         return;
-        //       }
-
-        //       // if shift key pressed for shift + tab combination
-        //       if (e.shiftKey) {
-        //         if (document.activeElement === firstFocusableElement) {
-        //           lastFocusableElement.focus();
-        //           e.preventDefault();
-        //         }
-        //       }
-
-        //       // if tab key is pressed
-        //       else {
-        //         if (document.activeElement === lastFocusableElement) {
-        //           firstFocusableElement.focus();
-        //           e.preventDefault();
-        //         }
-        //       }
-        //     });
-        //   },
-
-        //   // initilize modals
-        //   init: function () {
-        //     // close all modals when clicking background
-        //     var modals = document.getElementsByClassName("ezy-style-modal");
-        //     Array.from(modals).forEach(function (modal) {
-        //       modal.addEventListener("click", function (e) {
-        //         if (e.target == this) {
-        //           ezy.modals.closeAll();
-        //         }
-        //       });
-        //     });
-        //   },
-        // };
-
-        // ezy.modals.init();
-        // ezy.modals.trapFocus(document.getElementById("My"));
       }
     });
   } catch (err) {
