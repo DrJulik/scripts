@@ -110,11 +110,11 @@ const campaignInfo = async () => {
         const modal = document.createElement("section");
         modal.classList.add("ezy-style-modal");
 
-        let link1 = document.createElement("link");
-        link1.rel = "stylesheet";
-        link1.href =
-          "https://cdn.jsdelivr.net/gh/DrJulik/scripts@1.0.931/styles.min.css";
-        document.head.appendChild(link1);
+        // let link1 = document.createElement("link");
+        // link1.rel = "stylesheet";
+        // link1.href =
+        //   "https://cdn.jsdelivr.net/gh/DrJulik/scripts@1.0.931/styles.min.css";
+        // document.head.appendChild(link1);
 
         // SET CONTENT TYPES
         const setContentTypes = () => {
@@ -191,39 +191,282 @@ const campaignInfo = async () => {
           } else if (content.contentType === "product-feed") {
             const products = content.selectedProducts[0].selection;
             modal.innerHTML = `
-            <section class="ezy-style-modal">
+            <!-- TEMPLATE STARTS -->
   <section class="ezy-style-modal__window">
     <section class="ezy-style-modal__close">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      <a href="#" class="closeBtn" title="Close popup modal"">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x ezy-btn--round--clear"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </a>
     </section>
-    <section class="ezy-style-modal__content">
-      <div class="flex flex-row flex-wrap">
-        <div class="w-full sm:w-full flex justify-center items-center p-4 md:p-8">
-          <div class="overflow-hidden">
-            <div class="">
-              <h3 class="ezy-test__headline--bold-1 mb-2">Campaign headline for a standard modal</h3>
-              <p class="mb-4">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              </p>
-            </div>
-            <div class="ezy-product-feed">
-            ${products.map((product) => {
-              return `<div class="ezy-product-feed__item">
-              <img class="image--square" src="https://images.unsplash.com/photo-1602607203559-d38903b80507?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3898&q=80"/>
-              <p>Product title</p>
-              <p class="pb-2">$8.00</p>
-              <a class="ezy-btn w-full" href="">Add to cart</a>
-            </div>`;
-            })}
-            </div>
-          </div>
+    <section class="ezy-style-modal__content"
+      style="
+        background-color:${style.backgroundColor};
+        border-radius:${style.borderRadius}">
+
+      <section>
+        <!-- CONTENT -->
+<div class="tw-flex tw-flex-row tw-flex-wrap">
+  <div class="tw-w-full sm:tw-w-full tw-flex tw-justify-center tw-items-center">
+    <div class="tw-overflow-hidden">
+      <div class="tw-p-4 tw-max-w-prose">
+        <h3 class="ezy-type__headline--bold-1">${content.headline}</h3>
+        <p>
+        ${content.body}
+        </p>
+      </div>
+      <div class="ezy-type-productfeed__arrows">
+        <div class="ezy-type-productfeed__back">
+          <button class="js:ezy-scrollArrowButtons" data-scroll-direction="0" data-scroll-container="ezy-type-productfeed">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left ezy-btn--round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          </button>
+        </div>
+        <div class="ezy-type-productfeed__next">
+          <button class="js:ezy-scrollArrowButtons" data-scroll-direction="1" data-scroll-container="ezy-type-productfeed">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right ezy-btn--round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
         </div>
       </div>
+      <div class="ezy-type-productfeed">
+        ${products.map((product) => {
+          return `
+          <div class="ezy-type-productfeed__item">
+          <img class="image--square" src=${product.images[0].originalSrc}/>
+          <div class="tw-px-2 tw-py-4">
+            <p>${product.title}</p>
+            <p class="tw-pb-2">$<span class="tw-pb-2 js:ezy-productPrice">${
+              product.variants[0].price
+            }</span></p>
+            <select id="id" name="id" class="ezy-select tw-mb-2 js:ezy-changeVariantSelects">
+              ${product.variants.map((variant) => {
+                return `<option value="${variant.product.id}" data-variant-availability="${variant.availableForSale}" data-variant-price="${variant.price}">${variant.title}</option>`;
+              })}
+            </select>
+            <button class="ezy-btn js:ezy-addVariantButtons tw-w-full" data-variant-id="${
+              product.variants[0].price
+            }">
+              <span class="ezy-btn__text">
+                Add to cart
+              </span>
+              <span class="ezy-btn__spinner">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-loader"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+              </button>
+            </a>
+          </div>
+        </div>`;
+        })}
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
     </section>
   </section>
+  <a href="https://brickspacelab.com/" target="_blank" class="ezy-tooltip ezy-tooltip--inverted tw-absolute tw-bottom-2 tw-left-2
+    ##IF PAID_PLAN##tw-hidden##ENDIF##">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+    <span>Powered by Easypop</span>
+  </a>
 </section>`;
 
             body.appendChild(modal);
+            var ezy = ezy || {};
+            ezy.productfeed = {
+              // TODO:
+              // x create add variant function
+              // x show loading icon when adding
+              // x add function to scroll left/right
+              // x update when selecting variant
+
+              // simple fetch call
+              fetch: function (
+                requestType,
+                url,
+                data,
+                contentType,
+                successCallback,
+                errorCallback
+              ) {
+                fetch(url, {
+                  method: requestType,
+                  headers: {
+                    "Content-Type": contentType,
+                    Accept: contentType,
+                    "X-Requested-With": "xmlhttprequest",
+                  },
+                  body: JSON.stringify(data),
+                })
+                  .then((response) => response.json())
+                  .then((data) => {
+                    successCallback(data);
+                  })
+                  .catch((error) => {
+                    errorCallback(error);
+                  });
+              },
+
+              // initilize product feed
+              init: function () {
+                // add variant to cart
+                function addVariant(variantID, quantity, callback) {
+                  let data = {
+                    items: [
+                      {
+                        id: variantID,
+                        quantity: quantity,
+                      },
+                    ],
+                  };
+                  ezy.productfeed.fetch(
+                    "POST",
+                    "/cart/add.js",
+                    data,
+                    "application/json; charset=utf-8",
+
+                    // success
+                    function (data) {
+                      console.log(data);
+                      if (typeof callback === "function" && callback()) {
+                        window.setTimeout(function () {
+                          callback();
+                        }, 500);
+                      }
+                    },
+
+                    // error
+                    function (error) {
+                      if (typeof callback === "function" && callback()) {
+                        window.setTimeout(function () {
+                          callback();
+                        }, 500);
+                      }
+                    }
+                  );
+                }
+
+                // scroll container horizontally
+                function scrollHorizontally(element, direction) {
+                  if (direction == 0) {
+                    element.scroll({
+                      left: element.scrollLeft - 350,
+                      behavior: "smooth",
+                    });
+                  } else {
+                    element.scroll({
+                      left: element.scrollLeft + 350,
+                      behavior: "smooth",
+                    });
+                  }
+                }
+
+                // toggle loading state of button
+                function toggleButton(button) {
+                  if (button.classList.contains("ezy-btn--loading")) {
+                    button.classList.remove("ezy-btn--loading");
+                    button.disabled = false;
+                  } else {
+                    button.classList.add("ezy-btn--loading");
+                    button.disabled = true;
+                  }
+                }
+
+                // add disabled state to button
+                function disableButton(button) {
+                  button.classList.add("ezy-btn--disabled");
+                  button.disabled = true;
+                }
+
+                // add enabled state to button
+                function enableButton(button) {
+                  button.classList.remove("ezy-btn--disabled");
+                  button.disabled = false;
+                }
+
+                // listen for click on scroll arrows
+                var scrollArrowButtons = document.getElementsByClassName(
+                  "js:ezy-scrollArrowButtons"
+                );
+                Array.from(scrollArrowButtons).forEach(function (
+                  scrollArrowButton
+                ) {
+                  scrollArrowButton.addEventListener("click", function (e) {
+                    let scrollContainerClass = this.getAttribute(
+                      "data-scroll-container"
+                    );
+                    let scrollDirection = this.getAttribute(
+                      "data-scroll-direction"
+                    );
+                    var scrollContainers = document.getElementsByClassName(
+                      scrollContainerClass
+                    );
+                    Array.from(scrollContainers).forEach(function (
+                      scrollContainer
+                    ) {
+                      scrollHorizontally(scrollContainer, scrollDirection);
+                    });
+                  });
+                });
+
+                // listen for click on atc
+                var addVariantButtons = document.getElementsByClassName(
+                  "js:ezy-addVariantButtons"
+                );
+                Array.from(addVariantButtons).forEach(function (
+                  addVariantButton
+                ) {
+                  addVariantButton.addEventListener("click", function (e) {
+                    let variantId = this.getAttribute("data-variant-id");
+                    toggleButton(addVariantButton);
+                    addVariant(variantId, 1, function () {
+                      toggleButton(addVariantButton);
+                    });
+                  });
+                });
+
+                // listen for change to for variant select
+                var changeVariantSelects = document.getElementsByClassName(
+                  "js:ezy-changeVariantSelects"
+                );
+                Array.from(changeVariantSelects).forEach(function (
+                  changeVariantSelect
+                ) {
+                  changeVariantSelect.addEventListener("change", function () {
+                    let variantAvailability = this.options[
+                      this.selectedIndex
+                    ].getAttribute("data-variant-availability");
+                    let variantPrice = this.options[
+                      this.selectedIndex
+                    ].getAttribute("data-variant-price");
+                    let variantId = this.options[this.selectedIndex].value;
+                    let productItem = this.closest(
+                      ".ezy-type-productfeed__item"
+                    );
+                    let button = productItem.getElementsByClassName(
+                      "js:ezy-addVariantButtons"
+                    )[0];
+
+                    // update variant id in button
+                    button.setAttribute("data-variant-id", variantId);
+
+                    // update price in item
+                    productItem.getElementsByClassName(
+                      "js:ezy-productPrice"
+                    )[0].innerHTML = variantPrice;
+
+                    // check availability and update state
+                    if (variantAvailability == "true") {
+                      enableButton(button);
+                    } else {
+                      disableButton(button);
+                    }
+                  });
+                  // Create a new 'change' event
+                  var event = new Event("change");
+                  changeVariantSelect.dispatchEvent(event);
+                });
+              },
+            };
+            ezy.productfeed.init();
           } else if (content.contentType === "custom-html") {
             body.appendChild(modal);
           }
