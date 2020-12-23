@@ -238,7 +238,16 @@ const campaignInfo = async () => {
             }</span></p>
             <select id="id" name="id" class="ezy-select tw-mb-2 js:ezy-changeVariantSelects">
               ${product.variants.map((variant) => {
-                return `<option value="${variant.product.id}" data-variant-availability="${variant.availableForSale}" data-variant-price="${variant.price}">${variant.title}</option>`;
+                return `<option value="${
+                  variant.product.id
+                    .split("gid://shopify/Product/")
+                    .pop()
+                    .split("/")[0]
+                }" data-variant-availability="${
+                  variant.availableForSale
+                }" data-variant-price="${variant.price}">${
+                  variant.title
+                }</option>`;
               })}
             </select>
             <button class="ezy-btn js:ezy-addVariantButtons tw-w-full" data-variant-id="${
