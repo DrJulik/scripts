@@ -81,8 +81,8 @@ class ClassWatcher {
 const campaignInfo = async () => {
   try {
     const campData = await fetchCampaignInfo();
-    let cartData = await fetchCartInfo();
-    console.log(cartData);
+    // let cartData = await fetchCartInfo();
+    // console.log(cartData);
     // let cart_size = cartData.item_count;
     // let cart_value = cartData.total_price;
     campData.forEach((campaign) => {
@@ -187,7 +187,19 @@ const campaignInfo = async () => {
 
             body.appendChild(modal);
           } else if (content.contentType === "newsletter") {
-            modal.innerHTML = `<section class="ezy-style-modal" id="${name}">
+            let success;
+            let url = window.location.href;
+            if (url.includes("?customer_posted=true")) {
+              success = "yes";
+            } else if (
+              url.includes(
+                "t?contact%5Btags%5D=prospect%2Cnewsletter&form_type=customer"
+              )
+            ) {
+              success = "no";
+            }
+
+            modal.innerHTML = `
             <section class="ezy-style-modal__window">
               <section class="ezy-style-modal__close">
                 <a href="#" class="closeBtn" title="Close popup modal">
@@ -242,35 +254,30 @@ const campaignInfo = async () => {
                         <p class="tw-mb-4">${content.body}</p>
                         <form method="post" action="/contact#contact_form" id="contact_form" accept-charset="UTF-8" class="contact-form"><input type="hidden" name="form_type" value="customer"><input type="hidden" name="utf8" value="✓">
                 <input id="contact_tags" name="contact[tags]" type="hidden" value="prospect,newsletter">
-<table>
-<tbody>
-<tr>
-<td>Enter in your email to join our mailing list:</td>
-<td><input id="contact_email" name="contact[email]" type="text"></td>
-</tr>
-<tr>
-<td colspan="2"><input class="submit" type="submit"></td>
-</tr>
-</tbody>
-</table>
+
+<input class="tw-mb-2" id="contact_email" name="contact[email]" type="email">
+
+<input style="
+background-color: ${primaryButtonColor};
+border-radius: ${style.borderRadius}px;
+" class="ezy-btn tw-w-full" type="submit" value=${content.buttonText}>
+${
+  success === "yes"
+    ? `<h3 style="color: green">Thank you for signing up!</h3>`
+    : ""
+}
+    ${
+      success === "no"
+        ? `<h3 style="color: red">Please input a valid email!</h3>`
+        : ""
+    }
 </form>
-                        
-                        <a
-                          class="ezy-btn tw-w-full"
-                          href=${content.buttonUrl}
-                          style="
-                            background-color: ${primaryButtonColor};
-                            border-radius: ${style.borderRadius}px;
-                          "
-                        >
-                         ${content.buttonText}
-                        </a>
                       </div>
                     </div>
                   </div>
                 </section>
               </section>
-            </section>
+           
             ${
               freePlan
                 ? `<a
@@ -835,7 +842,6 @@ const campaignInfo = async () => {
               setContentTypes();
 
               let closeBtn = document.querySelector(".closeBtn");
-              console.log(closeBtn);
               closeBtn.addEventListener("click", (e) => {
                 modal.classList.add("ezy-style-modal--closed");
                 setTimeout(function () {
