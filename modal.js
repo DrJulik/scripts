@@ -110,11 +110,11 @@ const campaignInfo = async () => {
         const modal = document.createElement("section");
         modal.classList.add("ezy-style-modal");
 
-        // let link1 = document.createElement("link");
-        // link1.rel = "stylesheet";
-        // link1.href =
-        //   "https://cdn.jsdelivr.net/gh/DrJulik/scripts@1.0.935/styles.min.css";
-        // document.head.appendChild(link1);
+        let link1 = document.createElement("link");
+        link1.rel = "stylesheet";
+        link1.href =
+          "https://cdn.jsdelivr.net/gh/DrJulik/scripts@1.0.943/styles.min.css";
+        document.head.appendChild(link1);
 
         // SET CONTENT TYPES
         const setContentTypes = () => {
