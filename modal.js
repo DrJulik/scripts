@@ -81,8 +81,8 @@ class ClassWatcher {
 const campaignInfo = async () => {
   try {
     const campData = await fetchCampaignInfo();
-    // let cartData = await fetchCartInfo();
-    // console.log(cartData);
+    let cartData = await fetchCartInfo();
+    console.log(cartData);
     // let cart_size = cartData.item_count;
     // let cart_value = cartData.total_price;
     campData.forEach((campaign) => {
@@ -110,11 +110,11 @@ const campaignInfo = async () => {
         const modal = document.createElement("section");
         modal.classList.add("ezy-style-modal");
 
-        let link1 = document.createElement("link");
-        link1.rel = "stylesheet";
-        link1.href =
-          "https://cdn.jsdelivr.net/gh/DrJulik/scripts@1.0.935/styles.min.css";
-        document.head.appendChild(link1);
+        // let link1 = document.createElement("link");
+        // link1.rel = "stylesheet";
+        // link1.href =
+        //   "https://cdn.jsdelivr.net/gh/DrJulik/scripts@1.0.935/styles.min.css";
+        // document.head.appendChild(link1);
 
         // SET CONTENT TYPES
         const setContentTypes = () => {
@@ -227,86 +227,82 @@ const campaignInfo = async () => {
                   border-radius: ${style.borderRadius}px;
                 "
               >
-                <section>
-                  <div class="tw-flex tw-flex-row tw-flex-wrap tw-justify-center">
-                    <!-- ##IF IMAGE## -->
-                    ${
-                      content.imgUrl !== ""
-                        ? `<div class="tw-w-full sm:tw-w-1/2">
-                        <div>
-                          <img
-                            class="ezy-style-modal__content__image"
-                            src="${content.imgUrl}"
-                          />
-                        </div>
-                      </div>
-                      <!-- ##ENDIF## -->`
-                        : ""
-                    }
-                    
-                    <div
-                      class="tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center tw-p-4 tw-md:p-8"
-                    >
-                      <div>
-                        <h3 class="ezy-type__headline--bold-1 tw-mb-2">${
-                          content.headline
-                        }</h3>
-                        <p class="tw-mb-4">${content.body}</p>
-                        <form method="post" action="/contact#contact_form" id="contact_form" accept-charset="UTF-8" class="contact-form"><input type="hidden" name="form_type" value="customer"><input type="hidden" name="utf8" value="✓">
-                <input id="contact_tags" name="contact[tags]" type="hidden" value="prospect,newsletter">
-
-<input class="tw-mb-2" id="contact_email" name="contact[email]" type="email">
-
-<input style="
-background-color: ${primaryButtonColor};
-border-radius: ${style.borderRadius}px;
-" class="ezy-btn tw-w-full" type="submit" value=${content.buttonText}>
-${
-  success === "yes"
-    ? `<h3 style="color: green">Thank you for signing up!</h3>`
-    : ""
-}
-    ${
-      success === "no"
-        ? `<h3 style="color: red">Please input a valid email!</h3>`
-        : ""
-    }
-</form>
-                      </div>
-                    </div>
+              <section>
+              <div class="tw-flex tw-flex-row tw-flex-wrap tw-justify-center">
+                <!-- ##IF IMAGE## -->
+                ${
+                  content.imgUrl !== ""
+                    ? `
+                <div class="tw-w-full sm:tw-w-1/2">
+                  <div>
+                    <img class="ezy-style-modal__content__image" src="${content.imgUrl}" />
                   </div>
-                </section>
-              </section>
-           
-            ${
-              freePlan
-                ? `<a
-                  href="https://brickspacelab.com/"
-                  target="_blank"
-                  class="ezy-tooltip ezy-tooltip--inverted tw-absolute tw-bottom-2 tw-left-2 ##IF PAID_PLAN##tw-hidden##ENDIF##"
+                </div>
+                <!-- ##ENDIF## -->`
+                    : ""
+                }
+            
+                <div
+                  class="tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center tw-p-4 tw-md:p-8"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="feather feather-info"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                  </svg>
-                  <span>Powered by Easypop</span>
-                </a>`
+                  <div>
+                    <h3 class="ezy-type__headline--bold-1 tw-mb-2">
+                      ${content.headline}
+                    </h3>
+                    <p class="tw-mb-4">${content.body}</p>
+                    <form
+                      method="post"
+                      action="/contact#contact_form"
+                      id="contact_form"
+                      accept-charset="UTF-8"
+                      class="contact-form"
+                    >
+                      <input type="hidden" name="form_type" value="customer" /><input
+                        type="hidden"
+                        name="utf8"
+                        value="✓"
+                      />
+                      <input
+                        id="contact_tags"
+                        name="contact[tags]"
+                        type="hidden"
+                        value="prospect,newsletter"
+                      />
+            
+                      <input
+                        class="tw-mb-2"
+                        id="contact_email"
+                        name="contact[email]"
+                        type="email"
+                      />
+            
+                      <input
+                        style="
+            background-color: ${primaryButtonColor};
+            border-radius: ${style.borderRadius}px;
+            "
+                        class="ezy-btn tw-w-full"
+                        type="submit"
+                        value="${content.buttonText}"
+                      />
+                      ${
+                        success === "yes"
+                          ? `
+                      <h3 style="color: green">Thank you for signing up!</h3>
+                      `
+                          : ""
+                      } ${
+              success === "no"
+                ? `
+                      <h3 style="color: red">Please input a valid email!</h3>
+                      `
                 : ""
             }
-            
-          </section>`;
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </section>`;
             body.appendChild(modal);
           } else if (content.contentType === "product-feed") {
             const products = content.selectedProducts[0].selection;
@@ -840,10 +836,14 @@ ${
               console.log("conditions matched");
               // CONTENT TYPES
               setContentTypes();
+              modal.classList.add("ezy-style-modal--animate");
+              setTimeout(function () {
+                modal.classList.remove("ezy-style-modal--animate");
+              }, 100);
 
               let closeBtn = document.querySelector(".closeBtn");
               closeBtn.addEventListener("click", (e) => {
-                modal.classList.add("ezy-style-modal--closed");
+                modal.classList.add("ezy-style-modal--animate");
                 setTimeout(function () {
                   modal.classList.add("tw-hidden");
                 }, 1000);
@@ -852,7 +852,7 @@ ${
               closeBtn.addEventListener("keyup", (e) => {
                 if (e.keyCode === 13) {
                   e.preventDefault();
-                  modal.classList.add("ezy-style-modal--closed");
+                  modal.classList.add("ezy-style-modal--animate");
                   setTimeout(function () {
                     modal.classList.add("tw-hidden");
                   }, 1000);
@@ -861,7 +861,7 @@ ${
               });
               modal.addEventListener("click", function (e) {
                 if (e.target == this) {
-                  modal.classList.add("ezy-style-modal--closed");
+                  modal.classList.add("ezy-style-modal--animate");
                   setTimeout(function () {
                     modal.classList.add("tw-hidden");
                   }, 1000);
