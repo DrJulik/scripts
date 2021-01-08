@@ -113,7 +113,7 @@ const campaignInfo = async () => {
         let link1 = document.createElement("link");
         link1.rel = "stylesheet";
         link1.href =
-          "https://cdn.jsdelivr.net/gh/DrJulik/scripts@1.0.943/styles.min.css";
+          "https://cdn.jsdelivr.net/gh/DrJulik/scripts@1.0.942/styles.min.css";
         document.head.appendChild(link1);
 
         // SET CONTENT TYPES
@@ -753,6 +753,27 @@ const campaignInfo = async () => {
               } else if (trigger.matchingFormat === "less") {
                 if (cartData.total_price / 100 < trigger.matchingInput) {
                   return trigger.triggerType === "cart-value";
+                }
+              }
+            } else if (trigger.triggerType === "product-in-cart") {
+              if (trigger.matchingFormat === "contains") {
+                let matchingCartItems = items.find((item) =>
+                  item.title.includes(trigger.matchingInput)
+                );
+                if (matchingCartItems != undefined) {
+                  return trigger.triggerType === "product-in-cart";
+                }
+              } else if (trigger.matchingFormat === "matches") {
+                items = [
+                  {
+                    title: "shirt",
+                  },
+                ];
+                let matchingCartItems = items.find(
+                  (item) => item.title === trigger.matchingInput
+                );
+                if (matchingCartItems != undefined) {
+                  return trigger.triggerType === "product-in-cart";
                 }
               }
             } else if (scrolled) {
