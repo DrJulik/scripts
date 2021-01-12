@@ -1,4 +1,5 @@
 const shop = window.location.href.split("https://").pop().split("/")[0];
+const scriptV = "1.0.9442";
 
 const fetchCampaignInfo = async () => {
   const res = await fetch(
