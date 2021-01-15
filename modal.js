@@ -83,6 +83,8 @@ const campaignInfo = async () => {
     const campData = await fetchCampaignInfo();
     let cartData = await fetchCartInfo();
     console.log(cartData);
+    // let cart_size = cartData.item_count;
+    // let cart_value = cartData.total_price;
 
     campData.forEach((campaign) => {
       console.log(campaign);
@@ -304,8 +306,13 @@ const campaignInfo = async () => {
             </section>`;
             body.appendChild(modal);
           } else if (content.contentType === "cart-progress-bar") {
-            let cartProgress =
-              content.cartGoalValue / (cartData.total_price / 100);
+            let cartProgress;
+            if (cartData.total_price === 0) {
+              cartProgress = 0;
+            } else {
+              cartProgress =
+                (cartData.total_price / 100 / content.cartGoalValue) * 100;
+            }
 
             let remainder = cartData.total_price / 100 - content.cartGoalValue;
 
@@ -347,8 +354,10 @@ const campaignInfo = async () => {
                         <section class="tw-border-b tw-border-gray-200 tw-p-4">
                           <p class="tw-mb-1">
                           ${
-                            remainder >= 0
-                              ? `You're $${remainder} away from ${content.cartGoalPrize}.`
+                            remainder < 0
+                              ? `You're $${-remainder} away from ${
+                                  content.cartGoalPrize
+                                }.`
                               : `Congrats! You've unlocked free shipping`
                           }
                           </p>
