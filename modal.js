@@ -83,8 +83,8 @@ const campaignInfo = async () => {
     const campData = await fetchCampaignInfo();
     let cartData = await fetchCartInfo();
     console.log(cartData);
-    // let cart_size = cartData.item_count;
-    // let cart_value = cartData.total_price;
+    let cart_size = cartData.item_count;
+    let cart_value = cartData.total_price;
 
     campData.forEach((campaign) => {
       console.log(campaign);
@@ -306,6 +306,10 @@ const campaignInfo = async () => {
             </section>`;
             body.appendChild(modal);
           } else if (content.contentType === "cart-progress-bar") {
+            // for local testing
+            // let cartData = {
+            //   total_price: 49900,
+            // };
             let cartProgress;
             if (cartData.total_price === 0) {
               cartProgress = 0;
@@ -358,7 +362,7 @@ const campaignInfo = async () => {
                               ? `You're $${-remainder} away from ${
                                   content.cartGoalPrize
                                 }.`
-                              : `Congrats! You've unlocked free shipping`
+                              : `${content.cartSuccessMessage}`
                           }
                           </p>
                           <div
