@@ -1,5 +1,4 @@
 const shop = window.location.href.split("https://").pop().split("/")[0];
-const scriptV = "1.0.9442";
 
 const fetchCampaignInfo = async () => {
   const res = await fetch(
@@ -84,8 +83,7 @@ const campaignInfo = async () => {
     const campData = await fetchCampaignInfo();
     let cartData = await fetchCartInfo();
     console.log(cartData);
-    // let cart_size = cartData.item_count;
-    // let cart_value = cartData.total_price;
+
     campData.forEach((campaign) => {
       console.log(campaign);
       const {
@@ -305,6 +303,123 @@ const campaignInfo = async () => {
               </div>
             </section>`;
             body.appendChild(modal);
+          } else if (content.contentType === "cart-progress-bar") {
+            let cartProgress =
+              content.cartGoalValue / (cartData.total_price / 100);
+
+            let remainder = cartData.total_price / 100 - content.cartGoalValue;
+
+            modal.innerHTML = `
+            <section class="ezy-style-modal__window">
+              <section class="ezy-style-modal__close">
+                <a href="#" class="closeBtn" title="Close popup modal">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="feather feather-x ezy-btn--round--clear"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </a>
+              </section>
+              <section
+                class="ezy-style-modal__content"
+                style="
+                  background-color: ${backgroundColor};
+                  border-radius: ${style.borderRadius}px;
+                "
+              >
+                <!-- CONTENT -->
+                <section>
+                  <div class="tw-flex tw-flex-row tw-flex-wrap tw-justify-center">
+                    <div
+                      class="tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center"
+                    >
+                      <div>
+                        <section class="tw-border-b tw-border-gray-200 tw-p-4">
+                          <p class="tw-mb-1">
+                          ${
+                            remainder >= 0
+                              ? `You're $${remainder} away from ${content.cartGoalPrize}.`
+                              : `Congrats! You've unlocked free shipping`
+                          }
+                          </p>
+                          <div
+                            class="ezy-progressbar"
+                            style="
+                              
+                              border-radius: ${style.borderRadius}px;
+                            "
+                          >
+                            <div class="ezy-progressbar__inner" style="width: ${cartProgress}%; background-color: ${primaryButtonColor};"></div>
+                          </div>
+                        </section>
+          
+                        <section class="tw-p-4 tw-md:p-8">
+                          <h3 class="ezy-type__headline--bold-1 tw-mb-2">
+                            ${content.headline}
+                          </h3>
+                          <p class="tw-mb-4">
+                            ${content.body}
+                          </p>
+          
+                          <a
+                            class="ezy-btn tw-w-full"
+                            href="${content.buttonUrl}"
+                            style="
+                              background-color: ${style.primaryButtonColor};
+                              border-radius: ${style.borderRadius}px;
+                            "
+                          >
+                            ${content.buttonText}
+                          </a>
+                        </section>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+                <!-- END CONTENT -->
+              </section>
+            </section>
+            ${
+              freePlan
+                ? `<a
+            href="https://brickspacelab.com/"
+            target="_blank"
+            class="ezy-tooltip ezy-tooltip--inverted tw-absolute tw-bottom-2 tw-left-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="feather feather-info"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span>Powered by Easypop</span>
+          </a>`
+                : ``
+            }
+            
+          
+          `;
+            body.appendChild(modal);
           } else if (content.contentType === "product-feed") {
             const products = content.selectedProducts[0].selection;
             modal.innerHTML = `
@@ -319,7 +434,6 @@ const campaignInfo = async () => {
       style="
         background-color:${style.backgroundColor};
         border-radius:${style.borderRadius}">
-
       <section>
         <!-- CONTENT -->
 <div class="tw-flex tw-flex-row tw-flex-wrap">
@@ -758,14 +872,19 @@ const campaignInfo = async () => {
               }
             } else if (trigger.triggerType === "product-in-cart") {
               if (trigger.matchingFormat === "contains") {
-                let matchingCartItems = cartData.items.find((item) =>
+                let matchingCartItems = items.find((item) =>
                   item.title.includes(trigger.matchingInput)
                 );
                 if (matchingCartItems != undefined) {
                   return trigger.triggerType === "product-in-cart";
                 }
               } else if (trigger.matchingFormat === "matches") {
-                let matchingCartItems = cartData.items.find(
+                items = [
+                  {
+                    title: "shirt",
+                  },
+                ];
+                let matchingCartItems = items.find(
                   (item) => item.title === trigger.matchingInput
                 );
                 if (matchingCartItems != undefined) {
