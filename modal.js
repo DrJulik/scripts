@@ -1025,6 +1025,7 @@ const campaignInfo = async () => {
           };
           check();
 
+          // Cart catch
           (function (ns, fetch) {
             if (typeof fetch !== "function") return;
 
@@ -1078,40 +1079,6 @@ const campaignInfo = async () => {
           ) {
             document.addEventListener("mouseout", mouseEvent);
           }
-
-          // Cart catch
-          // (function (ns, fetch) {
-          //   if (typeof fetch !== "function") return;
-
-          //   ns.fetch = function () {
-          //     const response = fetch.apply(this, arguments);
-
-          //     response.then((res) => {
-          //       if (
-          //         [
-          //           `${window.location.origin}/cart/add.js`,
-          //           `${window.location.origin}/cart/update.js`,
-          //           `${window.location.origin}/cart/change.js`,
-          //           `${window.location.origin}/cart/clear.js`,
-          //         ].includes(res.url)
-          //       ) {
-          //         res
-          //           .clone()
-          //           .json()
-          //           .then((data) => {
-          //             console.log("cart updated");
-          //             cartDataFetch = fetchCartInfo();
-          //             cartDataFetch.then((cart) => {
-          //               cartData = cart;
-          //               check();
-          //             });
-          //           });
-          //       }
-          //     });
-
-          //     return response;
-          //   };
-          // })(window, window.fetch);
 
           // SCROLL DEPTH CHECK
           const catchModal = () => {
