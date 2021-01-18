@@ -885,19 +885,14 @@ const campaignInfo = async () => {
               }
             } else if (trigger.triggerType === "product-in-cart") {
               if (trigger.matchingFormat === "contains") {
-                let matchingCartItems = items.find((item) =>
+                let matchingCartItems = cartData.items.find((item) =>
                   item.title.includes(trigger.matchingInput)
                 );
                 if (matchingCartItems != undefined) {
                   return trigger.triggerType === "product-in-cart";
                 }
               } else if (trigger.matchingFormat === "matches") {
-                items = [
-                  {
-                    title: "shirt",
-                  },
-                ];
-                let matchingCartItems = items.find(
+                let matchingCartItems = cartData.items.find(
                   (item) => item.title === trigger.matchingInput
                 );
                 if (matchingCartItems != undefined) {
