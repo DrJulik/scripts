@@ -1027,7 +1027,7 @@ const campaignInfo = async () => {
           check();
 
           // Cart catch
-          (function (ns, fetch) {
+          let newFetch = (ns, fetch) => {
             console.log("im an  iffe");
             if (typeof fetch !== "function") return;
 
@@ -1060,7 +1060,8 @@ const campaignInfo = async () => {
 
               return response;
             };
-          })(window, window.fetch);
+          };
+          newFetch(window, window.fetch);
 
           // EXIT INTENT CHECK
           const mouseEvent = (e) => {
