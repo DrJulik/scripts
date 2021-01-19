@@ -1,4 +1,5 @@
 const shop = window.location.href.split("https://").pop().split("/")[0];
+// random
 
 const fetchCampaignInfo = async () => {
   const res = await fetch(
