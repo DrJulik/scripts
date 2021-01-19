@@ -1026,9 +1026,14 @@ const campaignInfo = async () => {
           }
           check();
 
+          // update cart info
+          const updateCartInfo = async () => {
+            const cartInfo = await fetchCartInfo();
+            console.log(cartInfo);
+          };
+
           // Cart catch
-          let newFetch = (ns, fetch) => {
-            console.log("im an  iffe");
+          (function (ns, fetch) {
             if (typeof fetch !== "function") return;
 
             ns.fetch = function () {
@@ -1048,20 +1053,14 @@ const campaignInfo = async () => {
                     .json()
                     .then((data) => {
                       console.log(data);
-                      cartDataFetch = fetchCartInfo();
-                      cartDataFetch.then((cart) => {
-                        console.log(cart);
-                        cartData = cart;
-                        check();
-                      });
+                      updateCartInfo();
                     });
                 }
               });
 
               return response;
             };
-          };
-          newFetch(window, window.fetch);
+          })(window, window.fetch);
 
           // EXIT INTENT CHECK
           const mouseEvent = (e) => {
