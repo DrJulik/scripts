@@ -1029,39 +1029,11 @@ const campaignInfo = async () => {
           // update cart info
           const updateCartInfo = async (cart) => {
             const cartInfo = await fetchCartInfo();
-            console.log(cartInfo);
-            console.log(JSON.parse(cart));
+            cartData = cartInfo;
+            check();
           };
 
           // Cart catch
-          // (function (ns, fetch) {
-          //   if (typeof fetch !== "function") return;
-
-          //   ns.fetch = function () {
-          //     const response = fetch.apply(this, arguments);
-
-          //     response.then((res) => {
-          //       if (
-          //         [
-          //           `${window.location.origin}/cart/add.js`,
-          //           `${window.location.origin}/cart/update.js`,
-          //           `${window.location.origin}/cart/change.js`,
-          //           `${window.location.origin}/cart/clear.js`,
-          //         ].includes(res.url)
-          //       ) {
-          //         res
-          //           .clone()
-          //           .json()
-          //           .then((data) => {
-          //             console.log(data);
-          //             updateCartInfo();
-          //           });
-          //       }
-          //     });
-
-          //     return response;
-          //   };
-          // })(window, window.fetch);
           const open = window.XMLHttpRequest.prototype.open;
 
           function openReplacement() {
