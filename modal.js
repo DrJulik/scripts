@@ -1027,40 +1027,60 @@ const campaignInfo = async () => {
           check();
 
           // update cart info
-          const updateCartInfo = async () => {
+          const updateCartInfo = async (cart) => {
             const cartInfo = await fetchCartInfo();
             console.log(cartInfo);
+            console.log(JSON.parse(cart));
           };
 
           // Cart catch
-          (function (ns, fetch) {
-            if (typeof fetch !== "function") return;
+          // (function (ns, fetch) {
+          //   if (typeof fetch !== "function") return;
 
-            ns.fetch = function () {
-              const response = fetch.apply(this, arguments);
+          //   ns.fetch = function () {
+          //     const response = fetch.apply(this, arguments);
 
-              response.then((res) => {
-                if (
-                  [
-                    `${window.location.origin}/cart/add.js`,
-                    `${window.location.origin}/cart/update.js`,
-                    `${window.location.origin}/cart/change.js`,
-                    `${window.location.origin}/cart/clear.js`,
-                  ].includes(res.url)
-                ) {
-                  res
-                    .clone()
-                    .json()
-                    .then((data) => {
-                      console.log(data);
-                      updateCartInfo();
-                    });
-                }
-              });
+          //     response.then((res) => {
+          //       if (
+          //         [
+          //           `${window.location.origin}/cart/add.js`,
+          //           `${window.location.origin}/cart/update.js`,
+          //           `${window.location.origin}/cart/change.js`,
+          //           `${window.location.origin}/cart/clear.js`,
+          //         ].includes(res.url)
+          //       ) {
+          //         res
+          //           .clone()
+          //           .json()
+          //           .then((data) => {
+          //             console.log(data);
+          //             updateCartInfo();
+          //           });
+          //       }
+          //     });
 
-              return response;
-            };
-          })(window, window.fetch);
+          //     return response;
+          //   };
+          // })(window, window.fetch);
+          const open = window.XMLHttpRequest.prototype.open;
+
+          function openReplacement() {
+            this.addEventListener("load", function () {
+              if (
+                [
+                  "/cart/add.js",
+                  "/cart/update.js",
+                  "/cart/change.js",
+                  "/cart/clear.js",
+                ].includes(this._url)
+              ) {
+                updateCartInfo(this.response);
+              }
+            });
+            return open.apply(this, arguments);
+          }
+
+          window.XMLHttpRequest.prototype.open = openReplacement;
 
           // EXIT INTENT CHECK
           const mouseEvent = (e) => {
