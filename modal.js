@@ -1048,6 +1048,7 @@ const campaignInfo = async () => {
                     .then((data) => {
                       cartDataFetch = fetchCartInfo();
                       cartDataFetch.then((cart) => {
+                        console.log(cart);
                         cartData = cart;
                         check();
                       });
