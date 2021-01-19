@@ -1046,6 +1046,7 @@ const campaignInfo = async () => {
                     .clone()
                     .json()
                     .then((data) => {
+                      console.log(data);
                       cartDataFetch = fetchCartInfo();
                       cartDataFetch.then((cart) => {
                         console.log(cart);
