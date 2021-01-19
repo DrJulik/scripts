@@ -79,6 +79,42 @@ class ClassWatcher {
   };
 }
 
+// Cart catch
+(function (ns, fetch) {
+  console.log("im an  iffe");
+  if (typeof fetch !== "function") return;
+
+  ns.fetch = function () {
+    const response = fetch.apply(this, arguments);
+
+    response.then((res) => {
+      if (
+        [
+          `${window.location.origin}/cart/add.js`,
+          `${window.location.origin}/cart/update.js`,
+          `${window.location.origin}/cart/change.js`,
+          `${window.location.origin}/cart/clear.js`,
+        ].includes(res.url)
+      ) {
+        res
+          .clone()
+          .json()
+          .then((data) => {
+            console.log(data);
+            cartDataFetch = fetchCartInfo();
+            cartDataFetch.then((cart) => {
+              console.log(cart);
+              cartData = cart;
+              check();
+            });
+          });
+      }
+    });
+
+    return response;
+  };
+})(window, window.fetch);
+
 const campaignInfo = async () => {
   try {
     const campData = await fetchCampaignInfo();
@@ -1025,41 +1061,6 @@ const campaignInfo = async () => {
             }
           };
           check();
-
-          // Cart catch
-          (function (ns, fetch) {
-            if (typeof fetch !== "function") return;
-
-            ns.fetch = function () {
-              const response = fetch.apply(this, arguments);
-
-              response.then((res) => {
-                if (
-                  [
-                    `${window.location.origin}/cart/add.js`,
-                    `${window.location.origin}/cart/update.js`,
-                    `${window.location.origin}/cart/change.js`,
-                    `${window.location.origin}/cart/clear.js`,
-                  ].includes(res.url)
-                ) {
-                  res
-                    .clone()
-                    .json()
-                    .then((data) => {
-                      console.log(data);
-                      cartDataFetch = fetchCartInfo();
-                      cartDataFetch.then((cart) => {
-                        console.log(cart);
-                        cartData = cart;
-                        check();
-                      });
-                    });
-                }
-              });
-
-              return response;
-            };
-          })(window, window.fetch);
 
           // EXIT INTENT CHECK
           const mouseEvent = (e) => {
