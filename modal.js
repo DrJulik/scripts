@@ -1033,7 +1033,7 @@ const campaignInfo = async () => {
             check();
           };
 
-          // Cart catch
+          // Cart catch XHR
           const open = window.XMLHttpRequest.prototype.open;
 
           function openReplacement() {
@@ -1053,6 +1053,33 @@ const campaignInfo = async () => {
           }
 
           window.XMLHttpRequest.prototype.open = openReplacement;
+
+          // cart check Fetch
+          (function (ns, fetch) {
+            if (typeof fetch !== "function") return;
+
+            ns.fetch = function () {
+              const response = fetch.apply(this, arguments);
+
+              response.then((res) => {
+                if (
+                  [
+                    `${window.location.origin}/cart/add.js`,
+                    `${window.location.origin}/cart/update.js`,
+                    `${window.location.origin}/cart/change.js`,
+                    `${window.location.origin}/cart/clear.js`,
+                  ].includes(res.url)
+                ) {
+                  res
+                    .clone()
+                    .json()
+                    .then((data) => console.log(data));
+                }
+              });
+
+              return response;
+            };
+          })(window, window.fetch);
 
           // EXIT INTENT CHECK
           const mouseEvent = (e) => {
