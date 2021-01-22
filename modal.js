@@ -1,9 +1,8 @@
-const shop = window.location.href.split("https://").pop().split("/")[0];
-// random
+const ezshop = window.location.href.split("https://").pop().split("/")[0];
 
 const fetchCampaignInfo = async () => {
   const res = await fetch(
-    `https://easypop.herokuapp.com/api/campaigns/${shop}`,
+    `https://easypop.herokuapp.com/api/campaigns/${ezshop}`,
     {
       method: "GET",
       headers: {
@@ -78,6 +77,40 @@ class ClassWatcher {
     }
   };
 }
+
+// Cart catch
+(function (ns, fetch) {
+  console.log("im an  iffee");
+  if (typeof fetch !== "function") return;
+
+  ns.fetch = function () {
+    const response = fetch.apply(this, arguments);
+
+    response.then((res) => {
+      if (
+        [
+          `${window.location.origin}/cart/add.js`,
+          `${window.location.origin}/cart/update.js`,
+          `${window.location.origin}/cart/change.js`,
+          `${window.location.origin}/cart/clear.js`,
+        ].includes(res.url)
+      ) {
+        res
+          .clone()
+          .json()
+          .then((data) => {
+            cartDataFetch = fetchCartInfo();
+            cartDataFetch.then((cart) => {
+              cartData = cart;
+              check();
+            });
+          });
+      }
+    });
+
+    return response;
+  };
+})(window, window.fetch);
 
 const campaignInfo = async () => {
   try {
@@ -493,9 +526,9 @@ const campaignInfo = async () => {
                 }</option>`;
               })}
             </select>
-            <button class="ezy-btn js:ezy-addVariantButtons tw-w-full" data-variant-id="${
-              product.variants[0].price
-            }">
+            <button class="ezy-btn js:ezy-addVariantButtons tw-w-full" style="background-color:${
+              style.primaryButtonColor
+            }" data-variant-id="${product.variants[0].price}">
               <span class="ezy-btn__text">
                 Add to cart
               </span>
@@ -524,12 +557,6 @@ const campaignInfo = async () => {
             body.appendChild(modal);
             var ezy = ezy || {};
             ezy.productfeed = {
-              // TODO:
-              // x create add variant function
-              // x show loading icon when adding
-              // x add function to scroll left/right
-              // x update when selecting variant
-
               // simple fetch call
               fetch: function (
                 requestType,
@@ -727,10 +754,14 @@ const campaignInfo = async () => {
         // SETTINGS
         // AUTO CLOSE
         const handleAutoClose = () => {
+          console.log("we are auto-closed");
           if (settings.autoClose) {
             setTimeout(() => {
               modal.classList.remove("open");
-              isOpen = false;
+              modal.classList.add("ezy-style-modal--animate");
+              setTimeout(function () {
+                modal.classList.add("tw-hidden");
+              }, 1000);
             }, settings.autoCloseTime * 1000);
           } else {
             return;
@@ -739,6 +770,7 @@ const campaignInfo = async () => {
 
         // Frequency
         const handleFrequency = (id) => {
+          console.log("we are handling frequency");
           // Check if they disabled frequency
           if (!settings.frequency) {
             localStorage.removeItem(`campaign_${id}`);
@@ -833,15 +865,6 @@ const campaignInfo = async () => {
         const createModal = (condition) => {
           // timer for time on page
           let timerElapsed = false;
-          // if (
-          //   settings.triggers.some((trigger) => {
-          //     trigger.triggerType === "time-on-page";
-          //   })
-          // ) {
-          //   timerElapsed = false;
-          // } else {
-          //   timerElapsed = true;
-          // }
 
           let exit = false;
           let scrolled = false;
@@ -947,7 +970,7 @@ const campaignInfo = async () => {
             });
           };
 
-          function check() {
+          const check = () => {
             console.log("checked");
 
             let conditionsMatched;
@@ -979,6 +1002,7 @@ const campaignInfo = async () => {
               console.log("conditions matched");
               // CONTENT TYPES
               setContentTypes();
+              modal.classList.add("open");
               modal.classList.add("ezy-style-modal--animate");
               setTimeout(function () {
                 modal.classList.remove("ezy-style-modal--animate");
@@ -1023,15 +1047,8 @@ const campaignInfo = async () => {
               }
               document.removeEventListener("mouseout", mouseEvent);
             }
-          }
-          check();
-
-          // update cart info
-          const updateCartInfo = async (cart) => {
-            const cartInfo = await fetchCartInfo();
-            cartData = cartInfo;
-            check();
           };
+          check();
 
           // Cart catch XHR
           const open = window.XMLHttpRequest.prototype.open;
