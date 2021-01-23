@@ -970,7 +970,7 @@ const campaignInfo = async () => {
             });
           };
 
-          const check = () => {
+          function check() {
             console.log("checked");
 
             let conditionsMatched;
@@ -1047,7 +1047,7 @@ const campaignInfo = async () => {
               }
               document.removeEventListener("mouseout", mouseEvent);
             }
-          };
+          }
           check();
 
           // Cart catch XHR
