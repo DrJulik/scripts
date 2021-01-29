@@ -933,7 +933,7 @@ select:focus {
   z-index: 999;
   --tw-bg-opacity: 1;
   background-color: rgba(0, 0, 0, var(--tw-bg-opacity));
-  --tw-bg-opacity: 0.75;
+  --tw-bg-opacity: 0.5;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -958,9 +958,17 @@ select:focus {
   transition-duration: 150ms;
   -webkit-transition-duration: 0.5s;
   transition-duration: 0.5s;
+  -webkit-transition: -webkit-backdrop-filter 0.5s;
+  transition: -webkit-backdrop-filter 0.5s;
+  transition: backdrop-filter 0.5s;
+  transition: backdrop-filter 0.5s, -webkit-backdrop-filter 0.5s;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 .ezy-style-modal--animate {
   opacity: 0;
+  -webkit-backdrop-filter: blur(10px) opacity(0);
+  backdrop-filter: blur(10px) opacity(0);
 }
 .ezy-style-modal--animate .ezy-style-modal__window {
   --tw-translate-x: 0;
@@ -1042,7 +1050,7 @@ select:focus {
   z-index: 999;
   --tw-bg-opacity: 1;
   background-color: rgba(0, 0, 0, var(--tw-bg-opacity));
-  --tw-bg-opacity: 0.75;
+  --tw-bg-opacity: 0.5;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1065,9 +1073,17 @@ select:focus {
   transition-duration: 150ms;
   -webkit-transition-duration: 0.5s;
   transition-duration: 0.5s;
+  -webkit-transition: -webkit-backdrop-filter 0.5s;
+  transition: -webkit-backdrop-filter 0.5s;
+  transition: backdrop-filter 0.5s;
+  transition: backdrop-filter 0.5s, -webkit-backdrop-filter 0.5s;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 .ezy-style-drawer--animate {
   --tw-bg-opacity: 0;
+  -webkit-backdrop-filter: blur(10px) opacity(0);
+  backdrop-filter: blur(10px) opacity(0);
 }
 .ezy-style-drawer--animate.ezy-style-drawer--left .ezy-style-drawer__window {
   --tw-translate-x: 0;
