@@ -2,7 +2,7 @@ const ezshop = window.location.href.split("https://").pop().split("/")[0];
 
 const fetchCampaignInfo = async () => {
   const res = await fetch(
-    `https://easypop.herokuapp.com/api/campaigns/${shop}`,
+    `https://easypop.herokuapp.com/api/campaigns/${ezshop}`,
     {
       method: "GET",
       headers: {
