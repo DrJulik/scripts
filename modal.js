@@ -2,7 +2,7 @@ const ezshop = window.location.href.split("https://").pop().split("/")[0];
 
 const fetchCampaignInfo = async () => {
   const res = await fetch(
-    `https://easypop.herokuapp.com/api/campaigns/${ezshop}`,
+    `https://easypop.herokuapp.com/api/campaigns/${shop}`,
     {
       method: "GET",
       headers: {
@@ -107,12 +107,12 @@ const campaignInfo = async () => {
         // DOM hooks
         const body = document.querySelector("body");
         const modal = document.createElement("section");
-        modal.classList.add("ezy-style-modal");
+        modal.classList.add("ezy", "ezy-style-modal");
 
         let link1 = document.createElement("link");
         link1.rel = "stylesheet";
         link1.href =
-          "https://cdn.jsdelivr.net/gh/DrJulik/scripts@1.0.94742/styles.min.css";
+          "https://cdn.jsdelivr.net/gh/DrJulik/scripts@1.0.947423/styles.min.css";
         document.head.appendChild(link1);
 
         // SET CONTENT TYPES

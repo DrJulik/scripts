@@ -1,0 +1,22 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "modal.js",
+  "scripts": {
+    "dev": "parcel modal.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DrJulik/scripts.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DrJulik/scripts/issues"
+  },
+  "homepage": "https://github.com/DrJulik/scripts#readme",
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4"
+  }
+}
