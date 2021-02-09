@@ -156,7 +156,7 @@ const campaignInfo = async () => {
         <p class="tw-mb-4">
         ${content.body}
         </p>
-        <a class="ezy-btn tw-w-full" href="${content.buttonUrl}"
+        <a class="main-btn ezy-btn tw-w-full" href="${content.buttonUrl}"
           style="
             background-color:${style.primaryButtonColor};
             border-radius:${style.borderRadius}px">${content.buttonText}</a>
@@ -383,7 +383,7 @@ const campaignInfo = async () => {
                           </p>
           
                           <a
-                            class="ezy-btn tw-w-full"
+                            class="main-btn ezy-btn tw-w-full"
                             href="${content.buttonUrl}"
                             style="
                               background-color: ${style.primaryButtonColor};
@@ -936,6 +936,7 @@ const campaignInfo = async () => {
             });
           };
 
+          // CHECK FUNCTION
           function check() {
             console.log("checked");
 
@@ -992,6 +993,31 @@ const campaignInfo = async () => {
                   isOpen = false;
                 }
               });
+
+              // MAIN BUTTON AS CLOSE BUTTON FUNC
+              let mainBtn = document.querySelector(".main-btn");
+
+              if (content.buttonClose && mainBtn != null) {
+                mainBtn.addEventListener("click", (e) => {
+                  e.preventDefault();
+                  modal.classList.add("ezy-style-modal--animate");
+                  setTimeout(function () {
+                    modal.classList.add("tw-hidden");
+                  }, 1000);
+                  isOpen = false;
+                });
+                mainBtn.addEventListener("keyup", (e) => {
+                  if (e.keyCode === 13) {
+                    e.preventDefault();
+                    modal.classList.add("ezy-style-modal--animate");
+                    setTimeout(function () {
+                      modal.classList.add("tw-hidden");
+                    }, 1000);
+                    isOpen = false;
+                  }
+                });
+              }
+
               modal.addEventListener("click", function (e) {
                 if (e.target == this) {
                   modal.classList.add("ezy-style-modal--animate");
