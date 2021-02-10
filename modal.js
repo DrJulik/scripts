@@ -667,16 +667,17 @@ const campaignInfo = async () => {
                 ) {
                   addVariantButton.addEventListener("click", function (e) {
                     let variantId = this.getAttribute("data-variant-id");
-
                     showNotification("Product was added to the cart!");
-                    modal.classList.add("ezy-style-modal--animate");
-                    setTimeout(function () {
-                      modal.classList.add("tw-hidden");
-                    }, 1000);
                     toggleButton(addVariantButton);
                     addVariant(variantId, 1, function () {
                       toggleButton(addVariantButton);
                     });
+                    if (content.closingBehav === "close") {
+                      modal.classList.add("ezy-style-modal--animate");
+                      setTimeout(function () {
+                        modal.classList.add("tw-hidden");
+                      }, 1000);
+                    }
                   });
                 });
 
