@@ -109,6 +109,11 @@ const campaignInfo = async () => {
         const modal = document.createElement("section");
         modal.classList.add("ezy", "ezy-style-modal");
 
+        // NOTIFICATION HTML, SEPARATE FROM THE MODAL
+        const notification = document.createElement("div");
+        notification.classList.add("ezy", "ezy-notification");
+        body.appendChild(notification);
+
         let link1 = document.createElement("link");
         link1.rel = "stylesheet";
         link1.href =
@@ -434,6 +439,7 @@ const campaignInfo = async () => {
           } else if (content.contentType === "product-feed") {
             const products = content.selectedProducts[0].selection;
             modal.innerHTML = `
+            
             <!-- TEMPLATE STARTS -->
   <section class="ezy-style-modal__window">
     <section class="ezy-style-modal__close">
@@ -661,6 +667,12 @@ const campaignInfo = async () => {
                 ) {
                   addVariantButton.addEventListener("click", function (e) {
                     let variantId = this.getAttribute("data-variant-id");
+
+                    showNotification("Product was added to the cart!");
+                    modal.classList.add("ezy-style-modal--animate");
+                    setTimeout(function () {
+                      modal.classList.add("tw-hidden");
+                    }, 1000);
                     toggleButton(addVariantButton);
                     addVariant(variantId, 1, function () {
                       toggleButton(addVariantButton);
@@ -709,6 +721,29 @@ const campaignInfo = async () => {
                   var event = new Event("change");
                   changeVariantSelect.dispatchEvent(event);
                 });
+                let showNotification = function (message) {
+                  var notification = document.querySelector(
+                    ".ezy-notification"
+                  );
+                  // for (var i = 0; i < notifications.length; i++) {
+                  //   let notification = notifications[i];
+                  //   let messageElement = notification.querySelector("span");
+                  //   if (message) {
+                  //     messageElement.innerHTML = message;
+                  //   }
+                  //   notification.classList.add("ezy-notification--animate");
+                  //   setTimeout(function () {
+                  //     notification.classList.remove(
+                  //       "ezy-notification--animate"
+                  //     );
+                  //   }, 3000);
+                  // }
+                  notification.innerHTML = message;
+                  notification.classList.add("ezy-notification--animate");
+                  setTimeout(function () {
+                    notification.classList.remove("ezy-notification--animate");
+                  }, 3000);
+                };
               },
             };
             ezy.productfeed.init();
