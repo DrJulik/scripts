@@ -1,8 +1,8 @@
-const ezshop = window.location.href.split("https://").pop().split("/")[0];
+// const ezshop = window.location.href.split("https://").pop().split("/")[0];
 
 const fetchCampaignInfo = async () => {
   const res = await fetch(
-    `https://easypop.herokuapp.com/api/campaigns/${ezshop}`,
+    `https://easypop.herokuapp.com/api/campaigns/freebiesdebug.myshopify.com`,
     {
       method: "GET",
       headers: {
@@ -14,16 +14,16 @@ const fetchCampaignInfo = async () => {
   return responseJson.data;
 };
 
-const fetchCartInfo = async () => {
-  const res = await fetch(`/cart.js`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const responseJson = await res.json();
-  return responseJson;
-};
+// const fetchCartInfo = async () => {
+//   const res = await fetch(`/cart.js`, {
+//     method: "GET",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//   });
+//   const responseJson = await res.json();
+//   return responseJson;
+// };
 
 // MUTATION OBSERVER TO WATCH FOR CLASS CHANGES
 class ClassWatcher {
@@ -81,8 +81,8 @@ class ClassWatcher {
 const campaignInfo = async () => {
   try {
     const campData = await fetchCampaignInfo();
-    let cartData = await fetchCartInfo();
-    console.log(cartData);
+    // let cartData = await fetchCartInfo();
+    // console.log(cartData);
 
     campData.forEach((campaign) => {
       console.log(campaign);
@@ -119,13 +119,484 @@ const campaignInfo = async () => {
         "https://cdn.jsdelivr.net/gh/DrJulik/scripts@1.0.947423/styles.min.css";
       document.head.appendChild(link1);
 
+      // INITIATE SETTINGS FUNCTIONS
+      const initiateSettings = () => {
+        // SETTINGS
+        // AUTO CLOSE
+        const handleAutoClose = () => {
+          console.log("we are auto-closed");
+          if (settings.autoClose) {
+            setTimeout(() => {
+              modal.classList.remove("open");
+              modal.classList.add("ezy-style-modal--animate");
+              setTimeout(function () {
+                modal.classList.add("tw-hidden");
+              }, 1000);
+            }, settings.autoCloseTime * 1000);
+          } else {
+            return;
+          }
+        };
+
+        // Frequency
+        const handleFrequency = (id) => {
+          console.log("we are handling frequency");
+          // Check if they disabled frequency
+          if (!settings.frequency) {
+            localStorage.removeItem(`campaign_${id}`);
+            localStorage.removeItem(`limit_${id}`);
+          }
+
+          let timesShown = 1;
+
+          Date.prototype.addDays = function (days) {
+            let date = new Date(this.valueOf());
+            date.setDate(date.getDate() + days);
+            return date;
+          };
+
+          let limitPeriod = parseInt(settings.frequencyPeriod);
+          let creationDate = new Date(createdAt);
+          let limitResetDate = creationDate.addDays(limitPeriod);
+          let today = new Date();
+
+          if (limitResetDate <= today) {
+            localStorage.removeItem(`limit_${id}`);
+          }
+
+          if (settings.frequency) {
+            if (!localStorage.getItem(`campaign_${id}`)) {
+              localStorage.setItem(`campaign_${id}`, timesShown);
+              let count = localStorage.getItem(`campaign_${id}`);
+              if (
+                settings.frequency &&
+                parseInt(count) >= parseInt(settings.frequencyTime)
+              ) {
+                console.log("Limit is reached");
+                localStorage.setItem(`limit_${id}`, true);
+              } else if (
+                settings.frequency &&
+                parseInt(count) < parseInt(settings.frequencyTime)
+              ) {
+                console.log("Limit not reached yet");
+              } else {
+                console.log("Frequency is off");
+              }
+            } else {
+              let count = localStorage.getItem(`campaign_${id}`);
+
+              if (!localStorage.getItem(`limit_${id}`)) {
+                count++;
+                localStorage.setItem(`campaign_${id}`, count);
+              } else {
+                return;
+              }
+
+              if (
+                settings.frequency &&
+                parseInt(count) >= parseInt(settings.frequencyTime)
+              ) {
+                console.log("Limit is reached");
+                localStorage.setItem(`limit_${id}`, true);
+              } else if (
+                settings.frequency &&
+                parseInt(count) < parseInt(settings.frequencyTime)
+              ) {
+                console.log("Limit not reached yet");
+              } else {
+                console.log("Frequency is off");
+              }
+            }
+          } else {
+            return;
+          }
+        };
+
+        let triggered = false;
+        function workOnClassAdd() {
+          handleFrequency(_id);
+          handleAutoClose();
+
+          if (!triggered) {
+            triggered = true;
+          }
+        }
+
+        function workOnClassRemoval() {}
+
+        // watch for a specific class change
+        let classWatcher = new ClassWatcher(
+          modal,
+          "open",
+          workOnClassAdd,
+          workOnClassRemoval
+        );
+
+        const createModal = (condition) => {
+          // timer for time on page
+          let timerElapsed = false;
+
+          let exit = false;
+          let scrolled = false;
+          let finishedScrolling = false;
+
+          const checkCondition = (trigger) => {
+            if (trigger.triggerType === "url") {
+              if (trigger.matchingFormat === "contains") {
+                urlTrigger = window.location.href.includes(
+                  trigger.matchingInput
+                );
+                if (urlTrigger) {
+                  return trigger.triggerType === "url";
+                }
+              } else if (trigger.matchingFormat === "matches") {
+                urlTrigger = window.location.href === trigger.matchingInput;
+                if (urlTrigger) {
+                  return trigger.triggerType === "url";
+                }
+              }
+            } else if (trigger.triggerType === "cart-size") {
+              if (trigger.matchingFormat === "greater") {
+                if (cartData.item_count > trigger.matchingInput) {
+                  return trigger.triggerType === "cart-size";
+                }
+              } else if (trigger.matchingFormat === "less") {
+                if (cartData.item_count < trigger.matchingInput) {
+                  return trigger.triggerType === "cart-size";
+                }
+              }
+            } else if (trigger.triggerType === "cart-value") {
+              if (trigger.matchingFormat === "greater") {
+                if (cartData.total_price / 100 > trigger.matchingInput) {
+                  return trigger.triggerType === "cart-value";
+                }
+              } else if (trigger.matchingFormat === "less") {
+                if (cartData.total_price / 100 < trigger.matchingInput) {
+                  return trigger.triggerType === "cart-value";
+                }
+              }
+            } else if (trigger.triggerType === "product-in-cart") {
+              if (trigger.matchingFormat === "contains") {
+                let matchingCartItems = cartData.items.find((item) =>
+                  item.title.includes(trigger.matchingInput)
+                );
+                if (matchingCartItems != undefined) {
+                  return trigger.triggerType === "product-in-cart";
+                }
+              } else if (trigger.matchingFormat === "matches") {
+                let matchingCartItems = cartData.items.find(
+                  (item) => item.title === trigger.matchingInput
+                );
+                if (matchingCartItems != undefined) {
+                  return trigger.triggerType === "product-in-cart";
+                }
+              }
+            } else if (scrolled) {
+              return trigger.triggerType === "scroll-depth";
+            } else if (trigger.triggerType === "time-on-page") {
+              if (timerElapsed) {
+                return trigger.triggerType === "time-on-page";
+              }
+            } else if (trigger.triggerType === "exit-intent") {
+              if (exit) {
+                return trigger.triggerType === "exit-intent";
+              }
+            }
+          };
+
+          const trapFocus = (element) => {
+            const modal = element;
+            const focusableElements =
+              'a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])';
+            const firstFocusableElement = modal.querySelectorAll(
+              focusableElements
+            )[0];
+            const focusableContent = modal.querySelectorAll(focusableElements);
+            const lastFocusableElement =
+              focusableContent[focusableContent.length - 1];
+
+            document.addEventListener("keydown", function (e) {
+              let isTabPressed = e.key === "Tab" || e.keyCode === 9;
+
+              if (!isTabPressed) {
+                return;
+              }
+
+              // if shift key pressed for shift + tab combination
+              if (e.shiftKey) {
+                if (document.activeElement === firstFocusableElement) {
+                  lastFocusableElement.focus();
+                  e.preventDefault();
+                }
+              }
+
+              // if tab key is pressed
+              else {
+                if (document.activeElement === lastFocusableElement) {
+                  firstFocusableElement.focus();
+                  e.preventDefault();
+                }
+              }
+            });
+          };
+
+          // CHECK FUNCTION
+          function check() {
+            console.log("checked");
+
+            let conditionsMatched;
+            if (condition === "all") {
+              conditionsMatched = triggers.every(checkCondition);
+            } else if (condition === "any") {
+              conditionsMatched = triggers.some(checkCondition);
+            }
+
+            let timerObj = triggers.find(
+              (trigger) => trigger.triggerType === "time-on-page"
+            );
+            if (!timerElapsed) {
+              setTimeout(
+                () => {
+                  timerElapsed = true;
+                  check();
+                },
+                timerObj ? timerObj.matchingInput * 1000 : null
+              );
+            }
+
+            if (
+              conditionsMatched &&
+              !finishedScrolling &&
+              !triggered &&
+              !localStorage.getItem(`limit_${_id}`)
+            ) {
+              console.log("conditions matched");
+              // CONTENT TYPES
+              setContentTypes();
+              modal.classList.add("open");
+              modal.classList.add("ezy-style-modal--animate");
+              setTimeout(function () {
+                modal.classList.remove("ezy-style-modal--animate");
+              }, 100);
+
+              let closeBtn = document.querySelector(".closeBtn");
+              closeBtn.addEventListener("click", (e) => {
+                modal.classList.add("ezy-style-modal--animate");
+                setTimeout(function () {
+                  modal.classList.add("tw-hidden");
+                }, 1000);
+                isOpen = false;
+              });
+              closeBtn.addEventListener("keyup", (e) => {
+                if (e.keyCode === 13) {
+                  e.preventDefault();
+                  modal.classList.add("ezy-style-modal--animate");
+                  setTimeout(function () {
+                    modal.classList.add("tw-hidden");
+                  }, 1000);
+                  isOpen = false;
+                }
+              });
+
+              // MAIN BUTTON AS CLOSE BUTTON FUNC
+              let mainBtn = document.querySelector(".main-btn");
+
+              if (content.buttonClose && mainBtn != null) {
+                mainBtn.addEventListener("click", (e) => {
+                  e.preventDefault();
+                  modal.classList.add("ezy-style-modal--animate");
+                  setTimeout(function () {
+                    modal.classList.add("tw-hidden");
+                  }, 1000);
+                  isOpen = false;
+                });
+                mainBtn.addEventListener("keyup", (e) => {
+                  if (e.keyCode === 13) {
+                    e.preventDefault();
+                    modal.classList.add("ezy-style-modal--animate");
+                    setTimeout(function () {
+                      modal.classList.add("tw-hidden");
+                    }, 1000);
+                    isOpen = false;
+                  }
+                });
+              }
+
+              modal.addEventListener("click", function (e) {
+                if (e.target == this) {
+                  modal.classList.add("ezy-style-modal--animate");
+                  setTimeout(function () {
+                    modal.classList.add("tw-hidden");
+                  }, 1000);
+                }
+              });
+
+              trapFocus(modal);
+
+              if (
+                triggers.some((trigger) => {
+                  // exit intent
+                  return trigger.triggerType === "scroll-depth";
+                })
+              ) {
+                finishedScrolling = true;
+              }
+              document.removeEventListener("mouseout", mouseEvent);
+            }
+          }
+          check();
+
+          // Cart catch
+          (function (ns, fetch) {
+            console.log("im an  iffee");
+            if (typeof fetch !== "function") return;
+
+            ns.fetch = function () {
+              const response = fetch.apply(this, arguments);
+
+              response.then((res) => {
+                if (
+                  [
+                    `${window.location.origin}/cart/add.js`,
+                    `${window.location.origin}/cart/update.js`,
+                    `${window.location.origin}/cart/change.js`,
+                    `${window.location.origin}/cart/clear.js`,
+                  ].includes(res.url)
+                ) {
+                  res
+                    .clone()
+                    .json()
+                    .then((data) => {
+                      cartDataFetch = fetchCartInfo();
+                      cartDataFetch.then((cart) => {
+                        cartData = cart;
+                        check();
+                      });
+                    });
+                }
+              });
+
+              return response;
+            };
+          })(window, window.fetch);
+
+          // Cart catch XHR
+          const open = window.XMLHttpRequest.prototype.open;
+
+          function openReplacement() {
+            this.addEventListener("load", function () {
+              if (
+                [
+                  "/cart/add.js",
+                  "/cart/update.js",
+                  "/cart/change.js",
+                  "/cart/clear.js",
+                ].includes(this._url)
+              ) {
+                updateCartInfo(this.response);
+              }
+            });
+            return open.apply(this, arguments);
+          }
+
+          window.XMLHttpRequest.prototype.open = openReplacement;
+
+          // cart check Fetch
+          (function (ns, fetch) {
+            if (typeof fetch !== "function") return;
+
+            ns.fetch = function () {
+              const response = fetch.apply(this, arguments);
+
+              response.then((res) => {
+                if (
+                  [
+                    `${window.location.origin}/cart/add.js`,
+                    `${window.location.origin}/cart/update.js`,
+                    `${window.location.origin}/cart/change.js`,
+                    `${window.location.origin}/cart/clear.js`,
+                  ].includes(res.url)
+                ) {
+                  res
+                    .clone()
+                    .json()
+                    .then((data) => console.log(data));
+                }
+              });
+
+              return response;
+            };
+          })(window, window.fetch);
+
+          // EXIT INTENT CHECK
+          const mouseEvent = (e) => {
+            const shouldShowExitIntent =
+              !e.toElement && !e.relatedTarget && e.clientY < 10;
+
+            if (shouldShowExitIntent) {
+              // document.removeEventListener("mouseout", mouseEvent); not removing cuz we wanna check every time
+              // Handling delay here
+              // flip the exit switch
+              exit = true;
+              check();
+            }
+          };
+          if (
+            triggers.some((trigger) => {
+              // exit intent
+              return trigger.triggerType === "exit-intent";
+            })
+          ) {
+            document.addEventListener("mouseout", mouseEvent);
+          }
+
+          // SCROLL DEPTH CHECK
+          const catchModal = () => {
+            scrollpos = window.scrollY;
+            let scrollObj = triggers.find(
+              (trigger) => trigger.triggerType === "scroll-depth"
+            );
+            if (!scrolled) {
+              if (scrollpos >= scrollObj.matchingInput) {
+                console.log("found");
+                scrolled = true;
+                check();
+              }
+
+              console.log("catching");
+            } else {
+              console.log("remove listener");
+              document.removeEventListener("scroll", catchModal);
+            }
+          };
+
+          if (
+            triggers.some((trigger) => {
+              // exit intent
+              return trigger.triggerType === "scroll-depth";
+            })
+          ) {
+            document.addEventListener("scroll", catchModal);
+          }
+        };
+
+        // MATCH CONDITIONS -------------------------------------------------------------------
+        if (triggerMatch === "all") {
+          console.log("all triggers are matched");
+          createModal("all");
+        } else if (triggerMatch === "any") {
+          console.log("any triggers are matched");
+          createModal("any");
+        }
+      };
+
       // I GUESS THIS IS WHERE WE BUILD THE CAMPAIGNS
       if (style.campaignType === "modal") {
         // classes for the outermost shell
         modal.classList.add("ezy", "ezy-style-modal");
 
         // SET CONTENT TYPES
-        const setContentTypes = () => {
+        function setContentTypes() {
           // tw-hidden inside section
           if (content.contentType === "text-image") {
             modal.innerHTML = `
@@ -755,482 +1226,16 @@ const campaignInfo = async () => {
           } else if (content.contentType === "custom-html") {
             body.appendChild(modal);
           }
-        };
-
-        // SETTINGS
-        // AUTO CLOSE
-        const handleAutoClose = () => {
-          console.log("we are auto-closed");
-          if (settings.autoClose) {
-            setTimeout(() => {
-              modal.classList.remove("open");
-              modal.classList.add("ezy-style-modal--animate");
-              setTimeout(function () {
-                modal.classList.add("tw-hidden");
-              }, 1000);
-            }, settings.autoCloseTime * 1000);
-          } else {
-            return;
-          }
-        };
-
-        // Frequency
-        const handleFrequency = (id) => {
-          console.log("we are handling frequency");
-          // Check if they disabled frequency
-          if (!settings.frequency) {
-            localStorage.removeItem(`campaign_${id}`);
-            localStorage.removeItem(`limit_${id}`);
-          }
-
-          let timesShown = 1;
-
-          Date.prototype.addDays = function (days) {
-            let date = new Date(this.valueOf());
-            date.setDate(date.getDate() + days);
-            return date;
-          };
-
-          let limitPeriod = parseInt(settings.frequencyPeriod);
-          let creationDate = new Date(createdAt);
-          let limitResetDate = creationDate.addDays(limitPeriod);
-          let today = new Date();
-
-          if (limitResetDate <= today) {
-            localStorage.removeItem(`limit_${id}`);
-          }
-
-          if (settings.frequency) {
-            if (!localStorage.getItem(`campaign_${id}`)) {
-              localStorage.setItem(`campaign_${id}`, timesShown);
-              let count = localStorage.getItem(`campaign_${id}`);
-              if (
-                settings.frequency &&
-                parseInt(count) >= parseInt(settings.frequencyTime)
-              ) {
-                console.log("Limit is reached");
-                localStorage.setItem(`limit_${id}`, true);
-              } else if (
-                settings.frequency &&
-                parseInt(count) < parseInt(settings.frequencyTime)
-              ) {
-                console.log("Limit not reached yet");
-              } else {
-                console.log("Frequency is off");
-              }
-            } else {
-              let count = localStorage.getItem(`campaign_${id}`);
-
-              if (!localStorage.getItem(`limit_${id}`)) {
-                count++;
-                localStorage.setItem(`campaign_${id}`, count);
-              } else {
-                return;
-              }
-
-              if (
-                settings.frequency &&
-                parseInt(count) >= parseInt(settings.frequencyTime)
-              ) {
-                console.log("Limit is reached");
-                localStorage.setItem(`limit_${id}`, true);
-              } else if (
-                settings.frequency &&
-                parseInt(count) < parseInt(settings.frequencyTime)
-              ) {
-                console.log("Limit not reached yet");
-              } else {
-                console.log("Frequency is off");
-              }
-            }
-          } else {
-            return;
-          }
-        };
-
-        let triggered = false;
-        function workOnClassAdd() {
-          handleFrequency(_id);
-          handleAutoClose();
-
-          if (!triggered) {
-            triggered = true;
-          }
         }
 
-        function workOnClassRemoval() {}
-
-        // watch for a specific class change
-        let classWatcher = new ClassWatcher(
-          modal,
-          "open",
-          workOnClassAdd,
-          workOnClassRemoval
-        );
-
-        const createModal = (condition) => {
-          // timer for time on page
-          let timerElapsed = false;
-
-          let exit = false;
-          let scrolled = false;
-          let finishedScrolling = false;
-
-          const checkCondition = (trigger) => {
-            if (trigger.triggerType === "url") {
-              if (trigger.matchingFormat === "contains") {
-                urlTrigger = window.location.href.includes(
-                  trigger.matchingInput
-                );
-                if (urlTrigger) {
-                  return trigger.triggerType === "url";
-                }
-              } else if (trigger.matchingFormat === "matches") {
-                urlTrigger = window.location.href === trigger.matchingInput;
-                if (urlTrigger) {
-                  return trigger.triggerType === "url";
-                }
-              }
-            } else if (trigger.triggerType === "cart-size") {
-              if (trigger.matchingFormat === "greater") {
-                if (cartData.item_count > trigger.matchingInput) {
-                  return trigger.triggerType === "cart-size";
-                }
-              } else if (trigger.matchingFormat === "less") {
-                if (cartData.item_count < trigger.matchingInput) {
-                  return trigger.triggerType === "cart-size";
-                }
-              }
-            } else if (trigger.triggerType === "cart-value") {
-              if (trigger.matchingFormat === "greater") {
-                if (cartData.total_price / 100 > trigger.matchingInput) {
-                  return trigger.triggerType === "cart-value";
-                }
-              } else if (trigger.matchingFormat === "less") {
-                if (cartData.total_price / 100 < trigger.matchingInput) {
-                  return trigger.triggerType === "cart-value";
-                }
-              }
-            } else if (trigger.triggerType === "product-in-cart") {
-              if (trigger.matchingFormat === "contains") {
-                let matchingCartItems = cartData.items.find((item) =>
-                  item.title.includes(trigger.matchingInput)
-                );
-                if (matchingCartItems != undefined) {
-                  return trigger.triggerType === "product-in-cart";
-                }
-              } else if (trigger.matchingFormat === "matches") {
-                let matchingCartItems = cartData.items.find(
-                  (item) => item.title === trigger.matchingInput
-                );
-                if (matchingCartItems != undefined) {
-                  return trigger.triggerType === "product-in-cart";
-                }
-              }
-            } else if (scrolled) {
-              return trigger.triggerType === "scroll-depth";
-            } else if (trigger.triggerType === "time-on-page") {
-              if (timerElapsed) {
-                return trigger.triggerType === "time-on-page";
-              }
-            } else if (trigger.triggerType === "exit-intent") {
-              if (exit) {
-                return trigger.triggerType === "exit-intent";
-              }
-            }
-          };
-
-          const trapFocus = (element) => {
-            const modal = element;
-            const focusableElements =
-              'a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])';
-            const firstFocusableElement = modal.querySelectorAll(
-              focusableElements
-            )[0];
-            const focusableContent = modal.querySelectorAll(focusableElements);
-            const lastFocusableElement =
-              focusableContent[focusableContent.length - 1];
-
-            document.addEventListener("keydown", function (e) {
-              let isTabPressed = e.key === "Tab" || e.keyCode === 9;
-
-              if (!isTabPressed) {
-                return;
-              }
-
-              // if shift key pressed for shift + tab combination
-              if (e.shiftKey) {
-                if (document.activeElement === firstFocusableElement) {
-                  lastFocusableElement.focus();
-                  e.preventDefault();
-                }
-              }
-
-              // if tab key is pressed
-              else {
-                if (document.activeElement === lastFocusableElement) {
-                  firstFocusableElement.focus();
-                  e.preventDefault();
-                }
-              }
-            });
-          };
-
-          // CHECK FUNCTION
-          function check() {
-            console.log("checked");
-
-            let conditionsMatched;
-            if (condition === "all") {
-              conditionsMatched = triggers.every(checkCondition);
-            } else if (condition === "any") {
-              conditionsMatched = triggers.some(checkCondition);
-            }
-
-            let timerObj = triggers.find(
-              (trigger) => trigger.triggerType === "time-on-page"
-            );
-            if (!timerElapsed) {
-              setTimeout(
-                () => {
-                  timerElapsed = true;
-                  check();
-                },
-                timerObj ? timerObj.matchingInput * 1000 : null
-              );
-            }
-
-            if (
-              conditionsMatched &&
-              !finishedScrolling &&
-              !triggered &&
-              !localStorage.getItem(`limit_${_id}`)
-            ) {
-              console.log("conditions matched");
-              // CONTENT TYPES
-              setContentTypes();
-              modal.classList.add("open");
-              modal.classList.add("ezy-style-modal--animate");
-              setTimeout(function () {
-                modal.classList.remove("ezy-style-modal--animate");
-              }, 100);
-
-              let closeBtn = document.querySelector(".closeBtn");
-              closeBtn.addEventListener("click", (e) => {
-                modal.classList.add("ezy-style-modal--animate");
-                setTimeout(function () {
-                  modal.classList.add("tw-hidden");
-                }, 1000);
-                isOpen = false;
-              });
-              closeBtn.addEventListener("keyup", (e) => {
-                if (e.keyCode === 13) {
-                  e.preventDefault();
-                  modal.classList.add("ezy-style-modal--animate");
-                  setTimeout(function () {
-                    modal.classList.add("tw-hidden");
-                  }, 1000);
-                  isOpen = false;
-                }
-              });
-
-              // MAIN BUTTON AS CLOSE BUTTON FUNC
-              let mainBtn = document.querySelector(".main-btn");
-
-              if (content.buttonClose && mainBtn != null) {
-                mainBtn.addEventListener("click", (e) => {
-                  e.preventDefault();
-                  modal.classList.add("ezy-style-modal--animate");
-                  setTimeout(function () {
-                    modal.classList.add("tw-hidden");
-                  }, 1000);
-                  isOpen = false;
-                });
-                mainBtn.addEventListener("keyup", (e) => {
-                  if (e.keyCode === 13) {
-                    e.preventDefault();
-                    modal.classList.add("ezy-style-modal--animate");
-                    setTimeout(function () {
-                      modal.classList.add("tw-hidden");
-                    }, 1000);
-                    isOpen = false;
-                  }
-                });
-              }
-
-              modal.addEventListener("click", function (e) {
-                if (e.target == this) {
-                  modal.classList.add("ezy-style-modal--animate");
-                  setTimeout(function () {
-                    modal.classList.add("tw-hidden");
-                  }, 1000);
-                }
-              });
-
-              trapFocus(modal);
-
-              if (
-                triggers.some((trigger) => {
-                  // exit intent
-                  return trigger.triggerType === "scroll-depth";
-                })
-              ) {
-                finishedScrolling = true;
-              }
-              document.removeEventListener("mouseout", mouseEvent);
-            }
-          }
-          check();
-
-          // Cart catch
-          (function (ns, fetch) {
-            console.log("im an  iffee");
-            if (typeof fetch !== "function") return;
-
-            ns.fetch = function () {
-              const response = fetch.apply(this, arguments);
-
-              response.then((res) => {
-                if (
-                  [
-                    `${window.location.origin}/cart/add.js`,
-                    `${window.location.origin}/cart/update.js`,
-                    `${window.location.origin}/cart/change.js`,
-                    `${window.location.origin}/cart/clear.js`,
-                  ].includes(res.url)
-                ) {
-                  res
-                    .clone()
-                    .json()
-                    .then((data) => {
-                      cartDataFetch = fetchCartInfo();
-                      cartDataFetch.then((cart) => {
-                        cartData = cart;
-                        check();
-                      });
-                    });
-                }
-              });
-
-              return response;
-            };
-          })(window, window.fetch);
-
-          // Cart catch XHR
-          const open = window.XMLHttpRequest.prototype.open;
-
-          function openReplacement() {
-            this.addEventListener("load", function () {
-              if (
-                [
-                  "/cart/add.js",
-                  "/cart/update.js",
-                  "/cart/change.js",
-                  "/cart/clear.js",
-                ].includes(this._url)
-              ) {
-                updateCartInfo(this.response);
-              }
-            });
-            return open.apply(this, arguments);
-          }
-
-          window.XMLHttpRequest.prototype.open = openReplacement;
-
-          // cart check Fetch
-          (function (ns, fetch) {
-            if (typeof fetch !== "function") return;
-
-            ns.fetch = function () {
-              const response = fetch.apply(this, arguments);
-
-              response.then((res) => {
-                if (
-                  [
-                    `${window.location.origin}/cart/add.js`,
-                    `${window.location.origin}/cart/update.js`,
-                    `${window.location.origin}/cart/change.js`,
-                    `${window.location.origin}/cart/clear.js`,
-                  ].includes(res.url)
-                ) {
-                  res
-                    .clone()
-                    .json()
-                    .then((data) => console.log(data));
-                }
-              });
-
-              return response;
-            };
-          })(window, window.fetch);
-
-          // EXIT INTENT CHECK
-          const mouseEvent = (e) => {
-            const shouldShowExitIntent =
-              !e.toElement && !e.relatedTarget && e.clientY < 10;
-
-            if (shouldShowExitIntent) {
-              // document.removeEventListener("mouseout", mouseEvent); not removing cuz we wanna check every time
-              // Handling delay here
-              // flip the exit switch
-              exit = true;
-              check();
-            }
-          };
-          if (
-            triggers.some((trigger) => {
-              // exit intent
-              return trigger.triggerType === "exit-intent";
-            })
-          ) {
-            document.addEventListener("mouseout", mouseEvent);
-          }
-
-          // SCROLL DEPTH CHECK
-          const catchModal = () => {
-            scrollpos = window.scrollY;
-            let scrollObj = triggers.find(
-              (trigger) => trigger.triggerType === "scroll-depth"
-            );
-            if (!scrolled) {
-              if (scrollpos >= scrollObj.matchingInput) {
-                console.log("found");
-                scrolled = true;
-                check();
-              }
-
-              console.log("catching");
-            } else {
-              console.log("remove listener");
-              document.removeEventListener("scroll", catchModal);
-            }
-          };
-
-          if (
-            triggers.some((trigger) => {
-              // exit intent
-              return trigger.triggerType === "scroll-depth";
-            })
-          ) {
-            document.addEventListener("scroll", catchModal);
-          }
-        };
-
-        // MATCH CONDITIONS -------------------------------------------------------------------
-        if (triggerMatch === "all") {
-          console.log("all triggers are matched");
-          createModal("all");
-        } else if (triggerMatch === "any") {
-          console.log("any triggers are matched");
-          createModal("any");
-        }
+        initiateSettings();
       } else if (style.campaignType === "full-screen") {
         // classes for the outermost shell
         modal.classList.add("ezy", "ezy-style-fullscreen");
         modal.style.backgroundColor = backgroundColor;
         console.log("this is full screen");
         // SET CONTENT TYPES
-        const setContentTypes = () => {
+        function setContentTypes() {
           // tw-hidden inside section
           if (content.contentType === "text-image") {
             modal.innerHTML = `
@@ -1767,475 +1772,1216 @@ const campaignInfo = async () => {
           } else if (content.contentType === "custom-html") {
             body.appendChild(modal);
           }
-        };
+        }
 
-        // SETTINGS
-        // AUTO CLOSE
-        const handleAutoClose = () => {
-          console.log("we are auto-closed");
-          if (settings.autoClose) {
-            setTimeout(() => {
-              modal.classList.remove("open");
-              modal.classList.add("ezy-style-modal--animate");
-              setTimeout(function () {
-                modal.classList.add("tw-hidden");
-              }, 1000);
-            }, settings.autoCloseTime * 1000);
-          } else {
-            return;
-          }
-        };
+        initiateSettings();
+      } else if (style.campaignType === "slide-in") {
+        // classes for the outermost shell
+        modal.classList.add(
+          "ezy",
+          "ezy-style-drawer",
+          `ezy-style-drawer--${style.placement}`
+        );
+        modal.style.backgroundColor = backgroundColor;
+        // SET CONTENT TYPES
+        function setContentTypes() {
+          // tw-hidden inside section
+          if (content.contentType === "text-image") {
+            modal.innerHTML = `
+            <section class="ezy-style-drawer__close">
+    <a href="#" title="Close drawer" class="closeBtn";">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x ezy-btn--round--inverted"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </a>
+  </section>
+  <section class="ezy-style-drawer__window"
+    style="
+      background-color:${backgroundColor};">
+    <section class="ezy-style-drawer__content">
+      <!-- CONTENT -->
+<section>
+  <div class="tw-flex tw-flex-row tw-flex-wrap tw-justify-center">
+    <!-- ##IF IMAGE## -->
+    <div class="tw-w-full sm:tw-w-1/2">
+      <div>
+        <img class="ezy-style-modal__content__image" src="${content.imgUrl}"/>
+      </div>
+    </div>
+    <!-- ##ENDIF## -->
+    <div class="tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center tw-p-4 tw-md:p-8">
+      <div>
+        <h3 class="ezy-type__headline--bold-1 tw-mb-2">${content.headline}</h3>
+        <p class="tw-mb-4">
+        ${content.body}
+        </p>
+        <a class="ezy-btn tw-w-full" href="${content.buttonUrl}"
+          style="
+            background-color:${primaryButtonColor};
+            border-radius:${style.borderRadius};">${content.buttonText}</a>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- END CONTENT -->
 
-        // Frequency
-        const handleFrequency = (id) => {
-          console.log("we are handling frequency");
-          // Check if they disabled frequency
-          if (!settings.frequency) {
-            localStorage.removeItem(`campaign_${id}`);
-            localStorage.removeItem(`limit_${id}`);
-          }
 
-          let timesShown = 1;
+    </section>
+    <a href="https://brickspacelab.com/" target="_blank" class="ezy-tooltip tw-absolute tw-bottom-2 tw-right-2
+      ##IF PAID_PLAN##tw-hidden##ENDIF##">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+      <span>Powered by Easypop</span>
+    </a>
+  </section>
 
-          Date.prototype.addDays = function (days) {
-            let date = new Date(this.valueOf());
-            date.setDate(date.getDate() + days);
-            return date;
-          };
+            `;
 
-          let limitPeriod = parseInt(settings.frequencyPeriod);
-          let creationDate = new Date(createdAt);
-          let limitResetDate = creationDate.addDays(limitPeriod);
-          let today = new Date();
-
-          if (limitResetDate <= today) {
-            localStorage.removeItem(`limit_${id}`);
-          }
-
-          if (settings.frequency) {
-            if (!localStorage.getItem(`campaign_${id}`)) {
-              localStorage.setItem(`campaign_${id}`, timesShown);
-              let count = localStorage.getItem(`campaign_${id}`);
-              if (
-                settings.frequency &&
-                parseInt(count) >= parseInt(settings.frequencyTime)
-              ) {
-                console.log("Limit is reached");
-                localStorage.setItem(`limit_${id}`, true);
-              } else if (
-                settings.frequency &&
-                parseInt(count) < parseInt(settings.frequencyTime)
-              ) {
-                console.log("Limit not reached yet");
-              } else {
-                console.log("Frequency is off");
-              }
-            } else {
-              let count = localStorage.getItem(`campaign_${id}`);
-
-              if (!localStorage.getItem(`limit_${id}`)) {
-                count++;
-                localStorage.setItem(`campaign_${id}`, count);
-              } else {
-                return;
-              }
-
-              if (
-                settings.frequency &&
-                parseInt(count) >= parseInt(settings.frequencyTime)
-              ) {
-                console.log("Limit is reached");
-                localStorage.setItem(`limit_${id}`, true);
-              } else if (
-                settings.frequency &&
-                parseInt(count) < parseInt(settings.frequencyTime)
-              ) {
-                console.log("Limit not reached yet");
-              } else {
-                console.log("Frequency is off");
-              }
+            body.appendChild(modal);
+          } else if (content.contentType === "newsletter") {
+            let success;
+            let url = window.location.href;
+            if (url.includes("?customer_posted=true")) {
+              success = "yes";
+            } else if (
+              url.includes(
+                "t?contact%5Btags%5D=prospect%2Cnewsletter&form_type=customer"
+              )
+            ) {
+              success = "no";
             }
-          } else {
-            return;
-          }
-        };
 
-        let triggered = false;
-        function workOnClassAdd() {
-          handleFrequency(_id);
-          handleAutoClose();
+            modal.innerHTML = `
+            <section class="ezy-style-drawer__close">
+    <a href="#" title="Close drawer" class="closeBtn";">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x ezy-btn--round--inverted"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </a>
+  </section>
+  <section class="ezy-style-drawer__window"
+    style="
+      background-color:##BACKGROUND_COLOR##;">
+    <section class="ezy-style-drawer__content">
+      <!-- CONTENT -->
+<section>
+  <div class="tw-flex tw-flex-row tw-flex-wrap tw-justify-center">
 
-          if (!triggered) {
-            triggered = true;
+    <!-- ##IF IMAGE## -->
+    <div class="tw-w-full sm:tw-w-1/2">
+      <div>
+        <img class="ezy-style-modal__content__image" src="##IMAGE_SRC##" />
+      </div>
+    </div>
+    <!-- ##ENDIF## -->
+
+    <div class="tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center tw-p-4 tw-md:p-8">
+      <div>
+        <h3 class="ezy-type__headline--bold-1 tw-mb-2">
+          ##HEADLINE##
+        </h3>
+        <p class="tw-mb-4">##BODY##</p>
+        <form
+          method="post"
+          action="/contact#contact_form"
+          id="contact_form"
+          accept-charset="UTF-8"
+          class="contact-form">
+
+          <input
+            type="hidden"
+            name="form_type"
+            value="customer" />
+          <input
+            type="hidden"
+            name="utf8"
+            value="✓" />
+          <input
+            id="contact_tags"
+            name="contact[tags]"
+            type="hidden"
+            value="easypop" />
+          <input
+            class="tw-mb-2"
+            id="contact_email"
+            name="contact[email]"
+            type="email" />
+          <input
+            class="ezy-btn tw-w-full"
+            type="submit"
+            value="##BUTTON_TEXT##"
+            style="
+              background-color:##BUTTON_COLOR##;
+              border-radius:##BORDER_RADIUS##;" />
+
+          <!-- ##IF SUCCESS## -->
+            <div class="tw-bg-black tw-bg-opacity-10 tw-mt-2 tw-p-2"
+              style="border-radius:##BORDER_RADIUS##;">
+              ##SUCCESS_MESSAGE##
+            </div>
+          <!-- ##ELSE## -->
+            <div class="tw-bg-black tw-bg-opacity-10 tw-mt-2 tw-p-2"
+              style="border-radius:##BORDER_RADIUS##;">
+              ##ERROR_MESSAGE##
+            </div>
+          <!-- ##ENDIF## -->
+
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- END CONTENT -->
+
+
+    </section>
+    <a href="https://brickspacelab.com/" target="_blank" class="ezy-tooltip tw-absolute tw-bottom-2 tw-right-2
+      ##IF PAID_PLAN##tw-hidden##ENDIF##">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+      <span>Powered by Easypop</span>
+    </a>
+  </section>`;
+            body.appendChild(modal);
+          } else if (content.contentType === "cart-progress-bar") {
+            // for local testing
+            let cartData = {
+              total_price: 49900,
+            };
+            let cartProgress;
+            if (cartData.total_price === 0) {
+              cartProgress = 0;
+            } else {
+              cartProgress =
+                (cartData.total_price / 100 / content.cartGoalValue) * 100;
+            }
+
+            let remainder = cartData.total_price / 100 - content.cartGoalValue;
+
+            modal.innerHTML = `
+            <section class="ezy-style-drawer__close">
+    <a href="#" title="Close drawer" onclick="ezy.drawers.closeAll();">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x ezy-btn--round--inverted"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </a>
+  </section>
+  <section class="ezy-style-drawer__window"
+    style="
+      background-color:##BACKGROUND_COLOR##;">
+    <section class="ezy-style-drawer__content">
+      <!-- CONTENT -->
+<section>
+  <div class="tw-flex tw-flex-row tw-flex-wrap tw-justify-center">
+    <div class="tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center">
+      <div class="tw-w-full">
+
+        <section class="tw-border-b tw-border-gray-200 tw-p-4">
+          <p class="tw-mb-1">You're $xx.xx away from ##GOAL_TEXT##.</p>
+          <p class="tw-mb-1">##SUCESS_TEXT##.</p>
+          <div class="ezy-progressbar"
+            style="
+              background-color:##BUTTON_COLOR##;
+              border-radius:##BORDER_RADIUS##;">
+            <div class="ezy-progressbar__inner" style="width:66%;">
+            </div>
+          </div>
+        </section>
+
+        <section class="tw-p-4 tw-md:p-8">
+          <h3 class="ezy-type__headline--bold-1 tw-mb-2">##HEADLINE##</h3>
+          <p class="tw-mb-4">
+            ##BODY##
+          </p>
+
+          <a class="ezy-btn tw-w-full" href="##BUTTON_URL##"
+            style="
+              background-color:##BUTTON_COLOR##;
+              border-radius:##BORDER_RADIUS##;">
+            ##BUTTON_TEXT##
+          </a>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</section>
+<!-- END CONTENT -->
+
+
+    </section>
+    <a href="https://brickspacelab.com/" target="_blank" class="ezy-tooltip tw-absolute tw-bottom-2 tw-right-2
+      ##IF PAID_PLAN##tw-hidden##ENDIF##">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+      <span>Powered by Easypop</span>
+    </a>
+  </section>
+            
+          
+          `;
+            body.appendChild(modal);
+          } else if (content.contentType === "product-feed") {
+            const products = content.selectedProducts[0].selection;
+            modal.innerHTML = `
+            
+            <section class="ezy-style-fullscreen__close">
+    <a href="#" title="Close fullscreen popup" class="closeBtn"">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x ezy-btn--round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </a>
+  </section>
+  <section class="ezy-style-fullscreen__window">
+    <section class="ezy-style-fullscreen__content">
+      <!-- CONTENT -->
+<div class="tw-flex tw-flex-row tw-flex-wrap">
+  <div class="tw-w-full sm:tw-w-full tw-flex tw-justify-center tw-items-center">
+    <div class="tw-overflow-hidden">
+      <div class="tw-p-4 tw-max-w-prose">
+        <h3 class="ezy-type__headline--bold-1">${content.headline}</h3>
+        <p>
+        ${content.body}
+        </p>
+      </div>
+      <div class="ezy-type-productfeed__arrows">
+        <div class="ezy-type-productfeed__back">
+          <button class="js:ezy-scrollArrowButtons" data-scroll-direction="0" data-scroll-container="ezy-type-productfeed">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left ezy-btn--round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          </button>
+        </div>
+        <div class="ezy-type-productfeed__next">
+          <button class="js:ezy-scrollArrowButtons" data-scroll-direction="1" data-scroll-container="ezy-type-productfeed">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right ezy-btn--round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+        </div>
+      </div>
+      <div class="ezy-type-productfeed">
+      ${products.map((product) => {
+        return `
+        <div class="ezy-type-productfeed__item">
+        <img class="image--square" src=${product.images[0].originalSrc}/>
+        <div class="tw-px-2 tw-py-4">
+          <p>${product.title}</p>
+          <p class="tw-pb-2">$<span class="tw-pb-2 js:ezy-productPrice">${
+            product.variants[0].price
+          }</span></p>
+          <select id="id" name="id" class="ezy-select tw-mb-2 js:ezy-changeVariantSelects">
+            ${product.variants.map((variant) => {
+              return `<option value="${
+                variant.id
+                  .split("gid://shopify/ProductVariant/")
+                  .pop()
+                  .split("/")[0]
+              }" data-variant-availability="${
+                variant.availableForSale
+              }" data-variant-price="${variant.price}">${
+                variant.title
+              }</option>`;
+            })}
+          </select>
+          <button class="ezy-btn js:ezy-addVariantButtons tw-w-full" style="background-color:${
+            style.primaryButtonColor
+          }" data-variant-id="${product.variants[0].price}">
+            <span class="ezy-btn__text">
+              Add to cart
+            </span>
+            <span class="ezy-btn__spinner">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-loader"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+            </button>
+          </a>
+        </div>
+      </div>`;
+      })}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+    </section>
+  </section>
+  <a href="https://brickspacelab.com/" target="_blank" class="ezy-tooltip tw-absolute tw-bottom-2 tw-left-2
+    ##IF PAID_PLAN##tw-hidden##ENDIF##">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+    <span>Powered by Easypop</span>
+  </a>
+</section>`;
+
+            body.appendChild(modal);
+            var ezy = ezy || {};
+            ezy.productfeed = {
+              // simple fetch call
+              fetch: function (
+                requestType,
+                url,
+                data,
+                contentType,
+                successCallback,
+                errorCallback
+              ) {
+                fetch(url, {
+                  method: requestType,
+                  headers: {
+                    "Content-Type": contentType,
+                    Accept: contentType,
+                    "X-Requested-With": "xmlhttprequest",
+                  },
+                  body: JSON.stringify(data),
+                })
+                  .then((response) => response.json())
+                  .then((data) => {
+                    successCallback(data);
+                  })
+                  .catch((error) => {
+                    errorCallback(error);
+                  });
+              },
+
+              // initilize product feed
+              init: function () {
+                // add variant to cart
+                function addVariant(variantID, quantity, callback) {
+                  let data = {
+                    items: [
+                      {
+                        id: variantID,
+                        quantity: quantity,
+                      },
+                    ],
+                  };
+                  ezy.productfeed.fetch(
+                    "POST",
+                    "/cart/add.js",
+                    data,
+                    "application/json; charset=utf-8",
+
+                    // success
+                    function (data) {
+                      console.log(data);
+                      if (typeof callback === "function" && callback()) {
+                        window.setTimeout(function () {
+                          callback();
+                        }, 500);
+                      }
+                    },
+
+                    // error
+                    function (error) {
+                      if (typeof callback === "function" && callback()) {
+                        window.setTimeout(function () {
+                          callback();
+                        }, 500);
+                      }
+                    }
+                  );
+                }
+
+                // scroll container horizontally
+                function scrollHorizontally(element, direction) {
+                  if (direction == 0) {
+                    element.scroll({
+                      left: element.scrollLeft - 350,
+                      behavior: "smooth",
+                    });
+                  } else {
+                    element.scroll({
+                      left: element.scrollLeft + 350,
+                      behavior: "smooth",
+                    });
+                  }
+                }
+
+                // toggle loading state of button
+                function toggleButton(button) {
+                  if (button.classList.contains("ezy-btn--loading")) {
+                    button.classList.remove("ezy-btn--loading");
+                    button.disabled = false;
+                  } else {
+                    button.classList.add("ezy-btn--loading");
+                    button.disabled = true;
+                  }
+                }
+
+                // add disabled state to button
+                function disableButton(button) {
+                  button.classList.add("ezy-btn--disabled");
+                  button.disabled = true;
+                }
+
+                // add enabled state to button
+                function enableButton(button) {
+                  button.classList.remove("ezy-btn--disabled");
+                  button.disabled = false;
+                }
+
+                // listen for click on scroll arrows
+                var scrollArrowButtons = document.getElementsByClassName(
+                  "js:ezy-scrollArrowButtons"
+                );
+                Array.from(scrollArrowButtons).forEach(function (
+                  scrollArrowButton
+                ) {
+                  scrollArrowButton.addEventListener("click", function (e) {
+                    let scrollContainerClass = this.getAttribute(
+                      "data-scroll-container"
+                    );
+                    let scrollDirection = this.getAttribute(
+                      "data-scroll-direction"
+                    );
+                    var scrollContainers = document.getElementsByClassName(
+                      scrollContainerClass
+                    );
+                    Array.from(scrollContainers).forEach(function (
+                      scrollContainer
+                    ) {
+                      scrollHorizontally(scrollContainer, scrollDirection);
+                    });
+                  });
+                });
+
+                // listen for click on atc
+                var addVariantButtons = document.getElementsByClassName(
+                  "js:ezy-addVariantButtons"
+                );
+                Array.from(addVariantButtons).forEach(function (
+                  addVariantButton
+                ) {
+                  addVariantButton.addEventListener("click", function (e) {
+                    let variantId = this.getAttribute("data-variant-id");
+                    showNotification("Product was added to the cart!");
+                    toggleButton(addVariantButton);
+                    addVariant(variantId, 1, function () {
+                      toggleButton(addVariantButton);
+                    });
+                    if (content.closingBehav === "close") {
+                      modal.classList.add("ezy-style-modal--animate");
+                      setTimeout(function () {
+                        modal.classList.add("tw-hidden");
+                      }, 1000);
+                    }
+                  });
+                });
+
+                // listen for change to for variant select
+                var changeVariantSelects = document.getElementsByClassName(
+                  "js:ezy-changeVariantSelects"
+                );
+                Array.from(changeVariantSelects).forEach(function (
+                  changeVariantSelect
+                ) {
+                  changeVariantSelect.addEventListener("change", function () {
+                    let variantAvailability = this.options[
+                      this.selectedIndex
+                    ].getAttribute("data-variant-availability");
+                    let variantPrice = this.options[
+                      this.selectedIndex
+                    ].getAttribute("data-variant-price");
+                    let variantId = this.options[this.selectedIndex].value;
+                    let productItem = this.closest(
+                      ".ezy-type-productfeed__item"
+                    );
+                    let button = productItem.getElementsByClassName(
+                      "js:ezy-addVariantButtons"
+                    )[0];
+
+                    // update variant id in button
+                    button.setAttribute("data-variant-id", variantId);
+
+                    // update price in item
+                    productItem.getElementsByClassName(
+                      "js:ezy-productPrice"
+                    )[0].innerHTML = variantPrice;
+
+                    // check availability and update state
+                    if (variantAvailability == "true") {
+                      enableButton(button);
+                    } else {
+                      disableButton(button);
+                    }
+                  });
+                  // Create a new 'change' event
+                  var event = new Event("change");
+                  changeVariantSelect.dispatchEvent(event);
+                });
+                let showNotification = function (message) {
+                  var notification = document.querySelector(
+                    ".ezy-notification"
+                  );
+                  // for (var i = 0; i < notifications.length; i++) {
+                  //   let notification = notifications[i];
+                  //   let messageElement = notification.querySelector("span");
+                  //   if (message) {
+                  //     messageElement.innerHTML = message;
+                  //   }
+                  //   notification.classList.add("ezy-notification--animate");
+                  //   setTimeout(function () {
+                  //     notification.classList.remove(
+                  //       "ezy-notification--animate"
+                  //     );
+                  //   }, 3000);
+                  // }
+                  notification.innerHTML = message;
+                  notification.classList.add("ezy-notification--animate");
+                  setTimeout(function () {
+                    notification.classList.remove("ezy-notification--animate");
+                  }, 3000);
+                };
+              },
+            };
+            ezy.productfeed.init();
+          } else if (content.contentType === "custom-html") {
+            body.appendChild(modal);
           }
         }
 
-        function workOnClassRemoval() {}
-
-        // watch for a specific class change
-        let classWatcher = new ClassWatcher(
-          modal,
-          "open",
-          workOnClassAdd,
-          workOnClassRemoval
+        initiateSettings();
+      } else if (style.campaignType === "message-box") {
+        // classes for the outermost shell
+        modal.classList.add(
+          "ezy",
+          "ezy-style-box",
+          `ezy-style-box--${style.placement}`
         );
 
-        const createModal = (condition) => {
-          // timer for time on page
-          let timerElapsed = false;
+        // SET CONTENT TYPES
+        function setContentTypes() {
+          // tw-hidden inside section
+          if (content.contentType === "text-image") {
+            modal.innerHTML = `
+            <section class="ezy-style-box__window">
 
-          let exit = false;
-          let scrolled = false;
-          let finishedScrolling = false;
+    <div class="ezy-style-box__close tw-flex tw-flex-wrap tw-justify-center">
+      <div class="tw-flex-grow tw-flex tw-w-1/2">
+        <a href="https://brickspacelab.com/" target="_blank" class="ezy-tooltip ezy-tooltip--fill tw-self-center
+          ##IF PAID_PLAN##tw-hidden##ENDIF##">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>Powered by Easypop</span>
+        </a>
+      </div>
+      <div class="tw-flex-grow tw-w-1/2 tw-text-right">
+        <a href="#" title="Close popup" class="closeBtn";">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x ezy-btn--round--fill"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </a>
+      </div>
+    </div>
 
-          const checkCondition = (trigger) => {
-            if (trigger.triggerType === "url") {
-              if (trigger.matchingFormat === "contains") {
-                urlTrigger = window.location.href.includes(
-                  trigger.matchingInput
-                );
-                if (urlTrigger) {
-                  return trigger.triggerType === "url";
-                }
-              } else if (trigger.matchingFormat === "matches") {
-                urlTrigger = window.location.href === trigger.matchingInput;
-                if (urlTrigger) {
-                  return trigger.triggerType === "url";
-                }
-              }
-            } else if (trigger.triggerType === "cart-size") {
-              if (trigger.matchingFormat === "greater") {
-                if (cartData.item_count > trigger.matchingInput) {
-                  return trigger.triggerType === "cart-size";
-                }
-              } else if (trigger.matchingFormat === "less") {
-                if (cartData.item_count < trigger.matchingInput) {
-                  return trigger.triggerType === "cart-size";
-                }
-              }
-            } else if (trigger.triggerType === "cart-value") {
-              if (trigger.matchingFormat === "greater") {
-                if (cartData.total_price / 100 > trigger.matchingInput) {
-                  return trigger.triggerType === "cart-value";
-                }
-              } else if (trigger.matchingFormat === "less") {
-                if (cartData.total_price / 100 < trigger.matchingInput) {
-                  return trigger.triggerType === "cart-value";
-                }
-              }
-            } else if (trigger.triggerType === "product-in-cart") {
-              if (trigger.matchingFormat === "contains") {
-                let matchingCartItems = cartData.items.find((item) =>
-                  item.title.includes(trigger.matchingInput)
-                );
-                if (matchingCartItems != undefined) {
-                  return trigger.triggerType === "product-in-cart";
-                }
-              } else if (trigger.matchingFormat === "matches") {
-                let matchingCartItems = cartData.items.find(
-                  (item) => item.title === trigger.matchingInput
-                );
-                if (matchingCartItems != undefined) {
-                  return trigger.triggerType === "product-in-cart";
-                }
-              }
-            } else if (scrolled) {
-              return trigger.triggerType === "scroll-depth";
-            } else if (trigger.triggerType === "time-on-page") {
-              if (timerElapsed) {
-                return trigger.triggerType === "time-on-page";
-              }
-            } else if (trigger.triggerType === "exit-intent") {
-              if (exit) {
-                return trigger.triggerType === "exit-intent";
-              }
-            }
-          };
+    <section class="ezy-style-box__content" style="
+      background-color:##BACKGROUND_COLOR##;
+      border-radius:##BORDER_RADIUS##;">
+      <!-- CONTENT -->
+<section>
+  <div class="tw-flex tw-flex-row tw-flex-wrap tw-justify-center">
+    <!-- ##IF IMAGE## -->
+    <div class="tw-w-full sm:tw-w-1/2">
+      <div>
+        <img class="ezy-style-modal__content__image" src="##IMAGE_SRC##"/>
+      </div>
+    </div>
+    <!-- ##ENDIF## -->
+    <div class="tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center tw-p-4 tw-md:p-8">
+      <div>
+        <h3 class="ezy-type__headline--bold-1 tw-mb-2">##HEADLINE##</h3>
+        <p class="tw-mb-4">
+          ##BODY##
+        </p>
+        <a class="ezy-btn tw-w-full" href="##BUTTON_URL##"
+          style="
+            background-color:##BUTTON_COLOR##;
+            border-radius:##BORDER_RADIUS##;">##BUTTON_TEXT##</a>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- END CONTENT -->
 
-          const trapFocus = (element) => {
-            const modal = element;
-            const focusableElements =
-              'a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])';
-            const firstFocusableElement = modal.querySelectorAll(
-              focusableElements
-            )[0];
-            const focusableContent = modal.querySelectorAll(focusableElements);
-            const lastFocusableElement =
-              focusableContent[focusableContent.length - 1];
 
-            document.addEventListener("keydown", function (e) {
-              let isTabPressed = e.key === "Tab" || e.keyCode === 9;
+    </section>
 
-              if (!isTabPressed) {
-                return;
-              }
 
-              // if shift key pressed for shift + tab combination
-              if (e.shiftKey) {
-                if (document.activeElement === firstFocusableElement) {
-                  lastFocusableElement.focus();
-                  e.preventDefault();
-                }
-              }
+            `;
 
-              // if tab key is pressed
-              else {
-                if (document.activeElement === lastFocusableElement) {
-                  firstFocusableElement.focus();
-                  e.preventDefault();
-                }
-              }
-            });
-          };
-
-          // CHECK FUNCTION
-          function check() {
-            console.log("checked");
-
-            let conditionsMatched;
-            if (condition === "all") {
-              conditionsMatched = triggers.every(checkCondition);
-            } else if (condition === "any") {
-              conditionsMatched = triggers.some(checkCondition);
-            }
-
-            let timerObj = triggers.find(
-              (trigger) => trigger.triggerType === "time-on-page"
-            );
-            if (!timerElapsed) {
-              setTimeout(
-                () => {
-                  timerElapsed = true;
-                  check();
-                },
-                timerObj ? timerObj.matchingInput * 1000 : null
-              );
-            }
-
-            if (
-              conditionsMatched &&
-              !finishedScrolling &&
-              !triggered &&
-              !localStorage.getItem(`limit_${_id}`)
+            body.appendChild(modal);
+          } else if (content.contentType === "newsletter") {
+            let success;
+            let url = window.location.href;
+            if (url.includes("?customer_posted=true")) {
+              success = "yes";
+            } else if (
+              url.includes(
+                "t?contact%5Btags%5D=prospect%2Cnewsletter&form_type=customer"
+              )
             ) {
-              console.log("conditions matched");
-              // CONTENT TYPES
-              setContentTypes();
-              modal.classList.add("open");
-              modal.classList.add("ezy-style-modal--animate");
-              setTimeout(function () {
-                modal.classList.remove("ezy-style-modal--animate");
-              }, 100);
-
-              let closeBtn = document.querySelector(".closeBtn");
-              closeBtn.addEventListener("click", (e) => {
-                modal.classList.add("ezy-style-modal--animate");
-                setTimeout(function () {
-                  modal.classList.add("tw-hidden");
-                }, 1000);
-                isOpen = false;
-              });
-              closeBtn.addEventListener("keyup", (e) => {
-                if (e.keyCode === 13) {
-                  e.preventDefault();
-                  modal.classList.add("ezy-style-modal--animate");
-                  setTimeout(function () {
-                    modal.classList.add("tw-hidden");
-                  }, 1000);
-                  isOpen = false;
-                }
-              });
-
-              // MAIN BUTTON AS CLOSE BUTTON FUNC
-              let mainBtn = document.querySelector(".main-btn");
-
-              if (content.buttonClose && mainBtn != null) {
-                mainBtn.addEventListener("click", (e) => {
-                  e.preventDefault();
-                  modal.classList.add("ezy-style-modal--animate");
-                  setTimeout(function () {
-                    modal.classList.add("tw-hidden");
-                  }, 1000);
-                  isOpen = false;
-                });
-                mainBtn.addEventListener("keyup", (e) => {
-                  if (e.keyCode === 13) {
-                    e.preventDefault();
-                    modal.classList.add("ezy-style-modal--animate");
-                    setTimeout(function () {
-                      modal.classList.add("tw-hidden");
-                    }, 1000);
-                    isOpen = false;
-                  }
-                });
-              }
-
-              modal.addEventListener("click", function (e) {
-                if (e.target == this) {
-                  modal.classList.add("ezy-style-modal--animate");
-                  setTimeout(function () {
-                    modal.classList.add("tw-hidden");
-                  }, 1000);
-                }
-              });
-
-              trapFocus(modal);
-
-              if (
-                triggers.some((trigger) => {
-                  // exit intent
-                  return trigger.triggerType === "scroll-depth";
-                })
-              ) {
-                finishedScrolling = true;
-              }
-              document.removeEventListener("mouseout", mouseEvent);
+              success = "no";
             }
-          }
-          check();
 
-          // Cart catch
-          (function (ns, fetch) {
-            console.log("im an  iffee");
-            if (typeof fetch !== "function") return;
+            modal.innerHTML = `
+            <section class="ezy-style-box__window">
 
-            ns.fetch = function () {
-              const response = fetch.apply(this, arguments);
-
-              response.then((res) => {
-                if (
-                  [
-                    `${window.location.origin}/cart/add.js`,
-                    `${window.location.origin}/cart/update.js`,
-                    `${window.location.origin}/cart/change.js`,
-                    `${window.location.origin}/cart/clear.js`,
-                  ].includes(res.url)
-                ) {
-                  res
-                    .clone()
-                    .json()
-                    .then((data) => {
-                      cartDataFetch = fetchCartInfo();
-                      cartDataFetch.then((cart) => {
-                        cartData = cart;
-                        check();
-                      });
-                    });
-                }
-              });
-
-              return response;
+            <div class="ezy-style-box__close tw-flex tw-flex-wrap tw-justify-center">
+              <div class="tw-flex-grow tw-flex tw-w-1/2">
+                <a href="https://brickspacelab.com/" target="_blank" class="ezy-tooltip ezy-tooltip--fill tw-self-center
+                  ##IF PAID_PLAN##tw-hidden##ENDIF##">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  <span>Powered by Easypop</span>
+                </a>
+              </div>
+              <div class="tw-flex-grow tw-w-1/2 tw-text-right">
+                <a href="#" title="Close popup" onclick="ezy.boxes.closeAll();">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x ezy-btn--round--fill"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </a>
+              </div>
+            </div>
+        
+            <section class="ezy-style-box__content" style="
+              background-color:##BACKGROUND_COLOR##;
+              border-radius:##BORDER_RADIUS##;">
+              <!-- CONTENT -->
+        <section>
+          <div class="tw-flex tw-flex-row tw-flex-wrap tw-justify-center">
+        
+            <!-- ##IF IMAGE## -->
+            <div class="tw-w-full sm:tw-w-1/2">
+              <div>
+                <img class="ezy-style-modal__content__image" src="##IMAGE_SRC##" />
+              </div>
+            </div>
+            <!-- ##ENDIF## -->
+        
+            <div class="tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center tw-p-4 tw-md:p-8">
+              <div>
+                <h3 class="ezy-type__headline--bold-1 tw-mb-2">
+                  ##HEADLINE##
+                </h3>
+                <p class="tw-mb-4">##BODY##</p>
+                <form
+                  method="post"
+                  action="/contact#contact_form"
+                  id="contact_form"
+                  accept-charset="UTF-8"
+                  class="contact-form">
+        
+                  <input
+                    type="hidden"
+                    name="form_type"
+                    value="customer" />
+                  <input
+                    type="hidden"
+                    name="utf8"
+                    value="✓" />
+                  <input
+                    id="contact_tags"
+                    name="contact[tags]"
+                    type="hidden"
+                    value="easypop" />
+                  <input
+                    class="tw-mb-2"
+                    id="contact_email"
+                    name="contact[email]"
+                    type="email" />
+                  <input
+                    class="ezy-btn tw-w-full"
+                    type="submit"
+                    value="##BUTTON_TEXT##"
+                    style="
+                      background-color:##BUTTON_COLOR##;
+                      border-radius:##BORDER_RADIUS##;" />
+        
+                  <!-- ##IF SUCCESS## -->
+                    <div class="tw-bg-black tw-bg-opacity-10 tw-mt-2 tw-p-2"
+                      style="border-radius:##BORDER_RADIUS##;">
+                      ##SUCCESS_MESSAGE##
+                    </div>
+                  <!-- ##ELSE## -->
+                    <div class="tw-bg-black tw-bg-opacity-10 tw-mt-2 tw-p-2"
+                      style="border-radius:##BORDER_RADIUS##;">
+                      ##ERROR_MESSAGE##
+                    </div>
+                  <!-- ##ENDIF## -->
+        
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- END CONTENT -->
+        
+        
+            </section>
+        `;
+            body.appendChild(modal);
+          } else if (content.contentType === "cart-progress-bar") {
+            // for local testing
+            let cartData = {
+              total_price: 49900,
             };
-          })(window, window.fetch);
-
-          // Cart catch XHR
-          const open = window.XMLHttpRequest.prototype.open;
-
-          function openReplacement() {
-            this.addEventListener("load", function () {
-              if (
-                [
-                  "/cart/add.js",
-                  "/cart/update.js",
-                  "/cart/change.js",
-                  "/cart/clear.js",
-                ].includes(this._url)
-              ) {
-                updateCartInfo(this.response);
-              }
-            });
-            return open.apply(this, arguments);
-          }
-
-          window.XMLHttpRequest.prototype.open = openReplacement;
-
-          // cart check Fetch
-          (function (ns, fetch) {
-            if (typeof fetch !== "function") return;
-
-            ns.fetch = function () {
-              const response = fetch.apply(this, arguments);
-
-              response.then((res) => {
-                if (
-                  [
-                    `${window.location.origin}/cart/add.js`,
-                    `${window.location.origin}/cart/update.js`,
-                    `${window.location.origin}/cart/change.js`,
-                    `${window.location.origin}/cart/clear.js`,
-                  ].includes(res.url)
-                ) {
-                  res
-                    .clone()
-                    .json()
-                    .then((data) => console.log(data));
-                }
-              });
-
-              return response;
-            };
-          })(window, window.fetch);
-
-          // EXIT INTENT CHECK
-          const mouseEvent = (e) => {
-            const shouldShowExitIntent =
-              !e.toElement && !e.relatedTarget && e.clientY < 10;
-
-            if (shouldShowExitIntent) {
-              // document.removeEventListener("mouseout", mouseEvent); not removing cuz we wanna check every time
-              // Handling delay here
-              // flip the exit switch
-              exit = true;
-              check();
-            }
-          };
-          if (
-            triggers.some((trigger) => {
-              // exit intent
-              return trigger.triggerType === "exit-intent";
-            })
-          ) {
-            document.addEventListener("mouseout", mouseEvent);
-          }
-
-          // SCROLL DEPTH CHECK
-          const catchModal = () => {
-            scrollpos = window.scrollY;
-            let scrollObj = triggers.find(
-              (trigger) => trigger.triggerType === "scroll-depth"
-            );
-            if (!scrolled) {
-              if (scrollpos >= scrollObj.matchingInput) {
-                console.log("found");
-                scrolled = true;
-                check();
-              }
-
-              console.log("catching");
+            let cartProgress;
+            if (cartData.total_price === 0) {
+              cartProgress = 0;
             } else {
-              console.log("remove listener");
-              document.removeEventListener("scroll", catchModal);
+              cartProgress =
+                (cartData.total_price / 100 / content.cartGoalValue) * 100;
             }
-          };
 
-          if (
-            triggers.some((trigger) => {
-              // exit intent
-              return trigger.triggerType === "scroll-depth";
-            })
-          ) {
-            document.addEventListener("scroll", catchModal);
+            let remainder = cartData.total_price / 100 - content.cartGoalValue;
+
+            modal.innerHTML = `
+            <section class="ezy-style-box__window">
+
+    <div class="ezy-style-box__close tw-flex tw-flex-wrap tw-justify-center">
+      <div class="tw-flex-grow tw-flex tw-w-1/2">
+        <a href="https://brickspacelab.com/" target="_blank" class="ezy-tooltip ezy-tooltip--fill tw-self-center
+          ##IF PAID_PLAN##tw-hidden##ENDIF##">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>Powered by Easypop</span>
+        </a>
+      </div>
+      <div class="tw-flex-grow tw-w-1/2 tw-text-right">
+        <a href="#" title="Close popup" onclick="ezy.boxes.closeAll();">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x ezy-btn--round--fill"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </a>
+      </div>
+    </div>
+
+    <section class="ezy-style-box__content" style="
+      background-color:##BACKGROUND_COLOR##;
+      border-radius:##BORDER_RADIUS##;">
+      <!-- CONTENT -->
+<section>
+  <div class="tw-flex tw-flex-row tw-flex-wrap tw-justify-center">
+    <div class="tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center">
+      <div class="tw-w-full">
+
+        <section class="tw-border-b tw-border-gray-200 tw-p-4">
+          <p class="tw-mb-1">You're $xx.xx away from ##GOAL_TEXT##.</p>
+          <p class="tw-mb-1">##SUCESS_TEXT##.</p>
+          <div class="ezy-progressbar"
+            style="
+              background-color:##BUTTON_COLOR##;
+              border-radius:##BORDER_RADIUS##;">
+            <div class="ezy-progressbar__inner" style="width:66%;">
+            </div>
+          </div>
+        </section>
+
+        <section class="tw-p-4 tw-md:p-8">
+          <h3 class="ezy-type__headline--bold-1 tw-mb-2">##HEADLINE##</h3>
+          <p class="tw-mb-4">
+            ##BODY##
+          </p>
+
+          <a class="ezy-btn tw-w-full" href="##BUTTON_URL##"
+            style="
+              background-color:##BUTTON_COLOR##;
+              border-radius:##BORDER_RADIUS##;">
+            ##BUTTON_TEXT##
+          </a>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</section>
+<!-- END CONTENT -->
+
+
+    </section>
+
+            
+          
+          `;
+            body.appendChild(modal);
+          } else if (content.contentType === "product-feed") {
+            const products = content.selectedProducts[0].selection;
+            modal.innerHTML = `
+            
+            <section class="ezy-style-box__window">
+
+    <div class="ezy-style-box__close tw-flex tw-flex-wrap tw-justify-center">
+      <div class="tw-flex-grow tw-flex tw-w-1/2">
+        <a href="https://brickspacelab.com/" target="_blank" class="ezy-tooltip ezy-tooltip--fill tw-self-center
+          ##IF PAID_PLAN##tw-hidden##ENDIF##">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>Powered by Easypop</span>
+        </a>
+      </div>
+      <div class="tw-flex-grow tw-w-1/2 tw-text-right">
+        <a href="#" title="Close popup" onclick="ezy.boxes.closeAll();">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x ezy-btn--round--fill"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </a>
+      </div>
+    </div>
+
+    <section class="ezy-style-box__content" style="
+      background-color:##BACKGROUND_COLOR##;
+      border-radius:##BORDER_RADIUS##;">
+      <!-- CONTENT -->
+<div class="tw-flex tw-flex-row tw-flex-wrap">
+  <div class="tw-w-full sm:tw-w-full tw-flex tw-justify-center tw-items-center">
+    <div class="tw-overflow-hidden">
+      <div class="tw-p-4 tw-max-w-prose">
+        <h3 class="ezy-type__headline--bold-1">##HEADLINE##</h3>
+        <p>
+          ##BODY##
+        </p>
+      </div>
+      <div class="ezy-type-productfeed__arrows">
+        <div class="ezy-type-productfeed__back">
+          <button class="js:ezy-scrollArrowButtons" data-scroll-direction="0" data-scroll-container="ezy-type-productfeed">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left ezy-btn--round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          </button>
+        </div>
+        <div class="ezy-type-productfeed__next">
+          <button class="js:ezy-scrollArrowButtons" data-scroll-direction="1" data-scroll-container="ezy-type-productfeed">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right ezy-btn--round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+        </div>
+      </div>
+      <div class="ezy-type-productfeed">
+
+        <!-- FOR PRODUCT IN PRODUCTS -->
+        <div class="ezy-type-productfeed__item">
+          <img class="image--square" src="https://images.unsplash.com/photo-1602607203559-d38903b80507?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3898&q=80"/>
+          <div class="tw-px-2 tw-py-4">
+            <p>##PRODUCT_TITLE##</p>
+            <p class="tw-pb-2">$<span class="tw-pb-2 js:ezy-productPrice">##PRICE##</span></p>
+            <select id="id" name="id" class="ezy-select tw-mb-2 js:ezy-changeVariantSelects">
+              <!-- FOR VARIANT IN VARIANTS -->
+              <option value="##VARIANT_ID##" data-variant-availability="##VARIANT_AVAILABLE##" data-variant-price="##VARIANT_PRICE##">##VARIANT_TITLE##</option>
+              <option value="##VARIANT_ID##" data-variant-availability="##VARIANT_AVAILABLE##" data-variant-price="##VARIANT_PRICE##">##VARIANT_TITLE##</option>
+              <option value="36804582244502" data-variant-availability="true" data-variant-price="16.00">Blue/black</option>
+              <!-- ENDFOR -->
+            </select>
+            <button class="ezy-btn js:ezy-addVariantButtons tw-w-full" data-variant-id="##FIRST_AVAIALBLE_VARIANT_ID##"
+              style="
+                background-color:##BUTTON_COLOR##;
+                border-radius:##BORDER_RADIUS##;">
+              <span class="ezy-btn__text">
+                Add to cart
+              </span>
+              <span class="ezy-btn__spinner">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-loader"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+              </button>
+            </a>
+          </div>
+        </div>
+        <!-- ENDFOR -->
+
+        <div class="ezy-type-productfeed__item">
+          <img class="image--square" src="https://images.unsplash.com/photo-1602607203559-d38903b80507?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3898&q=80"/>
+          <div class="tw-px-2 tw-py-4">
+            <p>Title</p>
+            <p class="tw-pb-2">$<span class="tw-pb-2 js:ezy-productPrice">4.00</span></p>
+            <select id="id" name="id" class="ezy-select tw-mb-2 js:ezy-changeVariantSelects">
+              <!-- FOR VARIANT IN VARIANTS -->
+              <option value="36804582244502" data-variant-availability="true" data-variant-price="4.00">Black</option>
+              <option value="36804582244502" data-variant-availability="false" data-variant-price="3.00">Pink/Black</option>
+              <option value="36804582244502" data-variant-availability="true" data-variant-price="16.00">Blue/Black</option>
+              <!-- ENDFOR -->
+            </select>
+            <button class="ezy-btn js:ezy-addVariantButtons tw-w-full" data-variant-id="##FIRST_AVAIALBLE_VARIANT_ID##">
+              <span class="ezy-btn__text">
+                Add to cart
+              </span>
+              <span class="ezy-btn__spinner">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-loader"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+              </button>
+            </a>
+          </div>
+        </div>
+        <div class="ezy-type-productfeed__item">
+          <img class="image--square" src="https://images.unsplash.com/photo-1602607203559-d38903b80507?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3898&q=80"/>
+          <div class="tw-px-2 tw-py-4">
+            <p>Title</p>
+            <p class="tw-pb-2">$<span class="tw-pb-2 js:ezy-productPrice">4.00</span></p>
+            <select id="id" name="id" class="ezy-select tw-mb-2 js:ezy-changeVariantSelects">
+              <!-- FOR VARIANT IN VARIANTS -->
+              <option value="36804582244502" data-variant-availability="true" data-variant-price="4.00">Black</option>
+              <option value="36804582244502" data-variant-availability="false" data-variant-price="3.00">Pink/Black</option>
+              <option value="36804582244502" data-variant-availability="true" data-variant-price="16.00">Blue/Black</option>
+              <!-- ENDFOR -->
+            </select>
+            <button class="ezy-btn js:ezy-addVariantButtons tw-w-full" data-variant-id="##FIRST_AVAIALBLE_VARIANT_ID##">
+              <span class="ezy-btn__text">
+                Add to cart
+              </span>
+              <span class="ezy-btn__spinner">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-loader"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+              </button>
+            </a>
+          </div>
+        </div>
+        <div class="ezy-type-productfeed__item">
+          <img class="image--square" src="https://images.unsplash.com/photo-1602607203559-d38903b80507?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3898&q=80"/>
+          <div class="tw-px-2 tw-py-4">
+            <p>Title</p>
+            <p class="tw-pb-2">$<span class="tw-pb-2 js:ezy-productPrice">4.00</span></p>
+            <select id="id" name="id" class="ezy-select tw-mb-2 js:ezy-changeVariantSelects">
+              <!-- FOR VARIANT IN VARIANTS -->
+              <option value="36804582244502" data-variant-availability="true" data-variant-price="4.00">Black</option>
+              <option value="36804582244502" data-variant-availability="false" data-variant-price="3.00">Pink/Black</option>
+              <option value="36804582244502" data-variant-availability="true" data-variant-price="16.00">Blue/Black</option>
+              <!-- ENDFOR -->
+            </select>
+            <button class="ezy-btn js:ezy-addVariantButtons tw-w-full" data-variant-id="##FIRST_AVAIALBLE_VARIANT_ID##">
+              <span class="ezy-btn__text">
+                Add to cart
+              </span>
+              <span class="ezy-btn__spinner">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-loader"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+              </button>
+            </a>
+          </div>
+        </div>
+        <div class="ezy-type-productfeed__item">
+          <img class="image--square" src="https://images.unsplash.com/photo-1602607203559-d38903b80507?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3898&q=80"/>
+          <div class="tw-px-2 tw-py-4">
+            <p>Title</p>
+            <p class="tw-pb-2">$<span class="tw-pb-2 js:ezy-productPrice">4.00</span></p>
+            <select id="id" name="id" class="ezy-select tw-mb-2 js:ezy-changeVariantSelects">
+              <!-- FOR VARIANT IN VARIANTS -->
+              <option value="36804582244502" data-variant-availability="true" data-variant-price="4.00">Black</option>
+              <option value="36804582244502" data-variant-availability="false" data-variant-price="3.00">Pink/Black</option>
+              <option value="36804582244502" data-variant-availability="true" data-variant-price="16.00">Blue/Black</option>
+              <!-- ENDFOR -->
+            </select>
+            <button class="ezy-btn js:ezy-addVariantButtons tw-w-full" data-variant-id="##FIRST_AVAIALBLE_VARIANT_ID##"
+              style="
+                background-color:##BUTTON_COLOR##;
+                border-radius:##BORDER_RADIUS##;">
+              <span class="ezy-btn__text">
+                Add to cart
+              </span>
+              <span class="ezy-btn__spinner">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-loader"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+              </button>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+</section>`;
+
+            body.appendChild(modal);
+            var ezy = ezy || {};
+            ezy.productfeed = {
+              // simple fetch call
+              fetch: function (
+                requestType,
+                url,
+                data,
+                contentType,
+                successCallback,
+                errorCallback
+              ) {
+                fetch(url, {
+                  method: requestType,
+                  headers: {
+                    "Content-Type": contentType,
+                    Accept: contentType,
+                    "X-Requested-With": "xmlhttprequest",
+                  },
+                  body: JSON.stringify(data),
+                })
+                  .then((response) => response.json())
+                  .then((data) => {
+                    successCallback(data);
+                  })
+                  .catch((error) => {
+                    errorCallback(error);
+                  });
+              },
+
+              // initilize product feed
+              init: function () {
+                // add variant to cart
+                function addVariant(variantID, quantity, callback) {
+                  let data = {
+                    items: [
+                      {
+                        id: variantID,
+                        quantity: quantity,
+                      },
+                    ],
+                  };
+                  ezy.productfeed.fetch(
+                    "POST",
+                    "/cart/add.js",
+                    data,
+                    "application/json; charset=utf-8",
+
+                    // success
+                    function (data) {
+                      console.log(data);
+                      if (typeof callback === "function" && callback()) {
+                        window.setTimeout(function () {
+                          callback();
+                        }, 500);
+                      }
+                    },
+
+                    // error
+                    function (error) {
+                      if (typeof callback === "function" && callback()) {
+                        window.setTimeout(function () {
+                          callback();
+                        }, 500);
+                      }
+                    }
+                  );
+                }
+
+                // scroll container horizontally
+                function scrollHorizontally(element, direction) {
+                  if (direction == 0) {
+                    element.scroll({
+                      left: element.scrollLeft - 350,
+                      behavior: "smooth",
+                    });
+                  } else {
+                    element.scroll({
+                      left: element.scrollLeft + 350,
+                      behavior: "smooth",
+                    });
+                  }
+                }
+
+                // toggle loading state of button
+                function toggleButton(button) {
+                  if (button.classList.contains("ezy-btn--loading")) {
+                    button.classList.remove("ezy-btn--loading");
+                    button.disabled = false;
+                  } else {
+                    button.classList.add("ezy-btn--loading");
+                    button.disabled = true;
+                  }
+                }
+
+                // add disabled state to button
+                function disableButton(button) {
+                  button.classList.add("ezy-btn--disabled");
+                  button.disabled = true;
+                }
+
+                // add enabled state to button
+                function enableButton(button) {
+                  button.classList.remove("ezy-btn--disabled");
+                  button.disabled = false;
+                }
+
+                // listen for click on scroll arrows
+                var scrollArrowButtons = document.getElementsByClassName(
+                  "js:ezy-scrollArrowButtons"
+                );
+                Array.from(scrollArrowButtons).forEach(function (
+                  scrollArrowButton
+                ) {
+                  scrollArrowButton.addEventListener("click", function (e) {
+                    let scrollContainerClass = this.getAttribute(
+                      "data-scroll-container"
+                    );
+                    let scrollDirection = this.getAttribute(
+                      "data-scroll-direction"
+                    );
+                    var scrollContainers = document.getElementsByClassName(
+                      scrollContainerClass
+                    );
+                    Array.from(scrollContainers).forEach(function (
+                      scrollContainer
+                    ) {
+                      scrollHorizontally(scrollContainer, scrollDirection);
+                    });
+                  });
+                });
+
+                // listen for click on atc
+                var addVariantButtons = document.getElementsByClassName(
+                  "js:ezy-addVariantButtons"
+                );
+                Array.from(addVariantButtons).forEach(function (
+                  addVariantButton
+                ) {
+                  addVariantButton.addEventListener("click", function (e) {
+                    let variantId = this.getAttribute("data-variant-id");
+                    showNotification("Product was added to the cart!");
+                    toggleButton(addVariantButton);
+                    addVariant(variantId, 1, function () {
+                      toggleButton(addVariantButton);
+                    });
+                    if (content.closingBehav === "close") {
+                      modal.classList.add("ezy-style-modal--animate");
+                      setTimeout(function () {
+                        modal.classList.add("tw-hidden");
+                      }, 1000);
+                    }
+                  });
+                });
+
+                // listen for change to for variant select
+                var changeVariantSelects = document.getElementsByClassName(
+                  "js:ezy-changeVariantSelects"
+                );
+                Array.from(changeVariantSelects).forEach(function (
+                  changeVariantSelect
+                ) {
+                  changeVariantSelect.addEventListener("change", function () {
+                    let variantAvailability = this.options[
+                      this.selectedIndex
+                    ].getAttribute("data-variant-availability");
+                    let variantPrice = this.options[
+                      this.selectedIndex
+                    ].getAttribute("data-variant-price");
+                    let variantId = this.options[this.selectedIndex].value;
+                    let productItem = this.closest(
+                      ".ezy-type-productfeed__item"
+                    );
+                    let button = productItem.getElementsByClassName(
+                      "js:ezy-addVariantButtons"
+                    )[0];
+
+                    // update variant id in button
+                    button.setAttribute("data-variant-id", variantId);
+
+                    // update price in item
+                    productItem.getElementsByClassName(
+                      "js:ezy-productPrice"
+                    )[0].innerHTML = variantPrice;
+
+                    // check availability and update state
+                    if (variantAvailability == "true") {
+                      enableButton(button);
+                    } else {
+                      disableButton(button);
+                    }
+                  });
+                  // Create a new 'change' event
+                  var event = new Event("change");
+                  changeVariantSelect.dispatchEvent(event);
+                });
+                let showNotification = function (message) {
+                  var notification = document.querySelector(
+                    ".ezy-notification"
+                  );
+                  // for (var i = 0; i < notifications.length; i++) {
+                  //   let notification = notifications[i];
+                  //   let messageElement = notification.querySelector("span");
+                  //   if (message) {
+                  //     messageElement.innerHTML = message;
+                  //   }
+                  //   notification.classList.add("ezy-notification--animate");
+                  //   setTimeout(function () {
+                  //     notification.classList.remove(
+                  //       "ezy-notification--animate"
+                  //     );
+                  //   }, 3000);
+                  // }
+                  notification.innerHTML = message;
+                  notification.classList.add("ezy-notification--animate");
+                  setTimeout(function () {
+                    notification.classList.remove("ezy-notification--animate");
+                  }, 3000);
+                };
+              },
+            };
+            ezy.productfeed.init();
+          } else if (content.contentType === "custom-html") {
+            body.appendChild(modal);
           }
-        };
-
-        // MATCH CONDITIONS -------------------------------------------------------------------
-        if (triggerMatch === "all") {
-          console.log("all triggers are matched");
-          createModal("all");
-        } else if (triggerMatch === "any") {
-          console.log("any triggers are matched");
-          createModal("any");
         }
+
+        initiateSettings();
       }
     });
   } catch (err) {
