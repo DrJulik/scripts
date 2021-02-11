@@ -136,8 +136,7 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-var ezshop = window.location.href.split("https://").pop().split("/")[0];
-
+// const ezshop = window.location.href.split("https://").pop().split("/")[0];
 var fetchCampaignInfo = /*#__PURE__*/function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
     var res, responseJson;
@@ -146,7 +145,7 @@ var fetchCampaignInfo = /*#__PURE__*/function () {
         switch (_context.prev = _context.next) {
           case 0:
             _context.next = 2;
-            return fetch("https://easypop.herokuapp.com/api/campaigns/".concat(ezshop), {
+            return fetch("https://easypop.herokuapp.com/api/campaigns/freebiesdebug.myshopify.com", {
               method: "GET",
               headers: {
                 "Content-Type": "application/json"
@@ -173,44 +172,17 @@ var fetchCampaignInfo = /*#__PURE__*/function () {
   return function fetchCampaignInfo() {
     return _ref.apply(this, arguments);
   };
-}();
-
-var fetchCartInfo = /*#__PURE__*/function () {
-  var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-    var res, responseJson;
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
-      while (1) {
-        switch (_context2.prev = _context2.next) {
-          case 0:
-            _context2.next = 2;
-            return fetch("/cart.js", {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json"
-              }
-            });
-
-          case 2:
-            res = _context2.sent;
-            _context2.next = 5;
-            return res.json();
-
-          case 5:
-            responseJson = _context2.sent;
-            return _context2.abrupt("return", responseJson);
-
-          case 7:
-          case "end":
-            return _context2.stop();
-        }
-      }
-    }, _callee2);
-  }));
-
-  return function fetchCartInfo() {
-    return _ref2.apply(this, arguments);
-  };
-}(); // MUTATION OBSERVER TO WATCH FOR CLASS CHANGES
+}(); // const fetchCartInfo = async () => {
+//   const res = await fetch(`/cart.js`, {
+//     method: "GET",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//   });
+//   const responseJson = await res.json();
+//   return responseJson;
+// };
+// MUTATION OBSERVER TO WATCH FOR CLASS CHANGES
 
 
 var ClassWatcher = /*#__PURE__*/function () {
@@ -281,24 +253,20 @@ var ClassWatcher = /*#__PURE__*/function () {
 }();
 
 var campaignInfo = /*#__PURE__*/function () {
-  var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
-    var campData, cartData;
-    return regeneratorRuntime.wrap(function _callee3$(_context3) {
+  var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+    var campData;
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
-        switch (_context3.prev = _context3.next) {
+        switch (_context2.prev = _context2.next) {
           case 0:
-            _context3.prev = 0;
-            _context3.next = 3;
+            _context2.prev = 0;
+            _context2.next = 3;
             return fetchCampaignInfo();
 
           case 3:
-            campData = _context3.sent;
-            _context3.next = 6;
-            return fetchCartInfo();
-
-          case 6:
-            cartData = _context3.sent;
-            console.log(cartData);
+            campData = _context2.sent;
+            // let cartData = await fetchCartInfo();
+            // console.log(cartData);
             campData.forEach(function (campaign) {
               console.log(campaign);
               var freePlan = campaign.freePlan,
@@ -313,247 +281,23 @@ var campaignInfo = /*#__PURE__*/function () {
                   primaryButtonColor = style.primaryButtonColor,
                   overlayColor = style.overlayColor;
               var triggers = settings.triggers,
-                  triggerMatch = settings.triggerMatch; // I GUESS THIS IS WHERE WE BUILD THE CAMPAIGNS
+                  triggerMatch = settings.triggerMatch; // DOM hooks
 
-              if (style.campaignType === "modal") {
-                // DOM hooks
-                var body = document.querySelector("body");
-                var modal = document.createElement("section");
-                modal.classList.add("ezy", "ezy-style-modal"); // NOTIFICATION HTML, SEPARATE FROM THE MODAL
+              var body = document.querySelector("body");
+              var modal = document.createElement("section"); // NOTIFICATION HTML, SEPARATE FROM THE MODAL
 
-                var notification = document.createElement("div");
-                notification.classList.add("ezy", "ezy-notification");
-                body.appendChild(notification);
-                var link1 = document.createElement("link");
-                link1.rel = "stylesheet";
-                link1.href = "https://cdn.jsdelivr.net/gh/DrJulik/scripts@1.0.947423/styles.min.css";
-                document.head.appendChild(link1); // SET CONTENT TYPES
+              var notification = document.createElement("div");
+              notification.classList.add("ezy", "ezy-notification");
+              body.appendChild(notification); // HOOKING UP OUR CSS
 
-                var setContentTypes = function setContentTypes() {
-                  // tw-hidden inside section
-                  if (content.contentType === "text-image") {
-                    modal.innerHTML = "\n            <!-- TEMPLATE STARTS -->\n\n  <section class=\"ezy-style-modal__window\">\n    <section class=\"ezy-style-modal__close\">\n      <a href=\"#\" class=\"closeBtn\" title=\"Close popup modal\"\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-x ezy-btn--round--clear\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line></svg>\n      </a>\n    </section>\n    <section class=\"ezy-style-modal__content\"\n      style=\"\n        background-color:".concat(style.backgroundColor, ";\n        border-radius:").concat(style.borderRadius, "px\">\n\n      <section>\n        \n<!-- CONTENT -->\n<section>\n  <div class=\"tw-flex tw-flex-row tw-flex-wrap tw-justify-center\">\n    <!-- ##IF IMAGE## -->\n    ").concat(content.imgUrl !== "" ? "<div class=\"tw-w-full sm:tw-w-1/2\"> \n      <div>\n        <img class=\"ezy-style-modal__content__image\" src=\"".concat(content.imgUrl, "\"/>\n      </div>\n    </div>") : "", "\n   \n    <!-- ##ENDIF## -->\n    <div class=\"tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center tw-p-4 tw-md:p-8\">\n      <div>\n        <h3 class=\"ezy-type__headline--bold-1 tw-mb-2\">").concat(content.headline, "</h3>\n        <p class=\"tw-mb-4\">\n        ").concat(content.body, "\n        </p>\n        <a class=\"main-btn ezy-btn tw-w-full\" href=\"").concat(content.buttonUrl, "\"\n          style=\"\n            background-color:").concat(style.primaryButtonColor, ";\n            border-radius:").concat(style.borderRadius, "px\">").concat(content.buttonText, "</a>\n      </div>\n    </div>\n  </div>\n</section>\n<!-- END CONTENT -->\n\n\n      </section>\n\n    </section>\n  </section>\n  <a href=\"https://brickspacelab.com/\" target=\"_blank\" class=\"ezy-tooltip ezy-tooltip--inverted tw-absolute tw-bottom-2 tw-left-2\n    ##IF PAID_PLAN##tw-hidden##ENDIF##\">\n    ").concat(freePlan ? "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-info\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>\n    <span>Powered by Easypop</span>" : "", "\n    \n  </a>\n\n            ");
-                    body.appendChild(modal);
-                  } else if (content.contentType === "newsletter") {
-                    var success;
-                    var url = window.location.href;
+              var link1 = document.createElement("link");
+              link1.rel = "stylesheet";
+              link1.href = "https://cdn.jsdelivr.net/gh/DrJulik/scripts@1.0.947423/styles.min.css";
+              document.head.appendChild(link1); // INITIATE SETTINGS FUNCTIONS
 
-                    if (url.includes("?customer_posted=true")) {
-                      success = "yes";
-                    } else if (url.includes("t?contact%5Btags%5D=prospect%2Cnewsletter&form_type=customer")) {
-                      success = "no";
-                    }
-
-                    modal.innerHTML = "\n            <section class=\"ezy-style-modal__window\">\n              <section class=\"ezy-style-modal__close\">\n                <a href=\"#\" class=\"closeBtn\" title=\"Close popup modal\">\n                  <svg\n                    xmlns=\"http://www.w3.org/2000/svg\"\n                    width=\"24\"\n                    height=\"24\"\n                    viewBox=\"0 0 24 24\"\n                    fill=\"none\"\n                    stroke=\"currentColor\"\n                    stroke-width=\"2\"\n                    stroke-linecap=\"round\"\n                    stroke-linejoin=\"round\"\n                    class=\"feather feather-x ezy-btn--round--clear\"\n                  >\n                    <line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line>\n                    <line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line>\n                  </svg>\n                </a>\n              </section>\n              <section\n                class=\"ezy-style-modal__content\"\n                style=\"\n                  background-color: ".concat(backgroundColor, ";\n                  border-radius: ").concat(style.borderRadius, "px;\n                \"\n              >\n              <section>\n              <div class=\"tw-flex tw-flex-row tw-flex-wrap tw-justify-center\">\n                <!-- ##IF IMAGE## -->\n                ").concat(content.imgUrl !== "" ? "\n                <div class=\"tw-w-full sm:tw-w-1/2\">\n                  <div>\n                    <img class=\"ezy-style-modal__content__image\" src=\"".concat(content.imgUrl, "\" />\n                  </div>\n                </div>\n                <!-- ##ENDIF## -->") : "", "\n            \n                <div\n                  class=\"tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center tw-p-4 tw-md:p-8\"\n                >\n                  <div>\n                    <h3 class=\"ezy-type__headline--bold-1 tw-mb-2\">\n                      ").concat(content.headline, "\n                    </h3>\n                    <p class=\"tw-mb-4\">").concat(content.body, "</p>\n                    <form\n                      method=\"post\"\n                      action=\"/contact#contact_form\"\n                      id=\"contact_form\"\n                      accept-charset=\"UTF-8\"\n                      class=\"contact-form\"\n                    >\n                      <input type=\"hidden\" name=\"form_type\" value=\"customer\" /><input\n                        type=\"hidden\"\n                        name=\"utf8\"\n                        value=\"\u2713\"\n                      />\n                      <input\n                        id=\"contact_tags\"\n                        name=\"contact[tags]\"\n                        type=\"hidden\"\n                        value=\"prospect,newsletter\"\n                      />\n            \n                      <input\n                        class=\"tw-mb-2\"\n                        id=\"contact_email\"\n                        name=\"contact[email]\"\n                        type=\"email\"\n                      />\n            \n                      <input\n                        style=\"\n            background-color: ").concat(primaryButtonColor, ";\n            border-radius: ").concat(style.borderRadius, "px;\n            \"\n                        class=\"ezy-btn tw-w-full\"\n                        type=\"submit\"\n                        value=\"").concat(content.buttonText, "\"\n                      />\n                      ").concat(success === "yes" ? "\n                      <h3 style=\"color: green\">Thank you for signing up!</h3>\n                      " : "", " ").concat(success === "no" ? "\n                      <h3 style=\"color: red\">Please input a valid email!</h3>\n                      " : "", "\n                    </form>\n                  </div>\n                </div>\n              </div>\n            </section>");
-                    body.appendChild(modal);
-                  } else if (content.contentType === "cart-progress-bar") {
-                    // for local testing
-                    // let cartData = {
-                    //   total_price: 49900,
-                    // };
-                    var cartProgress;
-
-                    if (cartData.total_price === 0) {
-                      cartProgress = 0;
-                    } else {
-                      cartProgress = cartData.total_price / 100 / content.cartGoalValue * 100;
-                    }
-
-                    var remainder = cartData.total_price / 100 - content.cartGoalValue;
-                    modal.innerHTML = "\n            <section class=\"ezy-style-modal__window\">\n              <section class=\"ezy-style-modal__close\">\n                <a href=\"#\" class=\"closeBtn\" title=\"Close popup modal\">\n                  <svg\n                    xmlns=\"http://www.w3.org/2000/svg\"\n                    width=\"24\"\n                    height=\"24\"\n                    viewBox=\"0 0 24 24\"\n                    fill=\"none\"\n                    stroke=\"currentColor\"\n                    stroke-width=\"2\"\n                    stroke-linecap=\"round\"\n                    stroke-linejoin=\"round\"\n                    class=\"feather feather-x ezy-btn--round--clear\"\n                  >\n                    <line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line>\n                    <line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line>\n                  </svg>\n                </a>\n              </section>\n              <section\n                class=\"ezy-style-modal__content\"\n                style=\"\n                  background-color: ".concat(backgroundColor, ";\n                  border-radius: ").concat(style.borderRadius, "px;\n                \"\n              >\n                <!-- CONTENT -->\n                <section>\n                  <div class=\"tw-flex tw-flex-row tw-flex-wrap tw-justify-center\">\n                    <div\n                      class=\"tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center\"\n                    >\n                      <div>\n                        <section class=\"tw-border-b tw-border-gray-200 tw-p-4\">\n                          <p class=\"tw-mb-1\">\n                          ").concat(remainder < 0 ? "You're $".concat(-remainder, " away from ").concat(content.cartGoalPrize, ".") : "".concat(content.cartSuccessMessage), "\n                          </p>\n                          <div\n                            class=\"ezy-progressbar\"\n                            style=\"\n                              \n                              border-radius: ").concat(style.borderRadius, "px;\n                            \"\n                          >\n                            <div class=\"ezy-progressbar__inner\" style=\"width: ").concat(cartProgress, "%; background-color: ").concat(primaryButtonColor, ";\"></div>\n                          </div>\n                        </section>\n          \n                        <section class=\"tw-p-4 tw-md:p-8\">\n                          <h3 class=\"ezy-type__headline--bold-1 tw-mb-2\">\n                            ").concat(content.headline, "\n                          </h3>\n                          <p class=\"tw-mb-4\">\n                            ").concat(content.body, "\n                          </p>\n          \n                          <a\n                            class=\"main-btn ezy-btn tw-w-full\"\n                            href=\"").concat(content.buttonUrl, "\"\n                            style=\"\n                              background-color: ").concat(style.primaryButtonColor, ";\n                              border-radius: ").concat(style.borderRadius, "px;\n                            \"\n                          >\n                            ").concat(content.buttonText, "\n                          </a>\n                        </section>\n                      </div>\n                    </div>\n                  </div>\n                </section>\n                <!-- END CONTENT -->\n              </section>\n            </section>\n            ").concat(freePlan ? "<a\n            href=\"https://brickspacelab.com/\"\n            target=\"_blank\"\n            class=\"ezy-tooltip ezy-tooltip--inverted tw-absolute tw-bottom-2 tw-left-2\"\n          >\n            <svg\n              xmlns=\"http://www.w3.org/2000/svg\"\n              width=\"24\"\n              height=\"24\"\n              viewBox=\"0 0 24 24\"\n              fill=\"none\"\n              stroke=\"currentColor\"\n              stroke-width=\"2\"\n              stroke-linecap=\"round\"\n              stroke-linejoin=\"round\"\n              class=\"feather feather-info\"\n            >\n              <circle cx=\"12\" cy=\"12\" r=\"10\"></circle>\n              <line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line>\n              <line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line>\n            </svg>\n            <span>Powered by Easypop</span>\n          </a>" : "", "\n            \n          \n          ");
-                    body.appendChild(modal);
-                  } else if (content.contentType === "product-feed") {
-                    var products = content.selectedProducts[0].selection;
-                    modal.innerHTML = "\n            \n            <!-- TEMPLATE STARTS -->\n  <section class=\"ezy-style-modal__window\">\n    <section class=\"ezy-style-modal__close\">\n      <a href=\"#\" class=\"closeBtn\" title=\"Close popup modal\"\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-x ezy-btn--round--clear\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line></svg>\n      </a>\n    </section>\n    <section class=\"ezy-style-modal__content\"\n      style=\"\n        background-color:".concat(style.backgroundColor, ";\n        border-radius:").concat(style.borderRadius, "\">\n      <section>\n        <!-- CONTENT -->\n<div class=\"tw-flex tw-flex-row tw-flex-wrap\">\n  <div class=\"tw-w-full sm:tw-w-full tw-flex tw-justify-center tw-items-center\">\n    <div class=\"tw-overflow-hidden\">\n      <div class=\"tw-p-4 tw-max-w-prose\">\n        <h3 class=\"ezy-type__headline--bold-1\">").concat(content.headline, "</h3>\n        <p>\n        ").concat(content.body, "\n        </p>\n      </div>\n      <div class=\"ezy-type-productfeed__arrows\">\n        <div class=\"ezy-type-productfeed__back\">\n          <button class=\"js:ezy-scrollArrowButtons\" data-scroll-direction=\"0\" data-scroll-container=\"ezy-type-productfeed\">\n            <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-arrow-left ezy-btn--round\"><line x1=\"19\" y1=\"12\" x2=\"5\" y2=\"12\"></line><polyline points=\"12 19 5 12 12 5\"></polyline></svg>\n          </button>\n        </div>\n        <div class=\"ezy-type-productfeed__next\">\n          <button class=\"js:ezy-scrollArrowButtons\" data-scroll-direction=\"1\" data-scroll-container=\"ezy-type-productfeed\">\n            <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-arrow-right ezy-btn--round\"><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"></line><polyline points=\"12 5 19 12 12 19\"></polyline></svg>\n          </button>\n        </div>\n      </div>\n      <div class=\"ezy-type-productfeed\">\n        ").concat(products.map(function (product) {
-                      return "\n          <div class=\"ezy-type-productfeed__item\">\n          <img class=\"image--square\" src=".concat(product.images[0].originalSrc, "/>\n          <div class=\"tw-px-2 tw-py-4\">\n            <p>").concat(product.title, "</p>\n            <p class=\"tw-pb-2\">$<span class=\"tw-pb-2 js:ezy-productPrice\">").concat(product.variants[0].price, "</span></p>\n            <select id=\"id\" name=\"id\" class=\"ezy-select tw-mb-2 js:ezy-changeVariantSelects\">\n              ").concat(product.variants.map(function (variant) {
-                        return "<option value=\"".concat(variant.id.split("gid://shopify/ProductVariant/").pop().split("/")[0], "\" data-variant-availability=\"").concat(variant.availableForSale, "\" data-variant-price=\"").concat(variant.price, "\">").concat(variant.title, "</option>");
-                      }), "\n            </select>\n            <button class=\"ezy-btn js:ezy-addVariantButtons tw-w-full\" style=\"background-color:").concat(style.primaryButtonColor, "\" data-variant-id=\"").concat(product.variants[0].price, "\">\n              <span class=\"ezy-btn__text\">\n                Add to cart\n              </span>\n              <span class=\"ezy-btn__spinner\">\n                <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-loader\"><line x1=\"12\" y1=\"2\" x2=\"12\" y2=\"6\"></line><line x1=\"12\" y1=\"18\" x2=\"12\" y2=\"22\"></line><line x1=\"4.93\" y1=\"4.93\" x2=\"7.76\" y2=\"7.76\"></line><line x1=\"16.24\" y1=\"16.24\" x2=\"19.07\" y2=\"19.07\"></line><line x1=\"2\" y1=\"12\" x2=\"6\" y2=\"12\"></line><line x1=\"18\" y1=\"12\" x2=\"22\" y2=\"12\"></line><line x1=\"4.93\" y1=\"19.07\" x2=\"7.76\" y2=\"16.24\"></line><line x1=\"16.24\" y1=\"7.76\" x2=\"19.07\" y2=\"4.93\"></line></svg>\n              </button>\n            </a>\n          </div>\n        </div>");
-                    }), "\n      </div>\n    </div>\n  </div>\n</div>\n</section>\n\n    </section>\n  </section>\n  <a href=\"https://brickspacelab.com/\" target=\"_blank\" class=\"ezy-tooltip ezy-tooltip--inverted tw-absolute tw-bottom-2 tw-left-2\n    ##IF PAID_PLAN##tw-hidden##ENDIF##\">\n    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-info\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>\n    <span>Powered by Easypop</span>\n  </a>\n</section>");
-                    body.appendChild(modal);
-                    var ezy = ezy || {};
-                    ezy.productfeed = {
-                      // simple fetch call
-                      fetch: function (_fetch) {
-                        function fetch(_x, _x2, _x3, _x4, _x5, _x6) {
-                          return _fetch.apply(this, arguments);
-                        }
-
-                        fetch.toString = function () {
-                          return _fetch.toString();
-                        };
-
-                        return fetch;
-                      }(function (requestType, url, data, contentType, successCallback, errorCallback) {
-                        fetch(url, {
-                          method: requestType,
-                          headers: {
-                            "Content-Type": contentType,
-                            Accept: contentType,
-                            "X-Requested-With": "xmlhttprequest"
-                          },
-                          body: JSON.stringify(data)
-                        }).then(function (response) {
-                          return response.json();
-                        }).then(function (data) {
-                          successCallback(data);
-                        }).catch(function (error) {
-                          errorCallback(error);
-                        });
-                      }),
-                      // initilize product feed
-                      init: function init() {
-                        // add variant to cart
-                        function addVariant(variantID, quantity, callback) {
-                          var data = {
-                            items: [{
-                              id: variantID,
-                              quantity: quantity
-                            }]
-                          };
-                          ezy.productfeed.fetch("POST", "/cart/add.js", data, "application/json; charset=utf-8", // success
-                          function (data) {
-                            console.log(data);
-
-                            if (typeof callback === "function" && callback()) {
-                              window.setTimeout(function () {
-                                callback();
-                              }, 500);
-                            }
-                          }, // error
-                          function (error) {
-                            if (typeof callback === "function" && callback()) {
-                              window.setTimeout(function () {
-                                callback();
-                              }, 500);
-                            }
-                          });
-                        } // scroll container horizontally
-
-
-                        function scrollHorizontally(element, direction) {
-                          if (direction == 0) {
-                            element.scroll({
-                              left: element.scrollLeft - 350,
-                              behavior: "smooth"
-                            });
-                          } else {
-                            element.scroll({
-                              left: element.scrollLeft + 350,
-                              behavior: "smooth"
-                            });
-                          }
-                        } // toggle loading state of button
-
-
-                        function toggleButton(button) {
-                          if (button.classList.contains("ezy-btn--loading")) {
-                            button.classList.remove("ezy-btn--loading");
-                            button.disabled = false;
-                          } else {
-                            button.classList.add("ezy-btn--loading");
-                            button.disabled = true;
-                          }
-                        } // add disabled state to button
-
-
-                        function disableButton(button) {
-                          button.classList.add("ezy-btn--disabled");
-                          button.disabled = true;
-                        } // add enabled state to button
-
-
-                        function enableButton(button) {
-                          button.classList.remove("ezy-btn--disabled");
-                          button.disabled = false;
-                        } // listen for click on scroll arrows
-
-
-                        var scrollArrowButtons = document.getElementsByClassName("js:ezy-scrollArrowButtons");
-                        Array.from(scrollArrowButtons).forEach(function (scrollArrowButton) {
-                          scrollArrowButton.addEventListener("click", function (e) {
-                            var scrollContainerClass = this.getAttribute("data-scroll-container");
-                            var scrollDirection = this.getAttribute("data-scroll-direction");
-                            var scrollContainers = document.getElementsByClassName(scrollContainerClass);
-                            Array.from(scrollContainers).forEach(function (scrollContainer) {
-                              scrollHorizontally(scrollContainer, scrollDirection);
-                            });
-                          });
-                        }); // listen for click on atc
-
-                        var addVariantButtons = document.getElementsByClassName("js:ezy-addVariantButtons");
-                        Array.from(addVariantButtons).forEach(function (addVariantButton) {
-                          addVariantButton.addEventListener("click", function (e) {
-                            var variantId = this.getAttribute("data-variant-id");
-                            showNotification("Product was added to the cart!");
-                            toggleButton(addVariantButton);
-                            addVariant(variantId, 1, function () {
-                              toggleButton(addVariantButton);
-                            });
-
-                            if (content.closingBehav === "close") {
-                              modal.classList.add("ezy-style-modal--animate");
-                              setTimeout(function () {
-                                modal.classList.add("tw-hidden");
-                              }, 1000);
-                            }
-                          });
-                        }); // listen for change to for variant select
-
-                        var changeVariantSelects = document.getElementsByClassName("js:ezy-changeVariantSelects");
-                        Array.from(changeVariantSelects).forEach(function (changeVariantSelect) {
-                          changeVariantSelect.addEventListener("change", function () {
-                            var variantAvailability = this.options[this.selectedIndex].getAttribute("data-variant-availability");
-                            var variantPrice = this.options[this.selectedIndex].getAttribute("data-variant-price");
-                            var variantId = this.options[this.selectedIndex].value;
-                            var productItem = this.closest(".ezy-type-productfeed__item");
-                            var button = productItem.getElementsByClassName("js:ezy-addVariantButtons")[0]; // update variant id in button
-
-                            button.setAttribute("data-variant-id", variantId); // update price in item
-
-                            productItem.getElementsByClassName("js:ezy-productPrice")[0].innerHTML = variantPrice; // check availability and update state
-
-                            if (variantAvailability == "true") {
-                              enableButton(button);
-                            } else {
-                              disableButton(button);
-                            }
-                          }); // Create a new 'change' event
-
-                          var event = new Event("change");
-                          changeVariantSelect.dispatchEvent(event);
-                        });
-
-                        var showNotification = function showNotification(message) {
-                          var notification = document.querySelector(".ezy-notification"); // for (var i = 0; i < notifications.length; i++) {
-                          //   let notification = notifications[i];
-                          //   let messageElement = notification.querySelector("span");
-                          //   if (message) {
-                          //     messageElement.innerHTML = message;
-                          //   }
-                          //   notification.classList.add("ezy-notification--animate");
-                          //   setTimeout(function () {
-                          //     notification.classList.remove(
-                          //       "ezy-notification--animate"
-                          //     );
-                          //   }, 3000);
-                          // }
-
-                          notification.innerHTML = message;
-                          notification.classList.add("ezy-notification--animate");
-                          setTimeout(function () {
-                            notification.classList.remove("ezy-notification--animate");
-                          }, 3000);
-                        };
-                      }
-                    };
-                    ezy.productfeed.init();
-                  } else if (content.contentType === "custom-html") {
-                    body.appendChild(modal);
-                  }
-                }; // SETTINGS
+              var initiateSettings = function initiateSettings() {
+                // SETTINGS
                 // AUTO CLOSE
-
-
                 var handleAutoClose = function handleAutoClose() {
                   console.log("we are auto-closed");
 
@@ -955,28 +699,940 @@ var campaignInfo = /*#__PURE__*/function () {
                   console.log("any triggers are matched");
                   createModal("any");
                 }
+              }; // I GUESS THIS IS WHERE WE BUILD THE CAMPAIGNS
+
+
+              if (style.campaignType === "modal") {
+                // classes for the outermost shell
+                modal.classList.add("ezy", "ezy-style-modal"); // SET CONTENT TYPES
+
+                function _setContentTypes() {
+                  // tw-hidden inside section
+                  if (content.contentType === "text-image") {
+                    modal.innerHTML = "\n            <!-- TEMPLATE STARTS -->\n\n  <section class=\"ezy-style-modal__window\">\n    <section class=\"ezy-style-modal__close\">\n      <a href=\"#\" class=\"closeBtn\" title=\"Close popup modal\"\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-x ezy-btn--round--clear\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line></svg>\n      </a>\n    </section>\n    <section class=\"ezy-style-modal__content\"\n      style=\"\n        background-color:".concat(style.backgroundColor, ";\n        border-radius:").concat(style.borderRadius, "px\">\n\n      <section>\n        \n<!-- CONTENT -->\n<section>\n  <div class=\"tw-flex tw-flex-row tw-flex-wrap tw-justify-center\">\n    <!-- ##IF IMAGE## -->\n    ").concat(content.imgUrl !== "" ? "<div class=\"tw-w-full sm:tw-w-1/2\"> \n      <div>\n        <img class=\"ezy-style-modal__content__image\" src=\"".concat(content.imgUrl, "\"/>\n      </div>\n    </div>") : "", "\n   \n    <!-- ##ENDIF## -->\n    <div class=\"tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center tw-p-4 tw-md:p-8\">\n      <div>\n        <h3 class=\"ezy-type__headline--bold-1 tw-mb-2\">").concat(content.headline, "</h3>\n        <p class=\"tw-mb-4\">\n        ").concat(content.body, "\n        </p>\n        <a class=\"main-btn ezy-btn tw-w-full\" href=\"").concat(content.buttonUrl, "\"\n          style=\"\n            background-color:").concat(style.primaryButtonColor, ";\n            border-radius:").concat(style.borderRadius, "px\">").concat(content.buttonText, "</a>\n      </div>\n    </div>\n  </div>\n</section>\n<!-- END CONTENT -->\n\n\n      </section>\n\n    </section>\n  </section>\n  <a href=\"https://brickspacelab.com/\" target=\"_blank\" class=\"ezy-tooltip ezy-tooltip--inverted tw-absolute tw-bottom-2 tw-left-2\n    ##IF PAID_PLAN##tw-hidden##ENDIF##\">\n    ").concat(freePlan ? "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-info\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>\n    <span>Powered by Easypop</span>" : "", "\n    \n  </a>\n\n            ");
+                    body.appendChild(modal);
+                  } else if (content.contentType === "newsletter") {
+                    var success;
+                    var url = window.location.href;
+
+                    if (url.includes("?customer_posted=true")) {
+                      success = "yes";
+                    } else if (url.includes("t?contact%5Btags%5D=prospect%2Cnewsletter&form_type=customer")) {
+                      success = "no";
+                    }
+
+                    modal.innerHTML = "\n            <section class=\"ezy-style-modal__window\">\n              <section class=\"ezy-style-modal__close\">\n                <a href=\"#\" class=\"closeBtn\" title=\"Close popup modal\">\n                  <svg\n                    xmlns=\"http://www.w3.org/2000/svg\"\n                    width=\"24\"\n                    height=\"24\"\n                    viewBox=\"0 0 24 24\"\n                    fill=\"none\"\n                    stroke=\"currentColor\"\n                    stroke-width=\"2\"\n                    stroke-linecap=\"round\"\n                    stroke-linejoin=\"round\"\n                    class=\"feather feather-x ezy-btn--round--clear\"\n                  >\n                    <line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line>\n                    <line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line>\n                  </svg>\n                </a>\n              </section>\n              <section\n                class=\"ezy-style-modal__content\"\n                style=\"\n                  background-color: ".concat(backgroundColor, ";\n                  border-radius: ").concat(style.borderRadius, "px;\n                \"\n              >\n              <section>\n              <div class=\"tw-flex tw-flex-row tw-flex-wrap tw-justify-center\">\n                <!-- ##IF IMAGE## -->\n                ").concat(content.imgUrl !== "" ? "\n                <div class=\"tw-w-full sm:tw-w-1/2\">\n                  <div>\n                    <img class=\"ezy-style-modal__content__image\" src=\"".concat(content.imgUrl, "\" />\n                  </div>\n                </div>\n                <!-- ##ENDIF## -->") : "", "\n            \n                <div\n                  class=\"tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center tw-p-4 tw-md:p-8\"\n                >\n                  <div>\n                    <h3 class=\"ezy-type__headline--bold-1 tw-mb-2\">\n                      ").concat(content.headline, "\n                    </h3>\n                    <p class=\"tw-mb-4\">").concat(content.body, "</p>\n                    <form\n                      method=\"post\"\n                      action=\"/contact#contact_form\"\n                      id=\"contact_form\"\n                      accept-charset=\"UTF-8\"\n                      class=\"contact-form\"\n                    >\n                      <input type=\"hidden\" name=\"form_type\" value=\"customer\" /><input\n                        type=\"hidden\"\n                        name=\"utf8\"\n                        value=\"\u2713\"\n                      />\n                      <input\n                        id=\"contact_tags\"\n                        name=\"contact[tags]\"\n                        type=\"hidden\"\n                        value=\"prospect,newsletter\"\n                      />\n            \n                      <input\n                        class=\"tw-mb-2\"\n                        id=\"contact_email\"\n                        name=\"contact[email]\"\n                        type=\"email\"\n                      />\n            \n                      <input\n                        style=\"\n            background-color: ").concat(primaryButtonColor, ";\n            border-radius: ").concat(style.borderRadius, "px;\n            \"\n                        class=\"ezy-btn tw-w-full\"\n                        type=\"submit\"\n                        value=\"").concat(content.buttonText, "\"\n                      />\n                      ").concat(success === "yes" ? "\n                      <h3 style=\"color: green\">Thank you for signing up!</h3>\n                      " : "", " ").concat(success === "no" ? "\n                      <h3 style=\"color: red\">Please input a valid email!</h3>\n                      " : "", "\n                    </form>\n                  </div>\n                </div>\n              </div>\n            </section>");
+                    body.appendChild(modal);
+                  } else if (content.contentType === "cart-progress-bar") {
+                    // for local testing
+                    // let cartData = {
+                    //   total_price: 49900,
+                    // };
+                    var cartProgress;
+
+                    if (cartData.total_price === 0) {
+                      cartProgress = 0;
+                    } else {
+                      cartProgress = cartData.total_price / 100 / content.cartGoalValue * 100;
+                    }
+
+                    var remainder = cartData.total_price / 100 - content.cartGoalValue;
+                    modal.innerHTML = "\n            <section class=\"ezy-style-modal__window\">\n              <section class=\"ezy-style-modal__close\">\n                <a href=\"#\" class=\"closeBtn\" title=\"Close popup modal\">\n                  <svg\n                    xmlns=\"http://www.w3.org/2000/svg\"\n                    width=\"24\"\n                    height=\"24\"\n                    viewBox=\"0 0 24 24\"\n                    fill=\"none\"\n                    stroke=\"currentColor\"\n                    stroke-width=\"2\"\n                    stroke-linecap=\"round\"\n                    stroke-linejoin=\"round\"\n                    class=\"feather feather-x ezy-btn--round--clear\"\n                  >\n                    <line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line>\n                    <line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line>\n                  </svg>\n                </a>\n              </section>\n              <section\n                class=\"ezy-style-modal__content\"\n                style=\"\n                  background-color: ".concat(backgroundColor, ";\n                  border-radius: ").concat(style.borderRadius, "px;\n                \"\n              >\n                <!-- CONTENT -->\n                <section>\n                  <div class=\"tw-flex tw-flex-row tw-flex-wrap tw-justify-center\">\n                    <div\n                      class=\"tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center\"\n                    >\n                      <div>\n                        <section class=\"tw-border-b tw-border-gray-200 tw-p-4\">\n                          <p class=\"tw-mb-1\">\n                          ").concat(remainder < 0 ? "You're $".concat(-remainder, " away from ").concat(content.cartGoalPrize, ".") : "".concat(content.cartSuccessMessage), "\n                          </p>\n                          <div\n                            class=\"ezy-progressbar\"\n                            style=\"\n                              \n                              border-radius: ").concat(style.borderRadius, "px;\n                            \"\n                          >\n                            <div class=\"ezy-progressbar__inner\" style=\"width: ").concat(cartProgress, "%; background-color: ").concat(primaryButtonColor, ";\"></div>\n                          </div>\n                        </section>\n          \n                        <section class=\"tw-p-4 tw-md:p-8\">\n                          <h3 class=\"ezy-type__headline--bold-1 tw-mb-2\">\n                            ").concat(content.headline, "\n                          </h3>\n                          <p class=\"tw-mb-4\">\n                            ").concat(content.body, "\n                          </p>\n          \n                          <a\n                            class=\"main-btn ezy-btn tw-w-full\"\n                            href=\"").concat(content.buttonUrl, "\"\n                            style=\"\n                              background-color: ").concat(style.primaryButtonColor, ";\n                              border-radius: ").concat(style.borderRadius, "px;\n                            \"\n                          >\n                            ").concat(content.buttonText, "\n                          </a>\n                        </section>\n                      </div>\n                    </div>\n                  </div>\n                </section>\n                <!-- END CONTENT -->\n              </section>\n            </section>\n            ").concat(freePlan ? "<a\n            href=\"https://brickspacelab.com/\"\n            target=\"_blank\"\n            class=\"ezy-tooltip ezy-tooltip--inverted tw-absolute tw-bottom-2 tw-left-2\"\n          >\n            <svg\n              xmlns=\"http://www.w3.org/2000/svg\"\n              width=\"24\"\n              height=\"24\"\n              viewBox=\"0 0 24 24\"\n              fill=\"none\"\n              stroke=\"currentColor\"\n              stroke-width=\"2\"\n              stroke-linecap=\"round\"\n              stroke-linejoin=\"round\"\n              class=\"feather feather-info\"\n            >\n              <circle cx=\"12\" cy=\"12\" r=\"10\"></circle>\n              <line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line>\n              <line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line>\n            </svg>\n            <span>Powered by Easypop</span>\n          </a>" : "", "\n            \n          \n          ");
+                    body.appendChild(modal);
+                  } else if (content.contentType === "product-feed") {
+                    var products = content.selectedProducts[0].selection;
+                    modal.innerHTML = "\n            \n            <!-- TEMPLATE STARTS -->\n  <section class=\"ezy-style-modal__window\">\n    <section class=\"ezy-style-modal__close\">\n      <a href=\"#\" class=\"closeBtn\" title=\"Close popup modal\"\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-x ezy-btn--round--clear\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line></svg>\n      </a>\n    </section>\n    <section class=\"ezy-style-modal__content\"\n      style=\"\n        background-color:".concat(style.backgroundColor, ";\n        border-radius:").concat(style.borderRadius, "\">\n      <section>\n        <!-- CONTENT -->\n<div class=\"tw-flex tw-flex-row tw-flex-wrap\">\n  <div class=\"tw-w-full sm:tw-w-full tw-flex tw-justify-center tw-items-center\">\n    <div class=\"tw-overflow-hidden\">\n      <div class=\"tw-p-4 tw-max-w-prose\">\n        <h3 class=\"ezy-type__headline--bold-1\">").concat(content.headline, "</h3>\n        <p>\n        ").concat(content.body, "\n        </p>\n      </div>\n      <div class=\"ezy-type-productfeed__arrows\">\n        <div class=\"ezy-type-productfeed__back\">\n          <button class=\"js:ezy-scrollArrowButtons\" data-scroll-direction=\"0\" data-scroll-container=\"ezy-type-productfeed\">\n            <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-arrow-left ezy-btn--round\"><line x1=\"19\" y1=\"12\" x2=\"5\" y2=\"12\"></line><polyline points=\"12 19 5 12 12 5\"></polyline></svg>\n          </button>\n        </div>\n        <div class=\"ezy-type-productfeed__next\">\n          <button class=\"js:ezy-scrollArrowButtons\" data-scroll-direction=\"1\" data-scroll-container=\"ezy-type-productfeed\">\n            <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-arrow-right ezy-btn--round\"><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"></line><polyline points=\"12 5 19 12 12 19\"></polyline></svg>\n          </button>\n        </div>\n      </div>\n      <div class=\"ezy-type-productfeed\">\n        ").concat(products.map(function (product) {
+                      return "\n          <div class=\"ezy-type-productfeed__item\">\n          <img class=\"image--square\" src=".concat(product.images[0].originalSrc, "/>\n          <div class=\"tw-px-2 tw-py-4\">\n            <p>").concat(product.title, "</p>\n            <p class=\"tw-pb-2\">$<span class=\"tw-pb-2 js:ezy-productPrice\">").concat(product.variants[0].price, "</span></p>\n            <select id=\"id\" name=\"id\" class=\"ezy-select tw-mb-2 js:ezy-changeVariantSelects\">\n              ").concat(product.variants.map(function (variant) {
+                        return "<option value=\"".concat(variant.id.split("gid://shopify/ProductVariant/").pop().split("/")[0], "\" data-variant-availability=\"").concat(variant.availableForSale, "\" data-variant-price=\"").concat(variant.price, "\">").concat(variant.title, "</option>");
+                      }), "\n            </select>\n            <button class=\"ezy-btn js:ezy-addVariantButtons tw-w-full\" style=\"background-color:").concat(style.primaryButtonColor, "\" data-variant-id=\"").concat(product.variants[0].price, "\">\n              <span class=\"ezy-btn__text\">\n                Add to cart\n              </span>\n              <span class=\"ezy-btn__spinner\">\n                <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-loader\"><line x1=\"12\" y1=\"2\" x2=\"12\" y2=\"6\"></line><line x1=\"12\" y1=\"18\" x2=\"12\" y2=\"22\"></line><line x1=\"4.93\" y1=\"4.93\" x2=\"7.76\" y2=\"7.76\"></line><line x1=\"16.24\" y1=\"16.24\" x2=\"19.07\" y2=\"19.07\"></line><line x1=\"2\" y1=\"12\" x2=\"6\" y2=\"12\"></line><line x1=\"18\" y1=\"12\" x2=\"22\" y2=\"12\"></line><line x1=\"4.93\" y1=\"19.07\" x2=\"7.76\" y2=\"16.24\"></line><line x1=\"16.24\" y1=\"7.76\" x2=\"19.07\" y2=\"4.93\"></line></svg>\n              </button>\n            </a>\n          </div>\n        </div>");
+                    }), "\n      </div>\n    </div>\n  </div>\n</div>\n</section>\n\n    </section>\n  </section>\n  <a href=\"https://brickspacelab.com/\" target=\"_blank\" class=\"ezy-tooltip ezy-tooltip--inverted tw-absolute tw-bottom-2 tw-left-2\n    ##IF PAID_PLAN##tw-hidden##ENDIF##\">\n    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-info\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>\n    <span>Powered by Easypop</span>\n  </a>\n</section>");
+                    body.appendChild(modal);
+                    var ezy = ezy || {};
+                    ezy.productfeed = {
+                      // simple fetch call
+                      fetch: function (_fetch) {
+                        function fetch(_x, _x2, _x3, _x4, _x5, _x6) {
+                          return _fetch.apply(this, arguments);
+                        }
+
+                        fetch.toString = function () {
+                          return _fetch.toString();
+                        };
+
+                        return fetch;
+                      }(function (requestType, url, data, contentType, successCallback, errorCallback) {
+                        fetch(url, {
+                          method: requestType,
+                          headers: {
+                            "Content-Type": contentType,
+                            Accept: contentType,
+                            "X-Requested-With": "xmlhttprequest"
+                          },
+                          body: JSON.stringify(data)
+                        }).then(function (response) {
+                          return response.json();
+                        }).then(function (data) {
+                          successCallback(data);
+                        }).catch(function (error) {
+                          errorCallback(error);
+                        });
+                      }),
+                      // initilize product feed
+                      init: function init() {
+                        // add variant to cart
+                        function addVariant(variantID, quantity, callback) {
+                          var data = {
+                            items: [{
+                              id: variantID,
+                              quantity: quantity
+                            }]
+                          };
+                          ezy.productfeed.fetch("POST", "/cart/add.js", data, "application/json; charset=utf-8", // success
+                          function (data) {
+                            console.log(data);
+
+                            if (typeof callback === "function" && callback()) {
+                              window.setTimeout(function () {
+                                callback();
+                              }, 500);
+                            }
+                          }, // error
+                          function (error) {
+                            if (typeof callback === "function" && callback()) {
+                              window.setTimeout(function () {
+                                callback();
+                              }, 500);
+                            }
+                          });
+                        } // scroll container horizontally
+
+
+                        function scrollHorizontally(element, direction) {
+                          if (direction == 0) {
+                            element.scroll({
+                              left: element.scrollLeft - 350,
+                              behavior: "smooth"
+                            });
+                          } else {
+                            element.scroll({
+                              left: element.scrollLeft + 350,
+                              behavior: "smooth"
+                            });
+                          }
+                        } // toggle loading state of button
+
+
+                        function toggleButton(button) {
+                          if (button.classList.contains("ezy-btn--loading")) {
+                            button.classList.remove("ezy-btn--loading");
+                            button.disabled = false;
+                          } else {
+                            button.classList.add("ezy-btn--loading");
+                            button.disabled = true;
+                          }
+                        } // add disabled state to button
+
+
+                        function disableButton(button) {
+                          button.classList.add("ezy-btn--disabled");
+                          button.disabled = true;
+                        } // add enabled state to button
+
+
+                        function enableButton(button) {
+                          button.classList.remove("ezy-btn--disabled");
+                          button.disabled = false;
+                        } // listen for click on scroll arrows
+
+
+                        var scrollArrowButtons = document.getElementsByClassName("js:ezy-scrollArrowButtons");
+                        Array.from(scrollArrowButtons).forEach(function (scrollArrowButton) {
+                          scrollArrowButton.addEventListener("click", function (e) {
+                            var scrollContainerClass = this.getAttribute("data-scroll-container");
+                            var scrollDirection = this.getAttribute("data-scroll-direction");
+                            var scrollContainers = document.getElementsByClassName(scrollContainerClass);
+                            Array.from(scrollContainers).forEach(function (scrollContainer) {
+                              scrollHorizontally(scrollContainer, scrollDirection);
+                            });
+                          });
+                        }); // listen for click on atc
+
+                        var addVariantButtons = document.getElementsByClassName("js:ezy-addVariantButtons");
+                        Array.from(addVariantButtons).forEach(function (addVariantButton) {
+                          addVariantButton.addEventListener("click", function (e) {
+                            var variantId = this.getAttribute("data-variant-id");
+                            showNotification("Product was added to the cart!");
+                            toggleButton(addVariantButton);
+                            addVariant(variantId, 1, function () {
+                              toggleButton(addVariantButton);
+                            });
+
+                            if (content.closingBehav === "close") {
+                              modal.classList.add("ezy-style-modal--animate");
+                              setTimeout(function () {
+                                modal.classList.add("tw-hidden");
+                              }, 1000);
+                            }
+                          });
+                        }); // listen for change to for variant select
+
+                        var changeVariantSelects = document.getElementsByClassName("js:ezy-changeVariantSelects");
+                        Array.from(changeVariantSelects).forEach(function (changeVariantSelect) {
+                          changeVariantSelect.addEventListener("change", function () {
+                            var variantAvailability = this.options[this.selectedIndex].getAttribute("data-variant-availability");
+                            var variantPrice = this.options[this.selectedIndex].getAttribute("data-variant-price");
+                            var variantId = this.options[this.selectedIndex].value;
+                            var productItem = this.closest(".ezy-type-productfeed__item");
+                            var button = productItem.getElementsByClassName("js:ezy-addVariantButtons")[0]; // update variant id in button
+
+                            button.setAttribute("data-variant-id", variantId); // update price in item
+
+                            productItem.getElementsByClassName("js:ezy-productPrice")[0].innerHTML = variantPrice; // check availability and update state
+
+                            if (variantAvailability == "true") {
+                              enableButton(button);
+                            } else {
+                              disableButton(button);
+                            }
+                          }); // Create a new 'change' event
+
+                          var event = new Event("change");
+                          changeVariantSelect.dispatchEvent(event);
+                        });
+
+                        var showNotification = function showNotification(message) {
+                          var notification = document.querySelector(".ezy-notification"); // for (var i = 0; i < notifications.length; i++) {
+                          //   let notification = notifications[i];
+                          //   let messageElement = notification.querySelector("span");
+                          //   if (message) {
+                          //     messageElement.innerHTML = message;
+                          //   }
+                          //   notification.classList.add("ezy-notification--animate");
+                          //   setTimeout(function () {
+                          //     notification.classList.remove(
+                          //       "ezy-notification--animate"
+                          //     );
+                          //   }, 3000);
+                          // }
+
+                          notification.innerHTML = message;
+                          notification.classList.add("ezy-notification--animate");
+                          setTimeout(function () {
+                            notification.classList.remove("ezy-notification--animate");
+                          }, 3000);
+                        };
+                      }
+                    };
+                    ezy.productfeed.init();
+                  } else if (content.contentType === "custom-html") {
+                    body.appendChild(modal);
+                  }
+                }
+
+                initiateSettings();
               } else if (style.campaignType === "full-screen") {
-                console.log("this is something else");
+                // classes for the outermost shell
+                modal.classList.add("ezy", "ezy-style-fullscreen");
+                modal.style.backgroundColor = backgroundColor;
+                console.log("this is full screen"); // SET CONTENT TYPES
+
+                function _setContentTypes2() {
+                  // tw-hidden inside section
+                  if (content.contentType === "text-image") {
+                    modal.innerHTML = "\n            <section class=\"ezy-style-fullscreen__close\">\n              <a href=\"#\" class=\"closeBtn\" title=\"Close fullscreen popup\"\">\n                <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-x ezy-btn--round\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line></svg>\n              </a>\n            </section>\n            <section class=\"ezy-style-fullscreen__window\">\n              <section class=\"ezy-style-fullscreen__content\">\n                <!-- CONTENT -->\n          <section>\n            <div class=\"tw-flex tw-flex-row tw-flex-wrap tw-justify-center\">\n              <!-- ##IF IMAGE## -->\n              <div class=\"tw-w-full sm:tw-w-1/2\">\n                <div>\n                  <img class=\"ezy-style-modal__content__image\" src=\"".concat(content.imgUrl, "\"/>\n                </div>\n              </div>\n              <!-- ##ENDIF## -->\n              <div class=\"tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center tw-p-4 tw-md:p-8\">\n                <div>\n                  <h3 class=\"ezy-type__headline--bold-1 tw-mb-2\">").concat(content.headline, "</h3>\n                  <p class=\"tw-mb-4\">\n                  ").concat(content.body, "\n                  </p>\n                  <a class=\"ezy-btn tw-w-full\" href=\"").concat(content.buttonUrl, "\"\n                    style=\"\n                      background-color:").concat(style.primaryButtonColor, ";\n                      border-radius:").concat(style.borderRadius, ";\">").concat(content.buttonText, "</a>\n                </div>\n              </div>\n            </div>\n          </section>\n          <!-- END CONTENT -->\n          \n          \n              </section>\n            </section>\n            <a href=\"https://brickspacelab.com/\" target=\"_blank\" class=\"ezy-tooltip tw-absolute tw-bottom-2 tw-left-2\n              ##IF PAID_PLAN##tw-hidden##ENDIF##\">\n              <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-info\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>\n              <span>Powered by Easypop</span>\n            </a>\n\n            ");
+                    body.appendChild(modal);
+                  } else if (content.contentType === "newsletter") {
+                    var success;
+                    var url = window.location.href;
+
+                    if (url.includes("?customer_posted=true")) {
+                      success = "yes";
+                    } else if (url.includes("t?contact%5Btags%5D=prospect%2Cnewsletter&form_type=customer")) {
+                      success = "no";
+                    }
+
+                    modal.innerHTML = "\n            <section class=\"ezy-style-fullscreen__close\">\n    <a href=\"#\" title=\"Close fullscreen popup\" class=\"closeBtn\"\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-x ezy-btn--round\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line></svg>\n    </a>\n  </section>\n  <section class=\"ezy-style-fullscreen__window\">\n    <section class=\"ezy-style-fullscreen__content\">\n      <!-- CONTENT -->\n<section>\n  <div class=\"tw-flex tw-flex-row tw-flex-wrap tw-justify-center\">\n\n    <!-- ##IF IMAGE## -->\n    <div class=\"tw-w-full sm:tw-w-1/2\">\n      <div>\n        <img class=\"ezy-style-modal__content__image\" src=\"".concat(content.imgUrl, "\" />\n      </div>\n    </div>\n    <!-- ##ENDIF## -->\n\n    <div class=\"tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center tw-p-4 tw-md:p-8\">\n      <div>\n        <h3 class=\"ezy-type__headline--bold-1 tw-mb-2\">\n        ").concat(content.headline, "\n        </h3>\n        <p class=\"tw-mb-4\">").concat(content.body, "</p>\n        <form\n          method=\"post\"\n          action=\"/contact#contact_form\"\n          id=\"contact_form\"\n          accept-charset=\"UTF-8\"\n          class=\"contact-form\">\n\n          <input\n            type=\"hidden\"\n            name=\"form_type\"\n            value=\"customer\" />\n          <input\n            type=\"hidden\"\n            name=\"utf8\"\n            value=\"\u2713\" />\n          <input\n            id=\"contact_tags\"\n            name=\"contact[tags]\"\n            type=\"hidden\"\n            value=\"easypop\" />\n          <input\n            class=\"tw-mb-2\"\n            id=\"contact_email\"\n            name=\"contact[email]\"\n            type=\"email\" />\n          <input\n            class=\"ezy-btn tw-w-full\"\n            type=\"submit\"\n            value=\"").concat(content.buttonText, "\"\n            style=\"\n              background-color:").concat(style.primaryButtonColor, ";\n              border-radius:").concat(style.borderRadius, ";\" />\n\n          <!-- ##IF SUCCESS## -->\n            <div class=\"tw-bg-black tw-bg-opacity-10 tw-mt-2 tw-p-2\"\n              style=\"border-radius:").concat(style.borderRadius, ";\">\n              ##SUCCESS_MESSAGE##\n            </div>\n          <!-- ##ELSE## -->\n            <div class=\"tw-bg-black tw-bg-opacity-10 tw-mt-2 tw-p-2\"\n              style=\"border-radius:").concat(style.borderRadius, ";\">\n              ##ERROR_MESSAGE##\n            </div>\n          <!-- ##ENDIF## -->\n\n        </form>\n      </div>\n    </div>\n  </div>\n</section>\n<!-- END CONTENT -->\n\n\n    </section>\n  </section>\n  <a href=\"https://brickspacelab.com/\" target=\"_blank\" class=\"ezy-tooltip tw-absolute tw-bottom-2 tw-left-2\n    ##IF PAID_PLAN##tw-hidden##ENDIF##\">\n    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-info\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>\n    <span>Powered by Easypop</span>\n  </a>");
+                    body.appendChild(modal);
+                  } else if (content.contentType === "cart-progress-bar") {
+                    // for local testing
+                    var _cartData = {
+                      total_price: 49900
+                    };
+                    var cartProgress;
+
+                    if (_cartData.total_price === 0) {
+                      cartProgress = 0;
+                    } else {
+                      cartProgress = _cartData.total_price / 100 / content.cartGoalValue * 100;
+                    }
+
+                    var remainder = _cartData.total_price / 100 - content.cartGoalValue;
+                    modal.innerHTML = "\n            <section class=\"ezy-style-fullscreen__close\">\n    <a href=\"#\" title=\"Close fullscreen popup\" class=\"closeBtn\"\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-x ezy-btn--round\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line></svg>\n    </a>\n  </section>\n  <section class=\"ezy-style-fullscreen__window\">\n    <section class=\"ezy-style-fullscreen__content\">\n      <!-- CONTENT -->\n<section>\n  <div class=\"tw-flex tw-flex-row tw-flex-wrap tw-justify-center\">\n    <div class=\"tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center\">\n      <div class=\"tw-w-full\">\n\n        <section class=\"tw-border-b tw-border-gray-200 tw-p-4\">\n          <p class=\"tw-mb-1\"> ".concat(remainder < 0 ? "You're $".concat(-remainder, " away from ").concat(content.cartGoalPrize, ".") : "".concat(content.cartSuccessMessage), "</p>\n          <div class=\"ezy-progressbar\"\n            style=\"\n              border-radius: ").concat(style.borderRadius, "px;\">\n            <div class=\"ezy-progressbar__inner\" style=\"width: ").concat(cartProgress, "%; background-color: ").concat(primaryButtonColor, ";\">\n            </div>\n          </div>\n        </section>\n\n        <section class=\"tw-p-4 tw-md:p-8\">\n          <h3 class=\"ezy-type__headline--bold-1 tw-mb-2\">").concat(content.headline, "</h3>\n          <p class=\"tw-mb-4\">\n          ").concat(content.body, "\n          </p>\n\n          <a class=\"ezy-btn tw-w-full\" href=\"").concat(content.buttonUrl, "\"\n            style=\"\n              background-color:").concat(style.primaryButtonColor, ";\n              border-radius:").concat(style.borderRadius, "px;\">\n            ").concat(content.buttonText, "\n          </a>\n        </section>\n\n      </div>\n    </div>\n  </div>\n</section>\n<!-- END CONTENT -->\n\n\n    </section>\n  </section>\n  <a href=\"https://brickspacelab.com/\" target=\"_blank\" class=\"ezy-tooltip tw-absolute tw-bottom-2 tw-left-2\n    ##IF PAID_PLAN##tw-hidden##ENDIF##\">\n    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-info\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>\n    <span>Powered by Easypop</span>\n  </a>\n            \n            \n          \n          ");
+                    body.appendChild(modal);
+                  } else if (content.contentType === "product-feed") {
+                    var products = content.selectedProducts[0].selection;
+                    modal.innerHTML = "\n            \n            <section class=\"ezy-style-fullscreen__close\">\n    <a href=\"#\" title=\"Close fullscreen popup\" class=\"closeBtn\"\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-x ezy-btn--round\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line></svg>\n    </a>\n  </section>\n  <section class=\"ezy-style-fullscreen__window\">\n    <section class=\"ezy-style-fullscreen__content\">\n      <!-- CONTENT -->\n<div class=\"tw-flex tw-flex-row tw-flex-wrap\">\n  <div class=\"tw-w-full sm:tw-w-full tw-flex tw-justify-center tw-items-center\">\n    <div class=\"tw-overflow-hidden\">\n      <div class=\"tw-p-4 tw-max-w-prose\">\n        <h3 class=\"ezy-type__headline--bold-1\">".concat(content.headline, "</h3>\n        <p>\n        ").concat(content.body, "\n        </p>\n      </div>\n      <div class=\"ezy-type-productfeed__arrows\">\n        <div class=\"ezy-type-productfeed__back\">\n          <button class=\"js:ezy-scrollArrowButtons\" data-scroll-direction=\"0\" data-scroll-container=\"ezy-type-productfeed\">\n            <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-arrow-left ezy-btn--round\"><line x1=\"19\" y1=\"12\" x2=\"5\" y2=\"12\"></line><polyline points=\"12 19 5 12 12 5\"></polyline></svg>\n          </button>\n        </div>\n        <div class=\"ezy-type-productfeed__next\">\n          <button class=\"js:ezy-scrollArrowButtons\" data-scroll-direction=\"1\" data-scroll-container=\"ezy-type-productfeed\">\n            <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-arrow-right ezy-btn--round\"><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"></line><polyline points=\"12 5 19 12 12 19\"></polyline></svg>\n          </button>\n        </div>\n      </div>\n      <div class=\"ezy-type-productfeed\">\n      ").concat(products.map(function (product) {
+                      return "\n        <div class=\"ezy-type-productfeed__item\">\n        <img class=\"image--square\" src=".concat(product.images[0].originalSrc, "/>\n        <div class=\"tw-px-2 tw-py-4\">\n          <p>").concat(product.title, "</p>\n          <p class=\"tw-pb-2\">$<span class=\"tw-pb-2 js:ezy-productPrice\">").concat(product.variants[0].price, "</span></p>\n          <select id=\"id\" name=\"id\" class=\"ezy-select tw-mb-2 js:ezy-changeVariantSelects\">\n            ").concat(product.variants.map(function (variant) {
+                        return "<option value=\"".concat(variant.id.split("gid://shopify/ProductVariant/").pop().split("/")[0], "\" data-variant-availability=\"").concat(variant.availableForSale, "\" data-variant-price=\"").concat(variant.price, "\">").concat(variant.title, "</option>");
+                      }), "\n          </select>\n          <button class=\"ezy-btn js:ezy-addVariantButtons tw-w-full\" style=\"background-color:").concat(style.primaryButtonColor, "\" data-variant-id=\"").concat(product.variants[0].price, "\">\n            <span class=\"ezy-btn__text\">\n              Add to cart\n            </span>\n            <span class=\"ezy-btn__spinner\">\n              <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-loader\"><line x1=\"12\" y1=\"2\" x2=\"12\" y2=\"6\"></line><line x1=\"12\" y1=\"18\" x2=\"12\" y2=\"22\"></line><line x1=\"4.93\" y1=\"4.93\" x2=\"7.76\" y2=\"7.76\"></line><line x1=\"16.24\" y1=\"16.24\" x2=\"19.07\" y2=\"19.07\"></line><line x1=\"2\" y1=\"12\" x2=\"6\" y2=\"12\"></line><line x1=\"18\" y1=\"12\" x2=\"22\" y2=\"12\"></line><line x1=\"4.93\" y1=\"19.07\" x2=\"7.76\" y2=\"16.24\"></line><line x1=\"16.24\" y1=\"7.76\" x2=\"19.07\" y2=\"4.93\"></line></svg>\n            </button>\n          </a>\n        </div>\n      </div>");
+                    }), "\n\n      </div>\n    </div>\n  </div>\n</div>\n\n    </section>\n  </section>\n  <a href=\"https://brickspacelab.com/\" target=\"_blank\" class=\"ezy-tooltip tw-absolute tw-bottom-2 tw-left-2\n    ##IF PAID_PLAN##tw-hidden##ENDIF##\">\n    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-info\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>\n    <span>Powered by Easypop</span>\n  </a>\n</section>");
+                    body.appendChild(modal);
+                    var ezy = ezy || {};
+                    ezy.productfeed = {
+                      // simple fetch call
+                      fetch: function (_fetch2) {
+                        function fetch(_x7, _x8, _x9, _x10, _x11, _x12) {
+                          return _fetch2.apply(this, arguments);
+                        }
+
+                        fetch.toString = function () {
+                          return _fetch2.toString();
+                        };
+
+                        return fetch;
+                      }(function (requestType, url, data, contentType, successCallback, errorCallback) {
+                        fetch(url, {
+                          method: requestType,
+                          headers: {
+                            "Content-Type": contentType,
+                            Accept: contentType,
+                            "X-Requested-With": "xmlhttprequest"
+                          },
+                          body: JSON.stringify(data)
+                        }).then(function (response) {
+                          return response.json();
+                        }).then(function (data) {
+                          successCallback(data);
+                        }).catch(function (error) {
+                          errorCallback(error);
+                        });
+                      }),
+                      // initilize product feed
+                      init: function init() {
+                        // add variant to cart
+                        function addVariant(variantID, quantity, callback) {
+                          var data = {
+                            items: [{
+                              id: variantID,
+                              quantity: quantity
+                            }]
+                          };
+                          ezy.productfeed.fetch("POST", "/cart/add.js", data, "application/json; charset=utf-8", // success
+                          function (data) {
+                            console.log(data);
+
+                            if (typeof callback === "function" && callback()) {
+                              window.setTimeout(function () {
+                                callback();
+                              }, 500);
+                            }
+                          }, // error
+                          function (error) {
+                            if (typeof callback === "function" && callback()) {
+                              window.setTimeout(function () {
+                                callback();
+                              }, 500);
+                            }
+                          });
+                        } // scroll container horizontally
+
+
+                        function scrollHorizontally(element, direction) {
+                          if (direction == 0) {
+                            element.scroll({
+                              left: element.scrollLeft - 350,
+                              behavior: "smooth"
+                            });
+                          } else {
+                            element.scroll({
+                              left: element.scrollLeft + 350,
+                              behavior: "smooth"
+                            });
+                          }
+                        } // toggle loading state of button
+
+
+                        function toggleButton(button) {
+                          if (button.classList.contains("ezy-btn--loading")) {
+                            button.classList.remove("ezy-btn--loading");
+                            button.disabled = false;
+                          } else {
+                            button.classList.add("ezy-btn--loading");
+                            button.disabled = true;
+                          }
+                        } // add disabled state to button
+
+
+                        function disableButton(button) {
+                          button.classList.add("ezy-btn--disabled");
+                          button.disabled = true;
+                        } // add enabled state to button
+
+
+                        function enableButton(button) {
+                          button.classList.remove("ezy-btn--disabled");
+                          button.disabled = false;
+                        } // listen for click on scroll arrows
+
+
+                        var scrollArrowButtons = document.getElementsByClassName("js:ezy-scrollArrowButtons");
+                        Array.from(scrollArrowButtons).forEach(function (scrollArrowButton) {
+                          scrollArrowButton.addEventListener("click", function (e) {
+                            var scrollContainerClass = this.getAttribute("data-scroll-container");
+                            var scrollDirection = this.getAttribute("data-scroll-direction");
+                            var scrollContainers = document.getElementsByClassName(scrollContainerClass);
+                            Array.from(scrollContainers).forEach(function (scrollContainer) {
+                              scrollHorizontally(scrollContainer, scrollDirection);
+                            });
+                          });
+                        }); // listen for click on atc
+
+                        var addVariantButtons = document.getElementsByClassName("js:ezy-addVariantButtons");
+                        Array.from(addVariantButtons).forEach(function (addVariantButton) {
+                          addVariantButton.addEventListener("click", function (e) {
+                            var variantId = this.getAttribute("data-variant-id");
+                            showNotification("Product was added to the cart!");
+                            toggleButton(addVariantButton);
+                            addVariant(variantId, 1, function () {
+                              toggleButton(addVariantButton);
+                            });
+
+                            if (content.closingBehav === "close") {
+                              modal.classList.add("ezy-style-modal--animate");
+                              setTimeout(function () {
+                                modal.classList.add("tw-hidden");
+                              }, 1000);
+                            }
+                          });
+                        }); // listen for change to for variant select
+
+                        var changeVariantSelects = document.getElementsByClassName("js:ezy-changeVariantSelects");
+                        Array.from(changeVariantSelects).forEach(function (changeVariantSelect) {
+                          changeVariantSelect.addEventListener("change", function () {
+                            var variantAvailability = this.options[this.selectedIndex].getAttribute("data-variant-availability");
+                            var variantPrice = this.options[this.selectedIndex].getAttribute("data-variant-price");
+                            var variantId = this.options[this.selectedIndex].value;
+                            var productItem = this.closest(".ezy-type-productfeed__item");
+                            var button = productItem.getElementsByClassName("js:ezy-addVariantButtons")[0]; // update variant id in button
+
+                            button.setAttribute("data-variant-id", variantId); // update price in item
+
+                            productItem.getElementsByClassName("js:ezy-productPrice")[0].innerHTML = variantPrice; // check availability and update state
+
+                            if (variantAvailability == "true") {
+                              enableButton(button);
+                            } else {
+                              disableButton(button);
+                            }
+                          }); // Create a new 'change' event
+
+                          var event = new Event("change");
+                          changeVariantSelect.dispatchEvent(event);
+                        });
+
+                        var showNotification = function showNotification(message) {
+                          var notification = document.querySelector(".ezy-notification"); // for (var i = 0; i < notifications.length; i++) {
+                          //   let notification = notifications[i];
+                          //   let messageElement = notification.querySelector("span");
+                          //   if (message) {
+                          //     messageElement.innerHTML = message;
+                          //   }
+                          //   notification.classList.add("ezy-notification--animate");
+                          //   setTimeout(function () {
+                          //     notification.classList.remove(
+                          //       "ezy-notification--animate"
+                          //     );
+                          //   }, 3000);
+                          // }
+
+                          notification.innerHTML = message;
+                          notification.classList.add("ezy-notification--animate");
+                          setTimeout(function () {
+                            notification.classList.remove("ezy-notification--animate");
+                          }, 3000);
+                        };
+                      }
+                    };
+                    ezy.productfeed.init();
+                  } else if (content.contentType === "custom-html") {
+                    body.appendChild(modal);
+                  }
+                }
+
+                initiateSettings();
+              } else if (style.campaignType === "slide-in") {
+                // classes for the outermost shell
+                modal.classList.add("ezy", "ezy-style-drawer", "ezy-style-drawer--".concat(style.placement));
+                modal.style.backgroundColor = backgroundColor; // SET CONTENT TYPES
+
+                function _setContentTypes3() {
+                  // tw-hidden inside section
+                  if (content.contentType === "text-image") {
+                    modal.innerHTML = "\n            <section class=\"ezy-style-drawer__close\">\n    <a href=\"#\" title=\"Close drawer\" class=\"closeBtn\";\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-x ezy-btn--round--inverted\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line></svg>\n    </a>\n  </section>\n  <section class=\"ezy-style-drawer__window\"\n    style=\"\n      background-color:".concat(backgroundColor, ";\">\n    <section class=\"ezy-style-drawer__content\">\n      <!-- CONTENT -->\n<section>\n  <div class=\"tw-flex tw-flex-row tw-flex-wrap tw-justify-center\">\n    <!-- ##IF IMAGE## -->\n    <div class=\"tw-w-full sm:tw-w-1/2\">\n      <div>\n        <img class=\"ezy-style-modal__content__image\" src=\"").concat(content.imgUrl, "\"/>\n      </div>\n    </div>\n    <!-- ##ENDIF## -->\n    <div class=\"tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center tw-p-4 tw-md:p-8\">\n      <div>\n        <h3 class=\"ezy-type__headline--bold-1 tw-mb-2\">").concat(content.headline, "</h3>\n        <p class=\"tw-mb-4\">\n        ").concat(content.body, "\n        </p>\n        <a class=\"ezy-btn tw-w-full\" href=\"").concat(content.buttonUrl, "\"\n          style=\"\n            background-color:").concat(primaryButtonColor, ";\n            border-radius:").concat(style.borderRadius, ";\">").concat(content.buttonText, "</a>\n      </div>\n    </div>\n  </div>\n</section>\n<!-- END CONTENT -->\n\n\n    </section>\n    <a href=\"https://brickspacelab.com/\" target=\"_blank\" class=\"ezy-tooltip tw-absolute tw-bottom-2 tw-right-2\n      ##IF PAID_PLAN##tw-hidden##ENDIF##\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-info\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>\n      <span>Powered by Easypop</span>\n    </a>\n  </section>\n\n            ");
+                    body.appendChild(modal);
+                  } else if (content.contentType === "newsletter") {
+                    var success;
+                    var url = window.location.href;
+
+                    if (url.includes("?customer_posted=true")) {
+                      success = "yes";
+                    } else if (url.includes("t?contact%5Btags%5D=prospect%2Cnewsletter&form_type=customer")) {
+                      success = "no";
+                    }
+
+                    modal.innerHTML = "\n            <section class=\"ezy-style-drawer__close\">\n    <a href=\"#\" title=\"Close drawer\" class=\"closeBtn\";\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-x ezy-btn--round--inverted\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line></svg>\n    </a>\n  </section>\n  <section class=\"ezy-style-drawer__window\"\n    style=\"\n      background-color:##BACKGROUND_COLOR##;\">\n    <section class=\"ezy-style-drawer__content\">\n      <!-- CONTENT -->\n<section>\n  <div class=\"tw-flex tw-flex-row tw-flex-wrap tw-justify-center\">\n\n    <!-- ##IF IMAGE## -->\n    <div class=\"tw-w-full sm:tw-w-1/2\">\n      <div>\n        <img class=\"ezy-style-modal__content__image\" src=\"##IMAGE_SRC##\" />\n      </div>\n    </div>\n    <!-- ##ENDIF## -->\n\n    <div class=\"tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center tw-p-4 tw-md:p-8\">\n      <div>\n        <h3 class=\"ezy-type__headline--bold-1 tw-mb-2\">\n          ##HEADLINE##\n        </h3>\n        <p class=\"tw-mb-4\">##BODY##</p>\n        <form\n          method=\"post\"\n          action=\"/contact#contact_form\"\n          id=\"contact_form\"\n          accept-charset=\"UTF-8\"\n          class=\"contact-form\">\n\n          <input\n            type=\"hidden\"\n            name=\"form_type\"\n            value=\"customer\" />\n          <input\n            type=\"hidden\"\n            name=\"utf8\"\n            value=\"\u2713\" />\n          <input\n            id=\"contact_tags\"\n            name=\"contact[tags]\"\n            type=\"hidden\"\n            value=\"easypop\" />\n          <input\n            class=\"tw-mb-2\"\n            id=\"contact_email\"\n            name=\"contact[email]\"\n            type=\"email\" />\n          <input\n            class=\"ezy-btn tw-w-full\"\n            type=\"submit\"\n            value=\"##BUTTON_TEXT##\"\n            style=\"\n              background-color:##BUTTON_COLOR##;\n              border-radius:##BORDER_RADIUS##;\" />\n\n          <!-- ##IF SUCCESS## -->\n            <div class=\"tw-bg-black tw-bg-opacity-10 tw-mt-2 tw-p-2\"\n              style=\"border-radius:##BORDER_RADIUS##;\">\n              ##SUCCESS_MESSAGE##\n            </div>\n          <!-- ##ELSE## -->\n            <div class=\"tw-bg-black tw-bg-opacity-10 tw-mt-2 tw-p-2\"\n              style=\"border-radius:##BORDER_RADIUS##;\">\n              ##ERROR_MESSAGE##\n            </div>\n          <!-- ##ENDIF## -->\n\n        </form>\n      </div>\n    </div>\n  </div>\n</section>\n<!-- END CONTENT -->\n\n\n    </section>\n    <a href=\"https://brickspacelab.com/\" target=\"_blank\" class=\"ezy-tooltip tw-absolute tw-bottom-2 tw-right-2\n      ##IF PAID_PLAN##tw-hidden##ENDIF##\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-info\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>\n      <span>Powered by Easypop</span>\n    </a>\n  </section>";
+                    body.appendChild(modal);
+                  } else if (content.contentType === "cart-progress-bar") {
+                    // for local testing
+                    var _cartData2 = {
+                      total_price: 49900
+                    };
+                    var cartProgress;
+
+                    if (_cartData2.total_price === 0) {
+                      cartProgress = 0;
+                    } else {
+                      cartProgress = _cartData2.total_price / 100 / content.cartGoalValue * 100;
+                    }
+
+                    var remainder = _cartData2.total_price / 100 - content.cartGoalValue;
+                    modal.innerHTML = "\n            <section class=\"ezy-style-drawer__close\">\n    <a href=\"#\" title=\"Close drawer\" onclick=\"ezy.drawers.closeAll();\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-x ezy-btn--round--inverted\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line></svg>\n    </a>\n  </section>\n  <section class=\"ezy-style-drawer__window\"\n    style=\"\n      background-color:##BACKGROUND_COLOR##;\">\n    <section class=\"ezy-style-drawer__content\">\n      <!-- CONTENT -->\n<section>\n  <div class=\"tw-flex tw-flex-row tw-flex-wrap tw-justify-center\">\n    <div class=\"tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center\">\n      <div class=\"tw-w-full\">\n\n        <section class=\"tw-border-b tw-border-gray-200 tw-p-4\">\n          <p class=\"tw-mb-1\">You're $xx.xx away from ##GOAL_TEXT##.</p>\n          <p class=\"tw-mb-1\">##SUCESS_TEXT##.</p>\n          <div class=\"ezy-progressbar\"\n            style=\"\n              background-color:##BUTTON_COLOR##;\n              border-radius:##BORDER_RADIUS##;\">\n            <div class=\"ezy-progressbar__inner\" style=\"width:66%;\">\n            </div>\n          </div>\n        </section>\n\n        <section class=\"tw-p-4 tw-md:p-8\">\n          <h3 class=\"ezy-type__headline--bold-1 tw-mb-2\">##HEADLINE##</h3>\n          <p class=\"tw-mb-4\">\n            ##BODY##\n          </p>\n\n          <a class=\"ezy-btn tw-w-full\" href=\"##BUTTON_URL##\"\n            style=\"\n              background-color:##BUTTON_COLOR##;\n              border-radius:##BORDER_RADIUS##;\">\n            ##BUTTON_TEXT##\n          </a>\n        </section>\n\n      </div>\n    </div>\n  </div>\n</section>\n<!-- END CONTENT -->\n\n\n    </section>\n    <a href=\"https://brickspacelab.com/\" target=\"_blank\" class=\"ezy-tooltip tw-absolute tw-bottom-2 tw-right-2\n      ##IF PAID_PLAN##tw-hidden##ENDIF##\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-info\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>\n      <span>Powered by Easypop</span>\n    </a>\n  </section>\n            \n          \n          ";
+                    body.appendChild(modal);
+                  } else if (content.contentType === "product-feed") {
+                    var products = content.selectedProducts[0].selection;
+                    modal.innerHTML = "\n            \n            <section class=\"ezy-style-fullscreen__close\">\n    <a href=\"#\" title=\"Close fullscreen popup\" class=\"closeBtn\"\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-x ezy-btn--round\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line></svg>\n    </a>\n  </section>\n  <section class=\"ezy-style-fullscreen__window\">\n    <section class=\"ezy-style-fullscreen__content\">\n      <!-- CONTENT -->\n<div class=\"tw-flex tw-flex-row tw-flex-wrap\">\n  <div class=\"tw-w-full sm:tw-w-full tw-flex tw-justify-center tw-items-center\">\n    <div class=\"tw-overflow-hidden\">\n      <div class=\"tw-p-4 tw-max-w-prose\">\n        <h3 class=\"ezy-type__headline--bold-1\">".concat(content.headline, "</h3>\n        <p>\n        ").concat(content.body, "\n        </p>\n      </div>\n      <div class=\"ezy-type-productfeed__arrows\">\n        <div class=\"ezy-type-productfeed__back\">\n          <button class=\"js:ezy-scrollArrowButtons\" data-scroll-direction=\"0\" data-scroll-container=\"ezy-type-productfeed\">\n            <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-arrow-left ezy-btn--round\"><line x1=\"19\" y1=\"12\" x2=\"5\" y2=\"12\"></line><polyline points=\"12 19 5 12 12 5\"></polyline></svg>\n          </button>\n        </div>\n        <div class=\"ezy-type-productfeed__next\">\n          <button class=\"js:ezy-scrollArrowButtons\" data-scroll-direction=\"1\" data-scroll-container=\"ezy-type-productfeed\">\n            <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-arrow-right ezy-btn--round\"><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"></line><polyline points=\"12 5 19 12 12 19\"></polyline></svg>\n          </button>\n        </div>\n      </div>\n      <div class=\"ezy-type-productfeed\">\n      ").concat(products.map(function (product) {
+                      return "\n        <div class=\"ezy-type-productfeed__item\">\n        <img class=\"image--square\" src=".concat(product.images[0].originalSrc, "/>\n        <div class=\"tw-px-2 tw-py-4\">\n          <p>").concat(product.title, "</p>\n          <p class=\"tw-pb-2\">$<span class=\"tw-pb-2 js:ezy-productPrice\">").concat(product.variants[0].price, "</span></p>\n          <select id=\"id\" name=\"id\" class=\"ezy-select tw-mb-2 js:ezy-changeVariantSelects\">\n            ").concat(product.variants.map(function (variant) {
+                        return "<option value=\"".concat(variant.id.split("gid://shopify/ProductVariant/").pop().split("/")[0], "\" data-variant-availability=\"").concat(variant.availableForSale, "\" data-variant-price=\"").concat(variant.price, "\">").concat(variant.title, "</option>");
+                      }), "\n          </select>\n          <button class=\"ezy-btn js:ezy-addVariantButtons tw-w-full\" style=\"background-color:").concat(style.primaryButtonColor, "\" data-variant-id=\"").concat(product.variants[0].price, "\">\n            <span class=\"ezy-btn__text\">\n              Add to cart\n            </span>\n            <span class=\"ezy-btn__spinner\">\n              <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-loader\"><line x1=\"12\" y1=\"2\" x2=\"12\" y2=\"6\"></line><line x1=\"12\" y1=\"18\" x2=\"12\" y2=\"22\"></line><line x1=\"4.93\" y1=\"4.93\" x2=\"7.76\" y2=\"7.76\"></line><line x1=\"16.24\" y1=\"16.24\" x2=\"19.07\" y2=\"19.07\"></line><line x1=\"2\" y1=\"12\" x2=\"6\" y2=\"12\"></line><line x1=\"18\" y1=\"12\" x2=\"22\" y2=\"12\"></line><line x1=\"4.93\" y1=\"19.07\" x2=\"7.76\" y2=\"16.24\"></line><line x1=\"16.24\" y1=\"7.76\" x2=\"19.07\" y2=\"4.93\"></line></svg>\n            </button>\n          </a>\n        </div>\n      </div>");
+                    }), "\n\n      </div>\n    </div>\n  </div>\n</div>\n\n    </section>\n  </section>\n  <a href=\"https://brickspacelab.com/\" target=\"_blank\" class=\"ezy-tooltip tw-absolute tw-bottom-2 tw-left-2\n    ##IF PAID_PLAN##tw-hidden##ENDIF##\">\n    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-info\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>\n    <span>Powered by Easypop</span>\n  </a>\n</section>");
+                    body.appendChild(modal);
+                    var ezy = ezy || {};
+                    ezy.productfeed = {
+                      // simple fetch call
+                      fetch: function (_fetch3) {
+                        function fetch(_x13, _x14, _x15, _x16, _x17, _x18) {
+                          return _fetch3.apply(this, arguments);
+                        }
+
+                        fetch.toString = function () {
+                          return _fetch3.toString();
+                        };
+
+                        return fetch;
+                      }(function (requestType, url, data, contentType, successCallback, errorCallback) {
+                        fetch(url, {
+                          method: requestType,
+                          headers: {
+                            "Content-Type": contentType,
+                            Accept: contentType,
+                            "X-Requested-With": "xmlhttprequest"
+                          },
+                          body: JSON.stringify(data)
+                        }).then(function (response) {
+                          return response.json();
+                        }).then(function (data) {
+                          successCallback(data);
+                        }).catch(function (error) {
+                          errorCallback(error);
+                        });
+                      }),
+                      // initilize product feed
+                      init: function init() {
+                        // add variant to cart
+                        function addVariant(variantID, quantity, callback) {
+                          var data = {
+                            items: [{
+                              id: variantID,
+                              quantity: quantity
+                            }]
+                          };
+                          ezy.productfeed.fetch("POST", "/cart/add.js", data, "application/json; charset=utf-8", // success
+                          function (data) {
+                            console.log(data);
+
+                            if (typeof callback === "function" && callback()) {
+                              window.setTimeout(function () {
+                                callback();
+                              }, 500);
+                            }
+                          }, // error
+                          function (error) {
+                            if (typeof callback === "function" && callback()) {
+                              window.setTimeout(function () {
+                                callback();
+                              }, 500);
+                            }
+                          });
+                        } // scroll container horizontally
+
+
+                        function scrollHorizontally(element, direction) {
+                          if (direction == 0) {
+                            element.scroll({
+                              left: element.scrollLeft - 350,
+                              behavior: "smooth"
+                            });
+                          } else {
+                            element.scroll({
+                              left: element.scrollLeft + 350,
+                              behavior: "smooth"
+                            });
+                          }
+                        } // toggle loading state of button
+
+
+                        function toggleButton(button) {
+                          if (button.classList.contains("ezy-btn--loading")) {
+                            button.classList.remove("ezy-btn--loading");
+                            button.disabled = false;
+                          } else {
+                            button.classList.add("ezy-btn--loading");
+                            button.disabled = true;
+                          }
+                        } // add disabled state to button
+
+
+                        function disableButton(button) {
+                          button.classList.add("ezy-btn--disabled");
+                          button.disabled = true;
+                        } // add enabled state to button
+
+
+                        function enableButton(button) {
+                          button.classList.remove("ezy-btn--disabled");
+                          button.disabled = false;
+                        } // listen for click on scroll arrows
+
+
+                        var scrollArrowButtons = document.getElementsByClassName("js:ezy-scrollArrowButtons");
+                        Array.from(scrollArrowButtons).forEach(function (scrollArrowButton) {
+                          scrollArrowButton.addEventListener("click", function (e) {
+                            var scrollContainerClass = this.getAttribute("data-scroll-container");
+                            var scrollDirection = this.getAttribute("data-scroll-direction");
+                            var scrollContainers = document.getElementsByClassName(scrollContainerClass);
+                            Array.from(scrollContainers).forEach(function (scrollContainer) {
+                              scrollHorizontally(scrollContainer, scrollDirection);
+                            });
+                          });
+                        }); // listen for click on atc
+
+                        var addVariantButtons = document.getElementsByClassName("js:ezy-addVariantButtons");
+                        Array.from(addVariantButtons).forEach(function (addVariantButton) {
+                          addVariantButton.addEventListener("click", function (e) {
+                            var variantId = this.getAttribute("data-variant-id");
+                            showNotification("Product was added to the cart!");
+                            toggleButton(addVariantButton);
+                            addVariant(variantId, 1, function () {
+                              toggleButton(addVariantButton);
+                            });
+
+                            if (content.closingBehav === "close") {
+                              modal.classList.add("ezy-style-modal--animate");
+                              setTimeout(function () {
+                                modal.classList.add("tw-hidden");
+                              }, 1000);
+                            }
+                          });
+                        }); // listen for change to for variant select
+
+                        var changeVariantSelects = document.getElementsByClassName("js:ezy-changeVariantSelects");
+                        Array.from(changeVariantSelects).forEach(function (changeVariantSelect) {
+                          changeVariantSelect.addEventListener("change", function () {
+                            var variantAvailability = this.options[this.selectedIndex].getAttribute("data-variant-availability");
+                            var variantPrice = this.options[this.selectedIndex].getAttribute("data-variant-price");
+                            var variantId = this.options[this.selectedIndex].value;
+                            var productItem = this.closest(".ezy-type-productfeed__item");
+                            var button = productItem.getElementsByClassName("js:ezy-addVariantButtons")[0]; // update variant id in button
+
+                            button.setAttribute("data-variant-id", variantId); // update price in item
+
+                            productItem.getElementsByClassName("js:ezy-productPrice")[0].innerHTML = variantPrice; // check availability and update state
+
+                            if (variantAvailability == "true") {
+                              enableButton(button);
+                            } else {
+                              disableButton(button);
+                            }
+                          }); // Create a new 'change' event
+
+                          var event = new Event("change");
+                          changeVariantSelect.dispatchEvent(event);
+                        });
+
+                        var showNotification = function showNotification(message) {
+                          var notification = document.querySelector(".ezy-notification"); // for (var i = 0; i < notifications.length; i++) {
+                          //   let notification = notifications[i];
+                          //   let messageElement = notification.querySelector("span");
+                          //   if (message) {
+                          //     messageElement.innerHTML = message;
+                          //   }
+                          //   notification.classList.add("ezy-notification--animate");
+                          //   setTimeout(function () {
+                          //     notification.classList.remove(
+                          //       "ezy-notification--animate"
+                          //     );
+                          //   }, 3000);
+                          // }
+
+                          notification.innerHTML = message;
+                          notification.classList.add("ezy-notification--animate");
+                          setTimeout(function () {
+                            notification.classList.remove("ezy-notification--animate");
+                          }, 3000);
+                        };
+                      }
+                    };
+                    ezy.productfeed.init();
+                  } else if (content.contentType === "custom-html") {
+                    body.appendChild(modal);
+                  }
+                }
+
+                initiateSettings();
+              } else if (style.campaignType === "message-box") {
+                // classes for the outermost shell
+                modal.classList.add("ezy", "ezy-style-box", "ezy-style-box--".concat(style.placement)); // SET CONTENT TYPES
+
+                function _setContentTypes4() {
+                  // tw-hidden inside section
+                  if (content.contentType === "text-image") {
+                    modal.innerHTML = "\n            <section class=\"ezy-style-box__window\">\n\n    <div class=\"ezy-style-box__close tw-flex tw-flex-wrap tw-justify-center\">\n      <div class=\"tw-flex-grow tw-flex tw-w-1/2\">\n        <a href=\"https://brickspacelab.com/\" target=\"_blank\" class=\"ezy-tooltip ezy-tooltip--fill tw-self-center\n          ##IF PAID_PLAN##tw-hidden##ENDIF##\">\n          <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-info\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>\n          <span>Powered by Easypop</span>\n        </a>\n      </div>\n      <div class=\"tw-flex-grow tw-w-1/2 tw-text-right\">\n        <a href=\"#\" title=\"Close popup\" class=\"closeBtn\";\">\n          <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-x ezy-btn--round--fill\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line></svg>\n        </a>\n      </div>\n    </div>\n\n    <section class=\"ezy-style-box__content\" style=\"\n      background-color:##BACKGROUND_COLOR##;\n      border-radius:##BORDER_RADIUS##;\">\n      <!-- CONTENT -->\n<section>\n  <div class=\"tw-flex tw-flex-row tw-flex-wrap tw-justify-center\">\n    <!-- ##IF IMAGE## -->\n    <div class=\"tw-w-full sm:tw-w-1/2\">\n      <div>\n        <img class=\"ezy-style-modal__content__image\" src=\"##IMAGE_SRC##\"/>\n      </div>\n    </div>\n    <!-- ##ENDIF## -->\n    <div class=\"tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center tw-p-4 tw-md:p-8\">\n      <div>\n        <h3 class=\"ezy-type__headline--bold-1 tw-mb-2\">##HEADLINE##</h3>\n        <p class=\"tw-mb-4\">\n          ##BODY##\n        </p>\n        <a class=\"ezy-btn tw-w-full\" href=\"##BUTTON_URL##\"\n          style=\"\n            background-color:##BUTTON_COLOR##;\n            border-radius:##BORDER_RADIUS##;\">##BUTTON_TEXT##</a>\n      </div>\n    </div>\n  </div>\n</section>\n<!-- END CONTENT -->\n\n\n    </section>\n\n\n            ";
+                    body.appendChild(modal);
+                  } else if (content.contentType === "newsletter") {
+                    var success;
+                    var url = window.location.href;
+
+                    if (url.includes("?customer_posted=true")) {
+                      success = "yes";
+                    } else if (url.includes("t?contact%5Btags%5D=prospect%2Cnewsletter&form_type=customer")) {
+                      success = "no";
+                    }
+
+                    modal.innerHTML = "\n            <section class=\"ezy-style-box__window\">\n\n            <div class=\"ezy-style-box__close tw-flex tw-flex-wrap tw-justify-center\">\n              <div class=\"tw-flex-grow tw-flex tw-w-1/2\">\n                <a href=\"https://brickspacelab.com/\" target=\"_blank\" class=\"ezy-tooltip ezy-tooltip--fill tw-self-center\n                  ##IF PAID_PLAN##tw-hidden##ENDIF##\">\n                  <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-info\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>\n                  <span>Powered by Easypop</span>\n                </a>\n              </div>\n              <div class=\"tw-flex-grow tw-w-1/2 tw-text-right\">\n                <a href=\"#\" title=\"Close popup\" onclick=\"ezy.boxes.closeAll();\">\n                  <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-x ezy-btn--round--fill\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line></svg>\n                </a>\n              </div>\n            </div>\n        \n            <section class=\"ezy-style-box__content\" style=\"\n              background-color:##BACKGROUND_COLOR##;\n              border-radius:##BORDER_RADIUS##;\">\n              <!-- CONTENT -->\n        <section>\n          <div class=\"tw-flex tw-flex-row tw-flex-wrap tw-justify-center\">\n        \n            <!-- ##IF IMAGE## -->\n            <div class=\"tw-w-full sm:tw-w-1/2\">\n              <div>\n                <img class=\"ezy-style-modal__content__image\" src=\"##IMAGE_SRC##\" />\n              </div>\n            </div>\n            <!-- ##ENDIF## -->\n        \n            <div class=\"tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center tw-p-4 tw-md:p-8\">\n              <div>\n                <h3 class=\"ezy-type__headline--bold-1 tw-mb-2\">\n                  ##HEADLINE##\n                </h3>\n                <p class=\"tw-mb-4\">##BODY##</p>\n                <form\n                  method=\"post\"\n                  action=\"/contact#contact_form\"\n                  id=\"contact_form\"\n                  accept-charset=\"UTF-8\"\n                  class=\"contact-form\">\n        \n                  <input\n                    type=\"hidden\"\n                    name=\"form_type\"\n                    value=\"customer\" />\n                  <input\n                    type=\"hidden\"\n                    name=\"utf8\"\n                    value=\"\u2713\" />\n                  <input\n                    id=\"contact_tags\"\n                    name=\"contact[tags]\"\n                    type=\"hidden\"\n                    value=\"easypop\" />\n                  <input\n                    class=\"tw-mb-2\"\n                    id=\"contact_email\"\n                    name=\"contact[email]\"\n                    type=\"email\" />\n                  <input\n                    class=\"ezy-btn tw-w-full\"\n                    type=\"submit\"\n                    value=\"##BUTTON_TEXT##\"\n                    style=\"\n                      background-color:##BUTTON_COLOR##;\n                      border-radius:##BORDER_RADIUS##;\" />\n        \n                  <!-- ##IF SUCCESS## -->\n                    <div class=\"tw-bg-black tw-bg-opacity-10 tw-mt-2 tw-p-2\"\n                      style=\"border-radius:##BORDER_RADIUS##;\">\n                      ##SUCCESS_MESSAGE##\n                    </div>\n                  <!-- ##ELSE## -->\n                    <div class=\"tw-bg-black tw-bg-opacity-10 tw-mt-2 tw-p-2\"\n                      style=\"border-radius:##BORDER_RADIUS##;\">\n                      ##ERROR_MESSAGE##\n                    </div>\n                  <!-- ##ENDIF## -->\n        \n                </form>\n              </div>\n            </div>\n          </div>\n        </section>\n        <!-- END CONTENT -->\n        \n        \n            </section>\n        ";
+                    body.appendChild(modal);
+                  } else if (content.contentType === "cart-progress-bar") {
+                    // for local testing
+                    var _cartData3 = {
+                      total_price: 49900
+                    };
+                    var cartProgress;
+
+                    if (_cartData3.total_price === 0) {
+                      cartProgress = 0;
+                    } else {
+                      cartProgress = _cartData3.total_price / 100 / content.cartGoalValue * 100;
+                    }
+
+                    var remainder = _cartData3.total_price / 100 - content.cartGoalValue;
+                    modal.innerHTML = "\n            <section class=\"ezy-style-box__window\">\n\n    <div class=\"ezy-style-box__close tw-flex tw-flex-wrap tw-justify-center\">\n      <div class=\"tw-flex-grow tw-flex tw-w-1/2\">\n        <a href=\"https://brickspacelab.com/\" target=\"_blank\" class=\"ezy-tooltip ezy-tooltip--fill tw-self-center\n          ##IF PAID_PLAN##tw-hidden##ENDIF##\">\n          <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-info\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>\n          <span>Powered by Easypop</span>\n        </a>\n      </div>\n      <div class=\"tw-flex-grow tw-w-1/2 tw-text-right\">\n        <a href=\"#\" title=\"Close popup\" onclick=\"ezy.boxes.closeAll();\">\n          <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-x ezy-btn--round--fill\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line></svg>\n        </a>\n      </div>\n    </div>\n\n    <section class=\"ezy-style-box__content\" style=\"\n      background-color:##BACKGROUND_COLOR##;\n      border-radius:##BORDER_RADIUS##;\">\n      <!-- CONTENT -->\n<section>\n  <div class=\"tw-flex tw-flex-row tw-flex-wrap tw-justify-center\">\n    <div class=\"tw-w-full sm:tw-w-1/2 tw-max-w-prose tw-flex tw-flex-grow tw-justify-center tw-items-center\">\n      <div class=\"tw-w-full\">\n\n        <section class=\"tw-border-b tw-border-gray-200 tw-p-4\">\n          <p class=\"tw-mb-1\">You're $xx.xx away from ##GOAL_TEXT##.</p>\n          <p class=\"tw-mb-1\">##SUCESS_TEXT##.</p>\n          <div class=\"ezy-progressbar\"\n            style=\"\n              background-color:##BUTTON_COLOR##;\n              border-radius:##BORDER_RADIUS##;\">\n            <div class=\"ezy-progressbar__inner\" style=\"width:66%;\">\n            </div>\n          </div>\n        </section>\n\n        <section class=\"tw-p-4 tw-md:p-8\">\n          <h3 class=\"ezy-type__headline--bold-1 tw-mb-2\">##HEADLINE##</h3>\n          <p class=\"tw-mb-4\">\n            ##BODY##\n          </p>\n\n          <a class=\"ezy-btn tw-w-full\" href=\"##BUTTON_URL##\"\n            style=\"\n              background-color:##BUTTON_COLOR##;\n              border-radius:##BORDER_RADIUS##;\">\n            ##BUTTON_TEXT##\n          </a>\n        </section>\n\n      </div>\n    </div>\n  </div>\n</section>\n<!-- END CONTENT -->\n\n\n    </section>\n\n            \n          \n          ";
+                    body.appendChild(modal);
+                  } else if (content.contentType === "product-feed") {
+                    var products = content.selectedProducts[0].selection;
+                    modal.innerHTML = "\n            \n            <section class=\"ezy-style-box__window\">\n\n    <div class=\"ezy-style-box__close tw-flex tw-flex-wrap tw-justify-center\">\n      <div class=\"tw-flex-grow tw-flex tw-w-1/2\">\n        <a href=\"https://brickspacelab.com/\" target=\"_blank\" class=\"ezy-tooltip ezy-tooltip--fill tw-self-center\n          ##IF PAID_PLAN##tw-hidden##ENDIF##\">\n          <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-info\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>\n          <span>Powered by Easypop</span>\n        </a>\n      </div>\n      <div class=\"tw-flex-grow tw-w-1/2 tw-text-right\">\n        <a href=\"#\" title=\"Close popup\" onclick=\"ezy.boxes.closeAll();\">\n          <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-x ezy-btn--round--fill\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line></svg>\n        </a>\n      </div>\n    </div>\n\n    <section class=\"ezy-style-box__content\" style=\"\n      background-color:##BACKGROUND_COLOR##;\n      border-radius:##BORDER_RADIUS##;\">\n      <!-- CONTENT -->\n<div class=\"tw-flex tw-flex-row tw-flex-wrap\">\n  <div class=\"tw-w-full sm:tw-w-full tw-flex tw-justify-center tw-items-center\">\n    <div class=\"tw-overflow-hidden\">\n      <div class=\"tw-p-4 tw-max-w-prose\">\n        <h3 class=\"ezy-type__headline--bold-1\">##HEADLINE##</h3>\n        <p>\n          ##BODY##\n        </p>\n      </div>\n      <div class=\"ezy-type-productfeed__arrows\">\n        <div class=\"ezy-type-productfeed__back\">\n          <button class=\"js:ezy-scrollArrowButtons\" data-scroll-direction=\"0\" data-scroll-container=\"ezy-type-productfeed\">\n            <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-arrow-left ezy-btn--round\"><line x1=\"19\" y1=\"12\" x2=\"5\" y2=\"12\"></line><polyline points=\"12 19 5 12 12 5\"></polyline></svg>\n          </button>\n        </div>\n        <div class=\"ezy-type-productfeed__next\">\n          <button class=\"js:ezy-scrollArrowButtons\" data-scroll-direction=\"1\" data-scroll-container=\"ezy-type-productfeed\">\n            <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-arrow-right ezy-btn--round\"><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"></line><polyline points=\"12 5 19 12 12 19\"></polyline></svg>\n          </button>\n        </div>\n      </div>\n      <div class=\"ezy-type-productfeed\">\n\n        <!-- FOR PRODUCT IN PRODUCTS -->\n        <div class=\"ezy-type-productfeed__item\">\n          <img class=\"image--square\" src=\"https://images.unsplash.com/photo-1602607203559-d38903b80507?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3898&q=80\"/>\n          <div class=\"tw-px-2 tw-py-4\">\n            <p>##PRODUCT_TITLE##</p>\n            <p class=\"tw-pb-2\">$<span class=\"tw-pb-2 js:ezy-productPrice\">##PRICE##</span></p>\n            <select id=\"id\" name=\"id\" class=\"ezy-select tw-mb-2 js:ezy-changeVariantSelects\">\n              <!-- FOR VARIANT IN VARIANTS -->\n              <option value=\"##VARIANT_ID##\" data-variant-availability=\"##VARIANT_AVAILABLE##\" data-variant-price=\"##VARIANT_PRICE##\">##VARIANT_TITLE##</option>\n              <option value=\"##VARIANT_ID##\" data-variant-availability=\"##VARIANT_AVAILABLE##\" data-variant-price=\"##VARIANT_PRICE##\">##VARIANT_TITLE##</option>\n              <option value=\"36804582244502\" data-variant-availability=\"true\" data-variant-price=\"16.00\">Blue/black</option>\n              <!-- ENDFOR -->\n            </select>\n            <button class=\"ezy-btn js:ezy-addVariantButtons tw-w-full\" data-variant-id=\"##FIRST_AVAIALBLE_VARIANT_ID##\"\n              style=\"\n                background-color:##BUTTON_COLOR##;\n                border-radius:##BORDER_RADIUS##;\">\n              <span class=\"ezy-btn__text\">\n                Add to cart\n              </span>\n              <span class=\"ezy-btn__spinner\">\n                <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-loader\"><line x1=\"12\" y1=\"2\" x2=\"12\" y2=\"6\"></line><line x1=\"12\" y1=\"18\" x2=\"12\" y2=\"22\"></line><line x1=\"4.93\" y1=\"4.93\" x2=\"7.76\" y2=\"7.76\"></line><line x1=\"16.24\" y1=\"16.24\" x2=\"19.07\" y2=\"19.07\"></line><line x1=\"2\" y1=\"12\" x2=\"6\" y2=\"12\"></line><line x1=\"18\" y1=\"12\" x2=\"22\" y2=\"12\"></line><line x1=\"4.93\" y1=\"19.07\" x2=\"7.76\" y2=\"16.24\"></line><line x1=\"16.24\" y1=\"7.76\" x2=\"19.07\" y2=\"4.93\"></line></svg>\n              </button>\n            </a>\n          </div>\n        </div>\n        <!-- ENDFOR -->\n\n        <div class=\"ezy-type-productfeed__item\">\n          <img class=\"image--square\" src=\"https://images.unsplash.com/photo-1602607203559-d38903b80507?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3898&q=80\"/>\n          <div class=\"tw-px-2 tw-py-4\">\n            <p>Title</p>\n            <p class=\"tw-pb-2\">$<span class=\"tw-pb-2 js:ezy-productPrice\">4.00</span></p>\n            <select id=\"id\" name=\"id\" class=\"ezy-select tw-mb-2 js:ezy-changeVariantSelects\">\n              <!-- FOR VARIANT IN VARIANTS -->\n              <option value=\"36804582244502\" data-variant-availability=\"true\" data-variant-price=\"4.00\">Black</option>\n              <option value=\"36804582244502\" data-variant-availability=\"false\" data-variant-price=\"3.00\">Pink/Black</option>\n              <option value=\"36804582244502\" data-variant-availability=\"true\" data-variant-price=\"16.00\">Blue/Black</option>\n              <!-- ENDFOR -->\n            </select>\n            <button class=\"ezy-btn js:ezy-addVariantButtons tw-w-full\" data-variant-id=\"##FIRST_AVAIALBLE_VARIANT_ID##\">\n              <span class=\"ezy-btn__text\">\n                Add to cart\n              </span>\n              <span class=\"ezy-btn__spinner\">\n                <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-loader\"><line x1=\"12\" y1=\"2\" x2=\"12\" y2=\"6\"></line><line x1=\"12\" y1=\"18\" x2=\"12\" y2=\"22\"></line><line x1=\"4.93\" y1=\"4.93\" x2=\"7.76\" y2=\"7.76\"></line><line x1=\"16.24\" y1=\"16.24\" x2=\"19.07\" y2=\"19.07\"></line><line x1=\"2\" y1=\"12\" x2=\"6\" y2=\"12\"></line><line x1=\"18\" y1=\"12\" x2=\"22\" y2=\"12\"></line><line x1=\"4.93\" y1=\"19.07\" x2=\"7.76\" y2=\"16.24\"></line><line x1=\"16.24\" y1=\"7.76\" x2=\"19.07\" y2=\"4.93\"></line></svg>\n              </button>\n            </a>\n          </div>\n        </div>\n        <div class=\"ezy-type-productfeed__item\">\n          <img class=\"image--square\" src=\"https://images.unsplash.com/photo-1602607203559-d38903b80507?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3898&q=80\"/>\n          <div class=\"tw-px-2 tw-py-4\">\n            <p>Title</p>\n            <p class=\"tw-pb-2\">$<span class=\"tw-pb-2 js:ezy-productPrice\">4.00</span></p>\n            <select id=\"id\" name=\"id\" class=\"ezy-select tw-mb-2 js:ezy-changeVariantSelects\">\n              <!-- FOR VARIANT IN VARIANTS -->\n              <option value=\"36804582244502\" data-variant-availability=\"true\" data-variant-price=\"4.00\">Black</option>\n              <option value=\"36804582244502\" data-variant-availability=\"false\" data-variant-price=\"3.00\">Pink/Black</option>\n              <option value=\"36804582244502\" data-variant-availability=\"true\" data-variant-price=\"16.00\">Blue/Black</option>\n              <!-- ENDFOR -->\n            </select>\n            <button class=\"ezy-btn js:ezy-addVariantButtons tw-w-full\" data-variant-id=\"##FIRST_AVAIALBLE_VARIANT_ID##\">\n              <span class=\"ezy-btn__text\">\n                Add to cart\n              </span>\n              <span class=\"ezy-btn__spinner\">\n                <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-loader\"><line x1=\"12\" y1=\"2\" x2=\"12\" y2=\"6\"></line><line x1=\"12\" y1=\"18\" x2=\"12\" y2=\"22\"></line><line x1=\"4.93\" y1=\"4.93\" x2=\"7.76\" y2=\"7.76\"></line><line x1=\"16.24\" y1=\"16.24\" x2=\"19.07\" y2=\"19.07\"></line><line x1=\"2\" y1=\"12\" x2=\"6\" y2=\"12\"></line><line x1=\"18\" y1=\"12\" x2=\"22\" y2=\"12\"></line><line x1=\"4.93\" y1=\"19.07\" x2=\"7.76\" y2=\"16.24\"></line><line x1=\"16.24\" y1=\"7.76\" x2=\"19.07\" y2=\"4.93\"></line></svg>\n              </button>\n            </a>\n          </div>\n        </div>\n        <div class=\"ezy-type-productfeed__item\">\n          <img class=\"image--square\" src=\"https://images.unsplash.com/photo-1602607203559-d38903b80507?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3898&q=80\"/>\n          <div class=\"tw-px-2 tw-py-4\">\n            <p>Title</p>\n            <p class=\"tw-pb-2\">$<span class=\"tw-pb-2 js:ezy-productPrice\">4.00</span></p>\n            <select id=\"id\" name=\"id\" class=\"ezy-select tw-mb-2 js:ezy-changeVariantSelects\">\n              <!-- FOR VARIANT IN VARIANTS -->\n              <option value=\"36804582244502\" data-variant-availability=\"true\" data-variant-price=\"4.00\">Black</option>\n              <option value=\"36804582244502\" data-variant-availability=\"false\" data-variant-price=\"3.00\">Pink/Black</option>\n              <option value=\"36804582244502\" data-variant-availability=\"true\" data-variant-price=\"16.00\">Blue/Black</option>\n              <!-- ENDFOR -->\n            </select>\n            <button class=\"ezy-btn js:ezy-addVariantButtons tw-w-full\" data-variant-id=\"##FIRST_AVAIALBLE_VARIANT_ID##\">\n              <span class=\"ezy-btn__text\">\n                Add to cart\n              </span>\n              <span class=\"ezy-btn__spinner\">\n                <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-loader\"><line x1=\"12\" y1=\"2\" x2=\"12\" y2=\"6\"></line><line x1=\"12\" y1=\"18\" x2=\"12\" y2=\"22\"></line><line x1=\"4.93\" y1=\"4.93\" x2=\"7.76\" y2=\"7.76\"></line><line x1=\"16.24\" y1=\"16.24\" x2=\"19.07\" y2=\"19.07\"></line><line x1=\"2\" y1=\"12\" x2=\"6\" y2=\"12\"></line><line x1=\"18\" y1=\"12\" x2=\"22\" y2=\"12\"></line><line x1=\"4.93\" y1=\"19.07\" x2=\"7.76\" y2=\"16.24\"></line><line x1=\"16.24\" y1=\"7.76\" x2=\"19.07\" y2=\"4.93\"></line></svg>\n              </button>\n            </a>\n          </div>\n        </div>\n        <div class=\"ezy-type-productfeed__item\">\n          <img class=\"image--square\" src=\"https://images.unsplash.com/photo-1602607203559-d38903b80507?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3898&q=80\"/>\n          <div class=\"tw-px-2 tw-py-4\">\n            <p>Title</p>\n            <p class=\"tw-pb-2\">$<span class=\"tw-pb-2 js:ezy-productPrice\">4.00</span></p>\n            <select id=\"id\" name=\"id\" class=\"ezy-select tw-mb-2 js:ezy-changeVariantSelects\">\n              <!-- FOR VARIANT IN VARIANTS -->\n              <option value=\"36804582244502\" data-variant-availability=\"true\" data-variant-price=\"4.00\">Black</option>\n              <option value=\"36804582244502\" data-variant-availability=\"false\" data-variant-price=\"3.00\">Pink/Black</option>\n              <option value=\"36804582244502\" data-variant-availability=\"true\" data-variant-price=\"16.00\">Blue/Black</option>\n              <!-- ENDFOR -->\n            </select>\n            <button class=\"ezy-btn js:ezy-addVariantButtons tw-w-full\" data-variant-id=\"##FIRST_AVAIALBLE_VARIANT_ID##\"\n              style=\"\n                background-color:##BUTTON_COLOR##;\n                border-radius:##BORDER_RADIUS##;\">\n              <span class=\"ezy-btn__text\">\n                Add to cart\n              </span>\n              <span class=\"ezy-btn__spinner\">\n                <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-loader\"><line x1=\"12\" y1=\"2\" x2=\"12\" y2=\"6\"></line><line x1=\"12\" y1=\"18\" x2=\"12\" y2=\"22\"></line><line x1=\"4.93\" y1=\"4.93\" x2=\"7.76\" y2=\"7.76\"></line><line x1=\"16.24\" y1=\"16.24\" x2=\"19.07\" y2=\"19.07\"></line><line x1=\"2\" y1=\"12\" x2=\"6\" y2=\"12\"></line><line x1=\"18\" y1=\"12\" x2=\"22\" y2=\"12\"></line><line x1=\"4.93\" y1=\"19.07\" x2=\"7.76\" y2=\"16.24\"></line><line x1=\"16.24\" y1=\"7.76\" x2=\"19.07\" y2=\"4.93\"></line></svg>\n              </button>\n            </a>\n          </div>\n        </div>\n\n      </div>\n    </div>\n  </div>\n</div>\n</section>";
+                    body.appendChild(modal);
+                    var ezy = ezy || {};
+                    ezy.productfeed = {
+                      // simple fetch call
+                      fetch: function (_fetch4) {
+                        function fetch(_x19, _x20, _x21, _x22, _x23, _x24) {
+                          return _fetch4.apply(this, arguments);
+                        }
+
+                        fetch.toString = function () {
+                          return _fetch4.toString();
+                        };
+
+                        return fetch;
+                      }(function (requestType, url, data, contentType, successCallback, errorCallback) {
+                        fetch(url, {
+                          method: requestType,
+                          headers: {
+                            "Content-Type": contentType,
+                            Accept: contentType,
+                            "X-Requested-With": "xmlhttprequest"
+                          },
+                          body: JSON.stringify(data)
+                        }).then(function (response) {
+                          return response.json();
+                        }).then(function (data) {
+                          successCallback(data);
+                        }).catch(function (error) {
+                          errorCallback(error);
+                        });
+                      }),
+                      // initilize product feed
+                      init: function init() {
+                        // add variant to cart
+                        function addVariant(variantID, quantity, callback) {
+                          var data = {
+                            items: [{
+                              id: variantID,
+                              quantity: quantity
+                            }]
+                          };
+                          ezy.productfeed.fetch("POST", "/cart/add.js", data, "application/json; charset=utf-8", // success
+                          function (data) {
+                            console.log(data);
+
+                            if (typeof callback === "function" && callback()) {
+                              window.setTimeout(function () {
+                                callback();
+                              }, 500);
+                            }
+                          }, // error
+                          function (error) {
+                            if (typeof callback === "function" && callback()) {
+                              window.setTimeout(function () {
+                                callback();
+                              }, 500);
+                            }
+                          });
+                        } // scroll container horizontally
+
+
+                        function scrollHorizontally(element, direction) {
+                          if (direction == 0) {
+                            element.scroll({
+                              left: element.scrollLeft - 350,
+                              behavior: "smooth"
+                            });
+                          } else {
+                            element.scroll({
+                              left: element.scrollLeft + 350,
+                              behavior: "smooth"
+                            });
+                          }
+                        } // toggle loading state of button
+
+
+                        function toggleButton(button) {
+                          if (button.classList.contains("ezy-btn--loading")) {
+                            button.classList.remove("ezy-btn--loading");
+                            button.disabled = false;
+                          } else {
+                            button.classList.add("ezy-btn--loading");
+                            button.disabled = true;
+                          }
+                        } // add disabled state to button
+
+
+                        function disableButton(button) {
+                          button.classList.add("ezy-btn--disabled");
+                          button.disabled = true;
+                        } // add enabled state to button
+
+
+                        function enableButton(button) {
+                          button.classList.remove("ezy-btn--disabled");
+                          button.disabled = false;
+                        } // listen for click on scroll arrows
+
+
+                        var scrollArrowButtons = document.getElementsByClassName("js:ezy-scrollArrowButtons");
+                        Array.from(scrollArrowButtons).forEach(function (scrollArrowButton) {
+                          scrollArrowButton.addEventListener("click", function (e) {
+                            var scrollContainerClass = this.getAttribute("data-scroll-container");
+                            var scrollDirection = this.getAttribute("data-scroll-direction");
+                            var scrollContainers = document.getElementsByClassName(scrollContainerClass);
+                            Array.from(scrollContainers).forEach(function (scrollContainer) {
+                              scrollHorizontally(scrollContainer, scrollDirection);
+                            });
+                          });
+                        }); // listen for click on atc
+
+                        var addVariantButtons = document.getElementsByClassName("js:ezy-addVariantButtons");
+                        Array.from(addVariantButtons).forEach(function (addVariantButton) {
+                          addVariantButton.addEventListener("click", function (e) {
+                            var variantId = this.getAttribute("data-variant-id");
+                            showNotification("Product was added to the cart!");
+                            toggleButton(addVariantButton);
+                            addVariant(variantId, 1, function () {
+                              toggleButton(addVariantButton);
+                            });
+
+                            if (content.closingBehav === "close") {
+                              modal.classList.add("ezy-style-modal--animate");
+                              setTimeout(function () {
+                                modal.classList.add("tw-hidden");
+                              }, 1000);
+                            }
+                          });
+                        }); // listen for change to for variant select
+
+                        var changeVariantSelects = document.getElementsByClassName("js:ezy-changeVariantSelects");
+                        Array.from(changeVariantSelects).forEach(function (changeVariantSelect) {
+                          changeVariantSelect.addEventListener("change", function () {
+                            var variantAvailability = this.options[this.selectedIndex].getAttribute("data-variant-availability");
+                            var variantPrice = this.options[this.selectedIndex].getAttribute("data-variant-price");
+                            var variantId = this.options[this.selectedIndex].value;
+                            var productItem = this.closest(".ezy-type-productfeed__item");
+                            var button = productItem.getElementsByClassName("js:ezy-addVariantButtons")[0]; // update variant id in button
+
+                            button.setAttribute("data-variant-id", variantId); // update price in item
+
+                            productItem.getElementsByClassName("js:ezy-productPrice")[0].innerHTML = variantPrice; // check availability and update state
+
+                            if (variantAvailability == "true") {
+                              enableButton(button);
+                            } else {
+                              disableButton(button);
+                            }
+                          }); // Create a new 'change' event
+
+                          var event = new Event("change");
+                          changeVariantSelect.dispatchEvent(event);
+                        });
+
+                        var showNotification = function showNotification(message) {
+                          var notification = document.querySelector(".ezy-notification"); // for (var i = 0; i < notifications.length; i++) {
+                          //   let notification = notifications[i];
+                          //   let messageElement = notification.querySelector("span");
+                          //   if (message) {
+                          //     messageElement.innerHTML = message;
+                          //   }
+                          //   notification.classList.add("ezy-notification--animate");
+                          //   setTimeout(function () {
+                          //     notification.classList.remove(
+                          //       "ezy-notification--animate"
+                          //     );
+                          //   }, 3000);
+                          // }
+
+                          notification.innerHTML = message;
+                          notification.classList.add("ezy-notification--animate");
+                          setTimeout(function () {
+                            notification.classList.remove("ezy-notification--animate");
+                          }, 3000);
+                        };
+                      }
+                    };
+                    ezy.productfeed.init();
+                  } else if (content.contentType === "custom-html") {
+                    body.appendChild(modal);
+                  }
+                }
+
+                initiateSettings();
               }
             });
-            _context3.next = 14;
+            _context2.next = 10;
             break;
 
-          case 11:
-            _context3.prev = 11;
-            _context3.t0 = _context3["catch"](0);
-            console.log(_context3.t0);
+          case 7:
+            _context2.prev = 7;
+            _context2.t0 = _context2["catch"](0);
+            console.log(_context2.t0);
 
-          case 14:
+          case 10:
           case "end":
-            return _context3.stop();
+            return _context2.stop();
         }
       }
-    }, _callee3, null, [[0, 11]]);
+    }, _callee2, null, [[0, 7]]);
   }));
 
   return function campaignInfo() {
-    return _ref3.apply(this, arguments);
+    return _ref2.apply(this, arguments);
   };
 }();
 
@@ -1009,7 +1665,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64262" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55860" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
