@@ -116,7 +116,7 @@ const campaignInfo = async () => {
       let link1 = document.createElement("link");
       link1.rel = "stylesheet";
       link1.href =
-        "https://cdn.jsdelivr.net/gh/DrJulik/scripts@1.0.947423/styles.min.css";
+        "https://cdn.jsdelivr.net/gh/DrJulik/scripts@1.0.947429/styles.min.css";
       document.head.appendChild(link1);
 
       // INITIATE SETTINGS FUNCTIONS
